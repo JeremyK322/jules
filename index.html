@@ -202,6 +202,64 @@
         }
         #gear:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
         #gear input { display: none; }
+        #help-btn {
+            position: absolute; top: 20px; right: 125px; z-index: 30;
+            font-size: 0.9rem; font-weight: bold; color: #fff;
+            background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
+            padding: 8px 14px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #6688aa; transition: background 0.2s, transform 0.2s;
+            user-select: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+        }
+        #help-btn:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
+
+        /* Help Modal */
+        #help-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(6px);
+            z-index: 100; display: none; align-items: center; justify-content: center;
+        }
+        #help-modal-overlay.visible { display: flex; }
+        #help-modal {
+            background: rgba(12, 15, 30, 0.96); border: 1px solid #6688aa;
+            border-radius: 12px; width: 90%; max-width: 650px; height: 80vh; max-height: 550px;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+        }
+        .help-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 20px; border-bottom: 1px solid #445566; background: rgba(255,255,255,0.03);
+            flex-shrink: 0;
+        }
+        .help-header .title { font-size: 1.1rem; font-weight: bold; color: #b8c8ee; letter-spacing: 0.5px; }
+        .help-header .close-btn { background: none; border: none; color: #889; font-size: 1.4rem; cursor: pointer; transition: color 0.2s; }
+        .help-header .close-btn:hover { color: #fff; }
+        .help-tabs {
+            display: flex; border-bottom: 1px solid #445566; background: rgba(0,0,0,0.3);
+            overflow-x: auto; flex-shrink: 0;
+        }
+        .help-tab-btn {
+            padding: 10px 16px; background: none; border: none; color: #88a; font-size: 0.85rem;
+            font-weight: bold; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .help-tab-btn:hover { color: #ccd; }
+        .help-tab-btn.active { color: #55aaff; border-bottom-color: #55aaff; background: rgba(85,170,255,0.1); }
+        .help-content {
+            padding: 18px 22px; overflow-y: auto; font-size: 0.88rem; line-height: 1.6; color: #ddd; flex: 1;
+        }
+        .help-content::-webkit-scrollbar { width: 4px; }
+        .help-content::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .help-tab-pane { display: none; }
+        .help-tab-pane.active { display: block; }
+        .help-tab-pane h3 { color: #88ccff; margin-top: 0; font-size: 1.05rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 10px; }
+        .help-tab-pane h4 { color: #aaccff; margin: 14px 0 4px 0; font-size: 0.92rem; }
+        .help-tab-pane p { margin: 6px 0; }
+        .help-tab-pane ul { padding-left: 20px; margin: 6px 0; }
+        .help-tab-pane li { margin-bottom: 6px; }
+        .article-box {
+            background: rgba(255,255,255,0.05); border-left: 3px solid #55aaff; padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+        }
+        .article-box strong { color: #77ccff; }
         #layers-toggle {
             position: absolute; top: 20px; left: 20px; z-index: 15;
             font-size: 1rem; font-weight: bold;
@@ -362,6 +420,7 @@
             #layers-panel { top: 10px; left: 10px; padding: 10px 12px; min-width: 180px; max-width: 280px; font-size: 0.8rem; }
             #layers-panel .title { font-size: 0.9rem; }
             #gear { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 10px; }
+            #help-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 105px; }
             #settings-panel { right: 10px; top: 50px; min-width: 160px; padding: 12px 14px; }
             #info-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 110px; }
             #info-display .label { min-width: 32px; }
@@ -412,6 +471,92 @@
             <div><span class="label">Lon</span><span class="value" id="lon-display">0.00 deg</span></div>
             <div><span class="label">Sens</span><span class="value" id="sens-display">1.00</span></div>
             <div><span class="label">Rot</span><span class="value" id="rot-state">OFF</span></div>
+        </div>
+    </div>
+
+    <!-- Help Button & Modal -->
+    <div id="help-btn" title="Help / Documentation">?</div>
+    <div id="help-modal-overlay">
+        <div id="help-modal">
+            <div class="help-header">
+                <span class="title">Lunar Constraint Map Guide</span>
+                <button class="close-btn" id="help-close-btn" title="Close help">X</button>
+            </div>
+            <div class="help-tabs">
+                <button class="help-tab-btn active" data-tab="about">About LCM & OST</button>
+                <button class="help-tab-btn" data-tab="settings">Settings</button>
+                <button class="help-tab-btn" data-tab="layers">Layers</button>
+                <button class="help-tab-btn" data-tab="info">Info Displays</button>
+            </div>
+            <div class="help-content">
+                <!-- Tab 1: About LCM & OST Articles -->
+                <div class="help-tab-pane active" id="tab-about">
+                    <h3>What is the Lunar Constraint Map (LCM)?</h3>
+                    <p>The <strong>Lunar Constraint Map</strong> is an interactive 3D geospatial tool designed to visualize spatial constraints, physical landforms, exploration heritage sites, resource zones, and regulatory status across the Moon's surface.</p>
+
+                    <h4>Outer Space Treaty (OST) Legal Framework</h4>
+                    <p>LCM incorporates key governance principles established under international space law:</p>
+
+                    <div class="article-box">
+                        <strong>Article 6 (Art. 6) – State Responsibility:</strong>
+                        <p>States Parties bear international responsibility for national activities in outer space, whether carried out by governmental agencies or non-governmental entities (private sector). Private missions require authorization and continuing supervision by the appropriate State.</p>
+                    </div>
+
+                    <div class="article-box">
+                        <strong>Article 9 (Art. 9) – Due Regard & Harmful Interference:</strong>
+                        <p>Activities in outer space must be conducted with due regard to the corresponding interests of all other States. If a state or entity has reason to believe an activity would cause potentially harmful interference with lunar activities of others, international consultation is required prior to proceeding.</p>
+                    </div>
+
+                    <div class="article-box">
+                        <strong>Article 11 (Art. 11) – Information Sharing:</strong>
+                        <p>States agree to inform the UN Secretary-General, the public, and the international scientific community to the greatest extent feasible of the nature, conduct, locations, and results of lunar activities.</p>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Settings -->
+                <div class="help-tab-pane" id="tab-settings">
+                    <h3>Settings Control Panel</h3>
+                    <p>Click the <strong>Settings</strong> button at the top-right corner to open configuration controls:</p>
+                    <ul>
+                        <li><strong>Load GLB:</strong> Load a custom 3D mesh model (`.glb` or `.gltf` file) for the lunar sphere. You can also drag and drop model files anywhere onto the canvas.</li>
+                        <li><strong>Reset View:</strong> Resets camera position and target orientation to default coordinates.</li>
+                        <li><strong>Lock N/S Pole:</strong> Restricts camera orbit control to the equatorial plane (locking vertical North/South polar tilt).</li>
+                        <li><strong>Auto-rotate:</strong> Toggles continuous slow rotation of the lunar globe.</li>
+                        <li><strong>Glow Opacity:</strong> Adjusts the transparency slider (0.00 to 1.00) for active 3D surface feature discs and highlight overlays.</li>
+                    </ul>
+                </div>
+
+                <!-- Tab 3: Layers -->
+                <div class="help-tab-pane" id="tab-layers">
+                    <h3>Moon Layers Panel</h3>
+                    <p>The <strong>Moon Layers</strong> panel at the top-left controls active features and spatial overlays:</p>
+                    <ul>
+                        <li><strong>Global Checkbox (top):</strong> Master toggle to enable or disable all categories and layers simultaneously.</li>
+                        <li><strong>Category Accordion:</strong> Click any category header (e.g., <em>Physical Features</em>, <em>Extractable</em>, <em>Spatial</em>) to expand or collapse its layer list.</li>
+                        <li><strong>Discs Checkbox:</strong> Toggle visibility of 3D surface discs for all features within that category without unchecking individual layers.</li>
+                        <li><strong>Layer Items & Feature Sub-lists:</strong> Click the arrow beside a layer item to expand individual point/orbit features. You can toggle specific landing sites, craters, or satellites individually.</li>
+                    </ul>
+                </div>
+
+                <!-- Tab 4: Info Displays -->
+                <div class="help-tab-pane" id="tab-info">
+                    <h3>On-Screen Information Panels</h3>
+                    <h4>Bottom-Right Panel (INFO)</h4>
+                    <ul>
+                        <li><strong>Dist:</strong> Camera distance multiplier relative to the center of the Moon.</li>
+                        <li><strong>Lat / Lon:</strong> Latitude (deg N/S) and Longitude (deg E/W) of current camera viewpoint.</li>
+                        <li><strong>Sens:</strong> Dynamic orbital rotation sensitivity based on zoom level.</li>
+                        <li><strong>Rot:</strong> Auto-rotation state (`ON` / `OFF`).</li>
+                        <li><strong>Collapse Button `[-] / [+]`:</strong> Minimizes the info panel to a compact header bar.</li>
+                    </ul>
+
+                    <h4>Bottom-Left Panel (Centre Overlap Status)</h4>
+                    <ul>
+                        <li><strong>Loc:</strong> Coordinates on the lunar surface directly at the center of your screen view.</li>
+                        <li><strong>Status:</strong> Shows active zone constraints, applicable OST Articles (Art. 6 / Art. 9), tier levels, and feature names located at the center crosshairs, or displays <em>"Open"</em> if no active constraints overlap.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1344,6 +1489,41 @@
                 settingsPanel.classList.remove('visible');
                 panelVisible = false;
             }
+        });
+
+        // Help Modal Logic
+        const helpBtn = document.getElementById('help-btn');
+        const helpModalOverlay = document.getElementById('help-modal-overlay');
+        const helpCloseBtn = document.getElementById('help-close-btn');
+        const helpTabBtns = document.querySelectorAll('.help-tab-btn');
+        const helpTabPanes = document.querySelectorAll('.help-tab-pane');
+
+        function openHelpModal() {
+            helpModalOverlay.classList.add('visible');
+        }
+        function closeHelpModal() {
+            helpModalOverlay.classList.remove('visible');
+        }
+
+        helpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openHelpModal();
+        });
+        helpCloseBtn.addEventListener('click', closeHelpModal);
+        helpModalOverlay.addEventListener('click', (e) => {
+            if (e.target === helpModalOverlay) closeHelpModal();
+        });
+
+        helpTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+                helpTabBtns.forEach(b => b.classList.remove('active'));
+                helpTabPanes.forEach(p => p.classList.remove('active'));
+
+                btn.classList.add('active');
+                const activePane = document.getElementById(`tab-${targetTab}`);
+                if (activePane) activePane.classList.add('active');
+            });
         });
 
         loadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
