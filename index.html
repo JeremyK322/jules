@@ -800,29 +800,23 @@
                     const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
                     const targetNormal = pos.clone().normalize();
 
-                    const isNatural = feature.tags && feature.tags.includes('natural');
-                    const isExtractable = feature.tags && (feature.tags.includes('helium3') || feature.tags.includes('water_ice'));
-                    const skipDisc = isNatural && !isExtractable;
-
-                    if (!skipDisc) {
-                        const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
-                        const discMat = new THREE.MeshBasicMaterial({
-                            color: new THREE.Color(color),
-                            transparent: true,
-                            opacity: 0.5,
-                            side: THREE.DoubleSide,
-                            depthWrite: false,
-                            depthTest: true,
-                        });
-                        discObject = new THREE.Mesh(discGeo, discMat);
-                        discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
-                        allGlowMeshes.push(discObject);
-                    }
+                    const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
+                    const discMat = new THREE.MeshBasicMaterial({
+                        color: new THREE.Color(color),
+                        transparent: true,
+                        opacity: 0.5,
+                        side: THREE.DoubleSide,
+                        depthWrite: false,
+                        depthTest: true,
+                    });
+                    discObject = new THREE.Mesh(discGeo, discMat);
+                    discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    allGlowMeshes.push(discObject);
 
                     const labelTex = createLabelTexture(feature.name, 30);
                     const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 0, sizeAttenuation: true });
                     labelSprite = new THREE.Sprite(labelMat);
-                    const labelHeight = skipDisc ? 1.005 : (1.005 + (visualRadiusKm / MOON_RADIUS_KM) * 0.2);
+                    const labelHeight = 1.005 + (visualRadiusKm / MOON_RADIUS_KM) * 0.2;
                     const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
                     labelSprite.position.copy(labelPos);
                     labelSprite.scale.set(0.4, 0.1, 1);
