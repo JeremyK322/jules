@@ -918,7 +918,7 @@
                 const header = document.createElement('div');
                 header.className = 'category-header';
                 const arrow = document.createElement('span');
-                arrow.className = 'arrow open';
+                arrow.className = 'arrow';
                 arrow.textContent = '>';
                 const catCheck = document.createElement('input');
                 catCheck.type = 'checkbox';
@@ -957,7 +957,7 @@
                 header.appendChild(discToggle);
 
                 const body = document.createElement('div');
-                body.className = 'category-body open';
+                body.className = 'category-body';
 
                 for (const layerKey of layerKeys) {
                     const def = LAYER_DEFS[layerKey];
@@ -969,7 +969,7 @@
                     layerDiv.dataset.layerKey = layerKey;
 
                     const layerArrow = document.createElement('span');
-                    layerArrow.className = 'layer-arrow open';
+                    layerArrow.className = 'layer-arrow';
                     layerArrow.textContent = '>';
 
                     const cb = document.createElement('input');
@@ -1000,7 +1000,7 @@
 
                     // Feature list
                     const featureList = document.createElement('div');
-                    featureList.className = 'feature-list open';
+                    featureList.className = 'feature-list';
                     for (const feature of layerFeatures) {
                         const featureItem = document.createElement('div');
                         featureItem.className = 'feature-item';
