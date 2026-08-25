@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lunar Constraint Map</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050510;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #fff;
+        }
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.75);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid #6688aa;
+            z-index: 20;
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        #message.error { border-color: #ff5555; background: rgba(60,0,0,0.85); }
+        #message.success { border-color: #55ff88; background: rgba(0,60,30,0.85); }
+        #message.hidden { opacity: 0; pointer-events: none; }
+        #layers-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(10,10,30,0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #445566;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-width: 240px;
+            max-width: 340px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        #layers-panel.closed { transform: translateX(-120%); opacity: 0; pointer-events: none; }
+        #layers-panel::-webkit-scrollbar { width: 4px; }
+        #layers-panel::-webkit-scrollbar-track { background: transparent; }
+        #layers-panel::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .layers-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #445566;
+            padding-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .layers-header .title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #aac;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .layers-header .title input[type="checkbox"] {
+            accent-color: #ff5555;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .layers-header .close-btn {
+            background: none; border: none; color: #778; font-size: 1.4rem;
+            cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.2s, transform 0.2s;
+        }
+        .layers-header .close-btn:hover { color: #fff; transform: scale(1.2); }
+        .category {
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(68,85,102,0.2);
+            padding-bottom: 4px;
+        }
+        .category:last-child { border-bottom: none; }
+        .category-header {
+            display: flex; align-items: center; gap: 6px; cursor: pointer;
+            padding: 4px 0; color: #99b; font-weight: 600; font-size: 0.85rem;
+            letter-spacing: 0.5px; transition: color 0.2s;
+        }
+        .category-header:hover { color: #cce; }
+        .category-header .arrow {
+            font-size: 0.7rem; transition: transform 0.25s; display: inline-block;
+        }
+        .category-header .arrow.open { transform: rotate(90deg); }
+        .category-header .cat-name { flex: 1; }
+        .category-header input[type="checkbox"] {
+            accent-color: #ff5555;
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+        .category-header .cat-count {
+            font-weight: 400; color: #667; font-size: 0.75rem;
+            background: #1a1a2e; padding: 0 8px; border-radius: 10px;
+        }
+        .category-header .disc-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #99b;
+            user-select: none;
+        }
+        .category-header .disc-toggle input[type="checkbox"] {
+            width: 12px;
+            height: 12px;
+            accent-color: #4a8;
+            margin: 0;
+        }
+        .category-body {
+            padding-left: 22px; overflow: hidden; max-height: 0; transition: max-height 0.3s ease;
+        }
+        .category-body.open { max-height: 2000px; }
+        .layer-item {
+            display: flex; align-items: center; gap: 8px; padding: 3px 0;
+            font-size: 0.82rem; color: #bbb; cursor: pointer; transition: color 0.2s;
+        }
+        .layer-item:hover { color: #fff; }
+        .layer-item input[type="checkbox"] {
+            accent-color: #ff5555; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0;
+        }
+        .layer-item .color-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .layer-item .sub-count {
+            margin-left: auto; color: #667; font-size: 0.75rem;
+        }
+        .layer-item .layer-arrow {
+            font-size: 0.65rem;
+            transition: transform 0.25s;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .layer-item .layer-arrow.open { transform: rotate(90deg); }
+        .layer-item.active-layer {
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .feature-list {
+            padding-left: 26px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .feature-list.open { max-height: 1200px; }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            font-size: 0.78rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .feature-item:hover { color: #fff; }
+        .feature-item input[type="checkbox"] {
+            accent-color: #44aaff;
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .feature-item .feature-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #gear {
+            position: absolute; top: 20px; right: 20px; z-index: 30;
+            font-size: 0.9rem; font-weight: bold; color: #fff;
+            background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
+            padding: 8px 16px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #6688aa; transition: background 0.2s, transform 0.2s;
+            user-select: none;
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+        }
+        #gear:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
+        #gear input { display: none; }
+        #layers-toggle {
+            position: absolute; top: 20px; left: 20px; z-index: 15;
+            font-size: 1rem; font-weight: bold;
+            background: rgba(10,10,30,0.8); backdrop-filter: blur(4px);
+            padding: 8px 14px; border-radius: 12px; cursor: pointer;
+            border: 2px solid #445566; transition: background 0.2s, transform 0.2s, opacity 0.3s;
+            user-select: none; display: none; opacity: 0; color: #fff;
+        }
+        #layers-toggle:hover { background: rgba(40,40,80,0.9); border-color: #6688aa; transform: scale(1.05); }
+        #layers-toggle.visible { display: block; opacity: 1; }
+        #settings-panel {
+            position: absolute; top: 65px; right: 20px;
+            background: rgba(10,10,30,0.92); backdrop-filter: blur(8px);
+            border: 1px solid #6688aa; border-radius: 12px; padding: 16px 20px;
+            min-width: 240px; z-index: 40; display: none;
+            flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        #settings-panel .settings-header-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #b8c8ee;
+            text-align: center;
+            border-bottom: 1px solid #445566;
+            padding-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        #settings-panel.visible { display: flex; }
+        .settings-item {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px; font-size: 0.95rem; padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item .label { color: #ccc; }
+        .settings-item .action-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid #556688;
+            border-radius: 6px; padding: 4px 14px; color: #fff; font-size: 0.85rem;
+            cursor: pointer; transition: background 0.2s; white-space: nowrap;
+        }
+        .settings-item .action-btn:hover { background: rgba(255,255,255,0.18); }
+        .settings-item .toggle { display: flex; align-items: center; gap: 8px; }
+        .toggle-switch {
+            position: relative; width: 40px; height: 22px; background: #334;
+            border-radius: 12px; cursor: pointer; transition: background 0.25s;
+            border: 1px solid #556; flex-shrink: 0;
+        }
+        .toggle-switch.on { background: #4a8; border-color: #6ac; }
+        .toggle-switch .slider {
+            position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            background: #fff; border-radius: 50%; transition: transform 0.25s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .toggle-switch.on .slider { transform: translateX(18px); }
+        .toggle-label { font-size: 0.85rem; color: #aaa; min-width: 40px; }
+        .slider-container {
+            display: flex; align-items: center; gap: 12px; width: 100%;
+        }
+        .slider-container input[type="range"] {
+            flex: 1; accent-color: #ff5555; background: #223; height: 4px;
+            border-radius: 2px; -webkit-appearance: none;
+        }
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: #ff5555; cursor: pointer;
+        }
+        .slider-value { min-width: 32px; text-align: center; color: #ddd; font-size: 0.9rem; }
+
+        /* Info Display (bottom-right) with collapse functionality */
+        #info-display {
+            position: absolute; bottom: 24px; right: 24px;
+            color: rgba(255,255,255,0.75);
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            padding: 10px 16px; border-radius: 8px; font-size: 0.85rem;
+            font-family: 'Courier New', monospace; z-index: 10;
+            border: 1px solid rgba(255,255,255,0.08); line-height: 1.7; min-width: 140px;
+            user-select: none;
+        }
+        #info-display-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        #info-display-header .title {
+            font-weight: bold;
+            color: #99b;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        #info-toggle-btn {
+            background: none;
+            border: none;
+            color: #99b;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        #info-toggle-btn:hover { color: #fff; }
+        #info-display-body {
+            display: block;
+        }
+        #info-display.collapsed #info-display-body {
+            display: none;
+        }
+        #info-display.collapsed #info-display-header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        #info-display .label { color: #99b; margin-right: 8px; display: inline-block; min-width: 44px; }
+        #info-display .value { color: #dde; font-weight: bold; }
+
+        /* Centre overlap display (bottom-left) */
+        #centre-overlap-display {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            pointer-events: none;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.08);
+            line-height: 1.6;
+            max-width: 320px;
+            min-width: 160px;
+            transition: opacity 0.2s;
+        }
+        #centre-overlap-display .label {
+            color: #99b;
+            margin-right: 8px;
+            display: inline-block;
+            min-width: 44px;
+        }
+        #centre-overlap-display .value {
+            color: #dde;
+            font-weight: bold;
+            word-wrap: break-word;
+            white-space: pre-line;
+        }
+        #centre-overlap-display .centre-latlon {
+            color: #88ccff;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 500px) {
+            #message { top: 12px; font-size: 0.75rem; padding: 4px 12px; }
+            #layers-panel { top: 10px; left: 10px; padding: 10px 12px; min-width: 180px; max-width: 280px; font-size: 0.8rem; }
+            #layers-panel .title { font-size: 0.9rem; }
+            #gear { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 10px; }
+            #settings-panel { right: 10px; top: 50px; min-width: 160px; padding: 12px 14px; }
+            #info-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 110px; }
+            #info-display .label { min-width: 32px; }
+            #centre-overlap-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; left: 16px; min-width: 100px; max-width: 200px; }
+            #centre-overlap-display .label { min-width: 32px; }
+            #layers-toggle { top: 10px; left: 10px; font-size: 0.85rem; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="message" class="hidden">Ready</div>
+
+    <!-- Layers panel -->
+    <div id="layers-panel">
+        <div class="layers-header">
+            <span class="title">
+                <input type="checkbox" id="global-toggle" title="Toggle all layers" />
+                Moon Layers
+            </span>
+            <button class="close-btn" id="layers-close" title="Close layers panel">X</button>
+        </div>
+        <div id="layer-list"></div>
+    </div>
+
+    <div id="layers-toggle" title="Show layers">Layers</div>
+
+    <!-- Centre overlap display (bottom-left) -->
+    <div id="centre-overlap-display">
+        <div>
+            <span class="label">Loc:</span>
+            <span class="centre-latlon" id="centre-latlon">Centre of screen</span>
+        </div>
+        <div>
+            <span class="label">Status:</span>
+            <span class="value" id="centre-overlap-text">-</span>
+        </div>
+    </div>
+
+    <!-- Info display (bottom-right) -->
+    <div id="info-display">
+        <div id="info-display-header">
+            <span class="title">INFO</span>
+            <button id="info-toggle-btn" title="Collapse/Expand info panel">[-]</button>
+        </div>
+        <div id="info-display-body">
+            <div><span class="label">Dist</span><span class="value" id="dist">0.00</span></div>
+            <div><span class="label">Lat</span><span class="value" id="lat-display">0.00 deg</span></div>
+            <div><span class="label">Lon</span><span class="value" id="lon-display">0.00 deg</span></div>
+            <div><span class="label">Sens</span><span class="value" id="sens-display">1.00</span></div>
+            <div><span class="label">Rot</span><span class="value" id="rot-state">OFF</span></div>
+        </div>
+    </div>
+
+    <!-- Settings gear -->
+    <div id="gear" title="Settings">Settings</div>
+    <div id="settings-panel">
+        <div class="settings-header-title">Lunar Constraint Map</div>
+        <div class="settings-item">
+            <span class="label"> Load GLB</span>
+            <button class="action-btn" id="load-btn">Choose file...</button>
+            <input type="file" id="file-input" accept=".glb,.gltf" style="display:none;" />
+        </div>
+        <div class="settings-item">
+            <span class="label"> Reset View</span>
+            <button class="action-btn" id="reset-view-btn">Reset</button>
+        </div>
+        <div class="settings-item">
+            <span class="label"> Lock N/S Pole</span>
+            <div class="toggle">
+                <span class="toggle-label" id="lock-label">OFF</span>
+                <div class="toggle-switch" id="lock-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label"> Auto-rotate</span>
+            <div class="toggle">
+                <span class="toggle-label" id="rot-label">OFF</span>
+                <div class="toggle-switch" id="rot-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item" style="flex-wrap: wrap;">
+            <span class="label"> Glow Opacity</span>
+            <div class="slider-container">
+                <input type="range" id="opacity-slider" min="0" max="1" step="0.01" value="0.5" />
+                <span class="slider-value" id="opacity-value">0.50</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { FEATURES, LAYER_DEFS, CATEGORIES, TIER_DEFS } from './moonLayers.js';
+
+        const msgEl = document.getElementById('message');
+        const fileInput = document.getElementById('file-input');
+        const loadBtn = document.getElementById('load-btn');
+        const resetViewBtn = document.getElementById('reset-view-btn');
+        const gearBtn = document.getElementById('gear');
+        const settingsPanel = document.getElementById('settings-panel');
+        const rotToggle = document.getElementById('rot-toggle');
+        const rotLabel = document.getElementById('rot-label');
+        const lockToggle = document.getElementById('lock-toggle');
+        const lockLabel = document.getElementById('lock-label');
+        const distSpan = document.getElementById('dist');
+        const latSpan = document.getElementById('lat-display');
+        const lonSpan = document.getElementById('lon-display');
+        const sensSpan = document.getElementById('sens-display');
+        const rotStateSpan = document.getElementById('rot-state');
+        const opacitySlider = document.getElementById('opacity-slider');
+        const opacityValue = document.getElementById('opacity-value');
+        const layerList = document.getElementById('layer-list');
+        const layersPanel = document.getElementById('layers-panel');
+        const layersToggle = document.getElementById('layers-toggle');
+        const layersClose = document.getElementById('layers-close');
+        const globalToggle = document.getElementById('global-toggle');
+        const infoDisplay = document.getElementById('info-display');
+        const infoToggleBtn = document.getElementById('info-toggle-btn');
+        const centreLatLonEl = document.getElementById('centre-latlon');
+        const centreOverlapText = document.getElementById('centre-overlap-text');
+
+        let isInfoCollapsed = false;
+        infoToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isInfoCollapsed = !isInfoCollapsed;
+            infoDisplay.classList.toggle('collapsed', isInfoCollapsed);
+            infoToggleBtn.textContent = isInfoCollapsed ? '[+]' : '[-]';
+        });
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        const INITIAL_CAM_POS = new THREE.Vector3(0, 0.6, 4.5);
+        const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.copy(INITIAL_CAM_POS);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.1;
+        controls.minDistance = 1.05;
+        controls.maxDistance = 15;
+        controls.target.set(0, 0, 0);
+        controls.enablePan = false;
+        controls.minPolarAngle = 0;
+        controls.maxPolarAngle = Math.PI;
+        controls.rotateSpeed = 1.0;
+        controls.update();
+
+        scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+
+        (function addStars() {
+            const geo = new THREE.BufferGeometry();
+            const count = 2500;
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count * 3; i += 3) {
+                const r = 40 + Math.random() * 60;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                pos[i] = r * Math.sin(phi) * Math.cos(theta);
+                pos[i+1] = r * Math.sin(phi) * Math.sin(theta);
+                pos[i+2] = r * Math.cos(phi);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true });
+            scene.add(new THREE.Points(geo, mat));
+        })();
+
+        let currentMoon = null;
+        let moonMeshes = [];
+        function createFallbackMoon() {
+            const tex = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/moon_1024.jpg');
+            const mat = new THREE.MeshBasicMaterial({ map: tex });
+            const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), mat);
+            mesh.rotation.x = 0.1;
+            return mesh;
+        }
+        const fallbackMoon = createFallbackMoon();
+        scene.add(fallbackMoon);
+        currentMoon = fallbackMoon;
+        moonMeshes = [fallbackMoon];
+
+        function showMessage(text, type = 'info') {
+            msgEl.textContent = text;
+            msgEl.className = type;
+            if (type === 'hidden') msgEl.classList.add('hidden');
+            else msgEl.classList.remove('hidden');
+        }
+
+        function makeMaterialFlat(oldMat) {
+            if (!oldMat) return new THREE.MeshBasicMaterial({ color: 0xffffff });
+            if (oldMat.isMeshBasicMaterial) return oldMat;
+            return new THREE.MeshBasicMaterial({
+                map: oldMat.map || null,
+                color: oldMat.color || new THREE.Color(0xffffff),
+                opacity: oldMat.opacity ?? 1.0,
+                transparent: oldMat.transparent || false,
+                side: oldMat.side || THREE.FrontSide,
+                depthWrite: oldMat.depthWrite ?? true,
+                depthTest: oldMat.depthTest ?? true,
+            });
+        }
+
+        function latLonToPosition(lat, lon, radius) {
+            const latRad = lat * Math.PI / 180;
+            const lonRad = lon * Math.PI / 180;
+            return new THREE.Vector3(
+                radius * Math.cos(latRad) * Math.cos(lonRad),
+                radius * Math.sin(latRad),
+                -radius * Math.cos(latRad) * Math.sin(lonRad)
+            );
+        }
+
+        function positionToLatLon(pos) {
+            const norm = pos.clone().normalize();
+            const latRad = Math.asin(Math.min(1, Math.max(-1, norm.y)));
+            const lonRad = Math.atan2(-norm.z, norm.x);
+            let lat = latRad * 180 / Math.PI;
+            let lon = lonRad * 180 / Math.PI;
+            return { lat, lon };
+        }
+
+        function distanceBetween(lat1, lon1, lat2, lon2) {
+            const R = 1737.4;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function lonToDisplay(lonDeg) {
+            let normalizedLon = ((lonDeg + 180) % 360 + 360) % 360 - 180;
+            const absLon = Math.abs(normalizedLon);
+            const dir = normalizedLon >= 0 ? 'E' : 'W';
+            return `${absLon.toFixed(2)} deg ${dir}`;
+        }
+
+        const MOON_RADIUS_KM = 1737.4;
+        const MOON_3D_RADIUS = 1;
+        const DEFAULT_RADIUS_KM = 10;
+        const MIN_VISUAL_RADIUS_KM = 100;
+        const MIN_DETECTION_KM = 200;
+
+        const layerPriority = [];
+        for (const catName of Object.keys(CATEGORIES)) {
+            const keys = CATEGORIES[catName];
+            for (const key of keys) {
+                if (LAYER_DEFS[key]) {
+                    layerPriority.push(key);
+                }
+            }
+        }
+
+        const TAG_REASON_MAP = {
+            heritage: 'Heritage site',
+            political: 'Political/symbolic site',
+            water_ice: 'Water ice / PSR',
+            science_interest: 'Scientific interest',
+            radio_quiet: 'Radio quiet zone',
+            sensitive: 'Sensitive environment',
+            data_value: 'Data value',
+            crewed: 'Crewed landing'
+        };
+
+        const activeLayers = new Set();
+        const categoryDiscState = new Map();
+        const featureActiveState = new Map();
+        const featureEnabledState = new Map(); // feature.id -> true/false
+
+        function getActiveTags() {
+            const activeTags = new Set();
+            for (const key of activeLayers) {
+                const def = LAYER_DEFS[key];
+                if (def) def.tags.forEach(t => activeTags.add(t));
+            }
+            return activeTags;
+        }
+
+        function getFeatureStatus(lat, lon) {
+            if (activeLayers.size === 0) return [];
+            const activeTags = getActiveTags();
+            const overlappingFeatures = [];
+
+            for (const feature of FEATURES) {
+                if (feature.tags && feature.tags.includes('natural')) continue;
+                if (feature.geometry && feature.geometry.type === 'orbit') continue;
+                if (!feature.tags.some(t => activeTags.has(t))) continue;
+                if (featureEnabledState.has(feature.id) && !featureEnabledState.get(feature.id)) continue;
+
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                let overlaps = false;
+                if (type === 'hemisphere') {
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const hPos = latLonToPosition(hLat, hLon, 1);
+                    const curPos = latLonToPosition(lat, lon, 1);
+                    if (hPos.dot(curPos) > 0) overlaps = true;
+                } else {
+                    const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);
+                    const d = distanceBetween(lat, lon, feature.lat, feature.lon);
+                    if (d < detectionRadius) overlaps = true;
+                }
+                if (overlaps) overlappingFeatures.push(feature);
+            }
+
+            if (overlappingFeatures.length === 0) return [];
+            const highestTier = Math.min(...overlappingFeatures.map(f => f.tier || 3));
+            const filtered = overlappingFeatures.filter(f => (f.tier || 3) === highestTier);
+            const statuses = [];
+            for (const feature of filtered) {
+                const lines = [];
+                lines.push(feature.name);
+                if (feature.tier && TIER_DEFS[feature.tier]) {
+                    lines.push(`Tier ${feature.tier} – ${TIER_DEFS[feature.tier].label}`);
+                }
+                if (feature.articles) {
+                    for (const article of feature.articles) {
+                        let text = '';
+                        if (article === 6) {
+                            const reason = feature.private ? 'Private mission' : 'State responsibility';
+                            text = `Art.6 – ${reason}`;
+                        } else if (article === 9) {
+                            let reason = '';
+                            for (const tag of feature.tags || []) {
+                                if (TAG_REASON_MAP[tag]) {
+                                    reason = TAG_REASON_MAP[tag];
+                                    break;
+                                }
+                            }
+                            if (!reason) reason = 'Consult before disturbance';
+                            text = `Art.9 – ${reason}`;
+                        }
+                        if (text) {
+                            if (feature.owner) text += ` – ${feature.owner}`;
+                            lines.push(text);
+                        }
+                    }
+                }
+                statuses.push(lines.join('\n'));
+            }
+            return statuses;
+        }
+
+        function createLabelTexture(text, fontSize = 32) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 96;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        function createCurvedDiscGeometry(radiusKm, sphereRadius = 1.002) {
+            const theta = radiusKm / MOON_RADIUS_KM;
+            const segments = Math.max(16, Math.min(64, Math.floor(theta * 60)));
+            const geo = new THREE.SphereGeometry(sphereRadius, segments, segments, 0, Math.PI * 2, 0, theta);
+            return geo;
+        }
+
+        function createSatelliteMesh() {
+            const group = new THREE.Group();
+            const busMat = new THREE.MeshBasicMaterial({ color: 0x888888 });
+            const busMesh = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.025), busMat);
+            group.add(busMesh);
+            const panelMat = new THREE.MeshBasicMaterial({ color: 0x555555 });
+            const panelMesh = new THREE.Mesh(new THREE.BoxGeometry(0.0875, 0.00375, 0.02), panelMat);
+            group.add(panelMesh);
+            const coreMat = new THREE.MeshBasicMaterial({ color: 0x999999 });
+            const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.015, 6, 6), coreMat);
+            group.add(coreMesh);
+            return group;
+        }
+
+        const featureObjects = {};
+        const allGlowMeshes = [];
+        const allLabels = [];
+        const satelliteList = [];
+
+        function buildLayers() {
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                if (entry.discObject) currentMoon.remove(entry.discObject);
+                if (entry.label) currentMoon.remove(entry.label);
+                if (entry.satellite) {
+                    currentMoon.remove(entry.satellite.group);
+                    if (entry.satellite.label) currentMoon.remove(entry.satellite.label);
+                }
+            }
+            for (const key in featureObjects) delete featureObjects[key];
+            allGlowMeshes.length = 0;
+            allLabels.length = 0;
+            satelliteList.length = 0;
+
+            for (const feature of FEATURES) {
+                let discObject = null;
+                let labelSprite = null;
+                let satelliteObj = null;
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                const color = '#ff5555';
+
+                if (type === 'point') {
+                    const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const visualRadiusKm = Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM);
+                    const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
+                    const targetNormal = pos.clone().normalize();
+
+                    const isNatural = feature.tags && feature.tags.includes('natural');
+                    const isExtractable = feature.tags && (feature.tags.includes('helium3') || feature.tags.includes('water_ice'));
+                    const skipDisc = isNatural && !isExtractable;
+
+                    if (!skipDisc) {
+                        const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
+                        const discMat = new THREE.MeshBasicMaterial({
+                            color: new THREE.Color(color),
+                            transparent: true,
+                            opacity: 0.5,
+                            side: THREE.DoubleSide,
+                            depthWrite: false,
+                            depthTest: true,
+                        });
+                        discObject = new THREE.Mesh(discGeo, discMat);
+                        discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                        allGlowMeshes.push(discObject);
+                    }
+
+                    const labelTex = createLabelTexture(feature.name, 30);
+                    const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 0, sizeAttenuation: true });
+                    labelSprite = new THREE.Sprite(labelMat);
+                    const labelHeight = skipDisc ? 1.005 : (1.005 + (visualRadiusKm / MOON_RADIUS_KM) * 0.2);
+                    const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
+                    labelSprite.position.copy(labelPos);
+                    labelSprite.scale.set(0.4, 0.1, 1);
+                    labelSprite.userData.featureId = feature.id;
+                    allLabels.push(labelSprite);
+                }
+                else if (type === 'hemisphere') {
+                    const radius3D = MOON_3D_RADIUS * 1.01;
+                    const segs = 48;
+                    const geo = new THREE.SphereGeometry(radius3D, segs, segs/2, 0, Math.PI*2, 0, Math.PI/2);
+                    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const targetNormal = latLonToPosition(hLat, hLon, 1).normalize();
+                    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    discObject = mesh;
+                }
+                else if (type === 'orbit') {
+                    const radiusKm = geom.radius_km || (MOON_RADIUS_KM + 100);
+                    const radius3D = radiusKm / MOON_RADIUS_KM * MOON_3D_RADIUS;
+                    const inclination = (geom.inclination || 0) * Math.PI / 180;
+                    const segments = 64;
+                    const points = [];
+                    for (let i = 0; i <= segments; i++) {
+                        const theta = (i / segments) * Math.PI * 2;
+                        let x = radius3D * Math.cos(theta);
+                        let y = radius3D * Math.sin(theta);
+                        let z = 0;
+                        const cosI = Math.cos(inclination);
+                        const sinI = Math.sin(inclination);
+                        const newY = y * cosI - z * sinI;
+                        const newZ = y * sinI + z * cosI;
+                        points.push(new THREE.Vector3(x, newY, newZ));
+                    }
+                    const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const isDashed = geom.dash || false;
+                    let mat;
+                    if (isDashed) {
+                        mat = new THREE.LineDashedMaterial({ color, dashSize: 0.02, gapSize: 0.015, transparent: true, opacity: 0.7, depthWrite: false });
+                    } else {
+                        mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false });
+                    }
+                    const line = new THREE.Line(orbitGeo, mat);
+                    if (isDashed) line.computeLineDistances();
+                    discObject = line;
+
+                    if (geom.has_satellite) {
+                        const satGroup = createSatelliteMesh();
+                        const satName = geom.satellite_name || feature.name;
+                        const labelTex = createLabelTexture(satName, 26);
+                        const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 1.0, sizeAttenuation: true });
+                        const satLabel = new THREE.Sprite(labelMat);
+                        satelliteObj = { group: satGroup, label: satLabel, radius3D, inclinationRad: inclination, angle: Math.random() * Math.PI * 2, speed: geom.speed || 0.2, parentObject: line };
+                        satelliteList.push(satelliteObj);
+                    }
+                }
+
+                featureObjects[feature.id] = {
+                    discObject,
+                    label: labelSprite || null,
+                    satellite: satelliteObj || null,
+                    type,
+                    tags: feature.tags || []
+                };
+                featureActiveState.set(feature.id, false);
+                featureEnabledState.set(feature.id, true);
+
+                if (currentMoon) {
+                    if (discObject) currentMoon.add(discObject);
+                    if (labelSprite) currentMoon.add(labelSprite);
+                    if (satelliteObj) {
+                        currentMoon.add(satelliteObj.group);
+                        currentMoon.add(satelliteObj.label);
+                    }
+                }
+
+                if (discObject) discObject.visible = false;
+                if (labelSprite) labelSprite.visible = false;
+                if (satelliteObj) {
+                    satelliteObj.group.visible = false;
+                    satelliteObj.label.visible = false;
+                }
+            }
+
+            buildLayerUI();
+            updateVisibility(new Set());
+            updateGlobalToggle();
+        }
+
+        function buildLayerUI() {
+            layerList.innerHTML = '';
+            activeLayers.clear();
+
+            for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category';
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                const arrow = document.createElement('span');
+                arrow.className = 'arrow open';
+                arrow.textContent = '>';
+                const catCheck = document.createElement('input');
+                catCheck.type = 'checkbox';
+                catCheck.checked = false;
+                catCheck.dataset.category = catName;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'cat-name';
+                nameSpan.textContent = catName;
+
+                let total = 0;
+                for (const k of layerKeys) {
+                    if (LAYER_DEFS[k]) {
+                        total += FEATURES.filter(f => f.tags && f.tags.some(t => LAYER_DEFS[k].tags.includes(t))).length;
+                    }
+                }
+                const countSpan = document.createElement('span');
+                countSpan.className = 'cat-count';
+                countSpan.textContent = total;
+
+                const discToggle = document.createElement('div');
+                discToggle.className = 'disc-toggle';
+                discToggle.title = 'Show/hide discs for this category';
+                const discCheck = document.createElement('input');
+                discCheck.type = 'checkbox';
+                discCheck.checked = true;
+                discCheck.dataset.categoryDisc = catName;
+                const discLabel = document.createElement('span');
+                discLabel.textContent = 'Discs';
+                discToggle.appendChild(discCheck);
+                discToggle.appendChild(discLabel);
+
+                header.appendChild(arrow);
+                header.appendChild(catCheck);
+                header.appendChild(nameSpan);
+                header.appendChild(countSpan);
+                header.appendChild(discToggle);
+
+                const body = document.createElement('div');
+                body.className = 'category-body open';
+
+                for (const layerKey of layerKeys) {
+                    const def = LAYER_DEFS[layerKey];
+                    if (!def) continue;
+                    const layerFeatures = FEATURES.filter(f => f.tags && f.tags.some(t => def.tags.includes(t)));
+
+                    const layerDiv = document.createElement('div');
+                    layerDiv.className = 'layer-item';
+                    layerDiv.dataset.layerKey = layerKey;
+
+                    const layerArrow = document.createElement('span');
+                    layerArrow.className = 'layer-arrow open';
+                    layerArrow.textContent = '>';
+
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = false;
+                    cb.dataset.layerKey = layerKey;
+                    cb.dataset.category = catName;
+                    cb.addEventListener('change', (e) => {
+                        if (e.target.checked) activeLayers.add(layerKey);
+                        else activeLayers.delete(layerKey);
+                        updateVisibility(activeLayers);
+                        updateCategoryCheckbox(catName);
+                        updateGlobalToggle();
+                        highlightActiveLayerItems();
+                    });
+
+                    const dot = document.createElement('span');
+                    dot.className = 'color-dot';
+                    dot.style.backgroundColor = def.color || '#ff5555';
+
+                    const label = document.createElement('span');
+                    label.textContent = def.label;
+
+                    const subCount = document.createElement('span');
+                    subCount.className = 'sub-count';
+                    subCount.textContent = layerFeatures.length;
+
+                    if (def.desc) layerDiv.title = def.desc;
+
+                    layerDiv.appendChild(layerArrow);
+                    layerDiv.appendChild(cb);
+                    layerDiv.appendChild(dot);
+                    layerDiv.appendChild(label);
+                    layerDiv.appendChild(subCount);
+                    body.appendChild(layerDiv);
+
+                    // Feature list
+                    const featureList = document.createElement('div');
+                    featureList.className = 'feature-list open';
+                    for (const feature of layerFeatures) {
+                        const featureItem = document.createElement('div');
+                        featureItem.className = 'feature-item';
+                        const featureCheck = document.createElement('input');
+                        featureCheck.type = 'checkbox';
+                        featureCheck.checked = true;
+                        featureCheck.dataset.featureId = feature.id;
+                        featureCheck.addEventListener('change', (e) => {
+                            featureEnabledState.set(feature.id, e.target.checked);
+                            updateVisibility(activeLayers);
+                        });
+                        const featureDot = document.createElement('span');
+                        featureDot.className = 'feature-dot';
+                        featureDot.style.backgroundColor = def.color || '#ff5555';
+                        const featureLabel = document.createElement('span');
+                        featureLabel.textContent = feature.name;
+                        featureItem.appendChild(featureCheck);
+                        featureItem.appendChild(featureDot);
+                        featureItem.appendChild(featureLabel);
+                        featureList.appendChild(featureItem);
+                    }
+                    body.appendChild(featureList);
+
+                    layerDiv.addEventListener('click', (e) => {
+                        if (e.target.type === 'checkbox') return;
+                        const isOpen = featureList.classList.toggle('open');
+                        layerArrow.classList.toggle('open', isOpen);
+                    });
+                }
+
+                catCheck.addEventListener('change', (e) => {
+                    const checked = e.target.checked;
+                    const subCheckboxes = body.querySelectorAll('.layer-item > input[type="checkbox"]');
+                    subCheckboxes.forEach(cb => {
+                        cb.checked = checked;
+                        const layerKey = cb.dataset.layerKey;
+                        if (checked) activeLayers.add(layerKey);
+                        else activeLayers.delete(layerKey);
+                    });
+                    updateVisibility(activeLayers);
+                    updateGlobalToggle();
+                    highlightActiveLayerItems();
+                });
+
+                discCheck.addEventListener('change', (e) => {
+                    categoryDiscState.set(catName, e.target.checked);
+                    applyDiscVisibility();
+                });
+
+                header.addEventListener('click', (e) => {
+                    if (e.target.type === 'checkbox') return;
+                    const isOpen = body.classList.toggle('open');
+                    arrow.classList.toggle('open', isOpen);
+                });
+
+                catDiv.appendChild(header);
+                catDiv.appendChild(body);
+                layerList.appendChild(catDiv);
+            }
+
+            globalToggle.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                const allSubChecks = layerList.querySelectorAll('.layer-item > input[type="checkbox"]');
+                const allCatChecks = layerList.querySelectorAll('.category-header > input[type="checkbox"]');
+                allSubChecks.forEach(cb => {
+                    cb.checked = checked;
+                    const layerKey = cb.dataset.layerKey;
+                    if (checked) activeLayers.add(layerKey);
+                    else activeLayers.delete(layerKey);
+                });
+                allCatChecks.forEach(cb => { cb.checked = checked; });
+                updateVisibility(activeLayers);
+                highlightActiveLayerItems();
+            });
+
+            highlightActiveLayerItems();
+        }
+
+        function applyDiscVisibility() {
+            for (const [fid, entry] of Object.entries(featureObjects)) {
+                if (!entry.discObject) continue;
+                const feature = FEATURES.find(f => f.id === fid);
+                if (!feature) continue;
+                let belongsToCategory = null;
+                for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
+                    for (const key of layerKeys) {
+                        const def = LAYER_DEFS[key];
+                        if (def && feature.tags.some(t => def.tags.includes(t))) {
+                            belongsToCategory = catName;
+                            break;
+                        }
+                    }
+                    if (belongsToCategory) break;
+                }
+                if (belongsToCategory && categoryDiscState.has(belongsToCategory)) {
+                    const discsVisible = categoryDiscState.get(belongsToCategory);
+                    entry.discObject.visible = discsVisible;
+                }
+            }
+        }
+
+        function highlightActiveLayerItems() {
+            const items = layerList.querySelectorAll('.layer-item');
+            items.forEach(item => {
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb && cb.checked) item.classList.add('active-layer');
+                else item.classList.remove('active-layer');
+            });
+        }
+
+        function updateCategoryCheckbox(catName) {
+            const catHeader = layerList.querySelector(`.category-header input[data-category="${catName}"]`);
+            if (!catHeader) return;
+            const body = catHeader.closest('.category').querySelector('.category-body');
+            const subChecks = body.querySelectorAll('.layer-item > input[type="checkbox"]');
+            const allChecked = Array.from(subChecks).every(cb => cb.checked);
+            catHeader.checked = allChecked;
+        }
+
+        function updateGlobalToggle() {
+            const allSubChecks = layerList.querySelectorAll('.layer-item > input[type="checkbox"]');
+            if (allSubChecks.length === 0) {
+                globalToggle.checked = false;
+                return;
+            }
+            const allChecked = Array.from(allSubChecks).every(cb => cb.checked);
+            globalToggle.checked = allChecked;
+        }
+
+        function updateVisibility(activeLayerKeys = new Set()) {
+            if (activeLayerKeys.size === 0) {
+                for (const key in featureObjects) {
+                    const entry = featureObjects[key];
+                    featureActiveState.set(key, false);
+                    if (entry.discObject) entry.discObject.visible = false;
+                    if (entry.label) entry.label.visible = false;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = false;
+                        entry.satellite.label.visible = false;
+                    }
+                }
+                return;
+            }
+
+            const activeTags = new Set();
+            for (const key of activeLayerKeys) {
+                const def = LAYER_DEFS[key];
+                if (def) def.tags.forEach(t => activeTags.add(t));
+            }
+
+            for (const [fid, entry] of Object.entries(featureObjects)) {
+                const feature = FEATURES.find(f => f.id === fid);
+                if (!feature) continue;
+
+                let primaryKey = null;
+                for (const key of layerPriority) {
+                    if (activeLayerKeys.has(key)) {
+                        const def = LAYER_DEFS[key];
+                        if (def && feature.tags.some(t => def.tags.includes(t))) {
+                            primaryKey = key;
+                            break;
+                        }
+                    }
+                }
+
+                const isFeatureEnabled = featureEnabledState.get(fid) !== false;
+                if (primaryKey && isFeatureEnabled) {
+                    featureActiveState.set(fid, true);
+                    if (entry.discObject) entry.discObject.visible = true;
+                    if (entry.label) entry.label.visible = true;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = true;
+                        entry.satellite.label.visible = true;
+                    }
+
+                    const color = LAYER_DEFS[primaryKey].color || '#ff5555';
+                    if (entry.discObject && entry.discObject.material) entry.discObject.material.color.set(color);
+                } else {
+                    featureActiveState.set(fid, false);
+                    if (entry.discObject) entry.discObject.visible = false;
+                    if (entry.label) entry.label.visible = false;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = false;
+                        entry.satellite.label.visible = false;
+                    }
+                }
+            }
+            applyDiscVisibility();
+            updateGlobalToggle();
+        }
+
+        opacitySlider.addEventListener('input', () => {
+            const val = parseFloat(opacitySlider.value);
+            opacityValue.textContent = val.toFixed(2);
+            allGlowMeshes.forEach(mesh => {
+                if (mesh.material) mesh.material.opacity = val;
+            });
+        });
+
+        function closeLayersPanel() {
+            layersPanel.classList.add('closed');
+            layersToggle.classList.add('visible');
+        }
+        function openLayersPanel() {
+            layersPanel.classList.remove('closed');
+            layersToggle.classList.remove('visible');
+        }
+        layersClose.addEventListener('click', closeLayersPanel);
+        layersToggle.addEventListener('click', openLayersPanel);
+
+        function resetView() {
+            camera.position.copy(INITIAL_CAM_POS);
+            controls.target.set(0, 0, 0);
+            controls.update();
+            showMessage('View reset', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        }
+
+        let isPoleLocked = false;
+        function applyPoleLock(locked) {
+            if (locked) {
+                controls.minPolarAngle = Math.PI / 2;
+                controls.maxPolarAngle = Math.PI / 2;
+                const offset = camera.position.clone().sub(controls.target);
+                const radius = offset.length();
+                if (radius > 0.001) {
+                    const theta = Math.atan2(offset.x, offset.z);
+                    camera.position.set(radius * Math.sin(theta), 0, radius * Math.cos(theta));
+                }
+                controls.update();
+            } else {
+                controls.minPolarAngle = 0;
+                controls.maxPolarAngle = Math.PI;
+                controls.update();
+            }
+        }
+
+        function loadGLB(url) {
+            showMessage('Loading GLB...', 'info');
+            const loader = new GLTFLoader();
+            loader.load(
+                url,
+                (gltf) => {
+                    if (currentMoon) scene.remove(currentMoon);
+                    const newMoon = gltf.scene;
+                    newMoon.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material = makeMaterialFlat(child.material);
+                            child.material.needsUpdate = true;
+                            moonMeshes.push(child);
+                        }
+                    });
+                    newMoon.rotation.y = 0;
+                    scene.add(newMoon);
+                    currentMoon = newMoon;
+                    for (const key in featureObjects) {
+                        const entry = featureObjects[key];
+                        if (entry.discObject) currentMoon.add(entry.discObject);
+                        if (entry.label) currentMoon.add(entry.label);
+                        if (entry.satellite) {
+                            currentMoon.add(entry.satellite.group);
+                            currentMoon.add(entry.satellite.label);
+                        }
+                    }
+                    showMessage('Moon loaded', 'success');
+                    setTimeout(() => showMessage('', 'hidden'), 2500);
+                },
+                (xhr) => {
+                    const pct = Math.round((xhr.loaded / xhr.total) * 100);
+                    if (pct < 100) showMessage(`Loading... ${pct}%`, 'info');
+                },
+                (error) => {
+                    console.error(error);
+                    showMessage(`Failed: ${error.message || 'unknown'}`, 'error');
+                }
+            );
+        }
+
+        let panelVisible = false;
+        gearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            panelVisible = !panelVisible;
+            settingsPanel.classList.toggle('visible', panelVisible);
+        });
+        document.addEventListener('click', (e) => {
+            if (panelVisible && !settingsPanel.contains(e.target) && e.target !== gearBtn) {
+                settingsPanel.classList.remove('visible');
+                panelVisible = false;
+            }
+        });
+
+        loadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['glb', 'gltf'].includes(ext)) {
+                showMessage('Please select .glb or .gltf', 'error');
+                fileInput.value = '';
+                return;
+            }
+            if (currentMoon === fallbackMoon) scene.remove(fallbackMoon);
+            moonMeshes = [];
+            loadGLB(URL.createObjectURL(file));
+            fileInput.value = '';
+            settingsPanel.classList.remove('visible');
+            panelVisible = false;
+        });
+
+        resetViewBtn.addEventListener('click', (e) => { e.stopPropagation(); resetView(); });
+
+        function updateLockUI() {
+            const on = isPoleLocked;
+            lockToggle.classList.toggle('on', on);
+            lockLabel.textContent = on ? 'ON' : 'OFF';
+        }
+        lockToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isPoleLocked = !isPoleLocked;
+            applyPoleLock(isPoleLocked);
+            updateLockUI();
+            showMessage(isPoleLocked ? 'Pole lock ON' : 'Pole lock OFF', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        });
+        updateLockUI();
+
+        function updateRotateUI() {
+            const on = controls.autoRotate;
+            rotToggle.classList.toggle('on', on);
+            rotLabel.textContent = on ? 'ON' : 'OFF';
+            rotStateSpan.textContent = on ? 'ON' : 'OFF';
+        }
+        rotToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            controls.autoRotate = !controls.autoRotate;
+            updateRotateUI();
+        });
+        updateRotateUI();
+
+        window.addEventListener('dragover', (e) => { e.preventDefault(); gearBtn.style.borderColor = '#aaccff'; });
+        window.addEventListener('dragleave', (e) => { e.preventDefault(); gearBtn.style.borderColor = '#6688aa'; });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            gearBtn.style.borderColor = '#6688aa';
+            const files = e.dataTransfer.files;
+            if (files.length === 0) return;
+            const file = files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['glb', 'gltf'].includes(ext)) {
+                showMessage('Drop a .glb/.gltf file', 'error');
+                return;
+            }
+            if (currentMoon === fallbackMoon) scene.remove(fallbackMoon);
+            moonMeshes = [];
+            loadGLB(URL.createObjectURL(file));
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        buildLayers();
+
+        let clock = new THREE.Clock();
+        let highlightedFeatureIds = new Set();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            controls.update();
+
+            const cameraWorldPos = camera.position;
+            const dist = cameraWorldPos.distanceTo(controls.target);
+            const maxDist = controls.maxDistance;
+            const t = Math.max(0, Math.min(1, (dist - controls.minDistance) / (maxDist - controls.minDistance)));
+            controls.rotateSpeed = 0.1 + t * 0.9;
+            sensSpan.textContent = controls.rotateSpeed.toFixed(2);
+
+            const showLabels = dist < 3.0;
+            const cameraDir = camera.position.clone().normalize();
+
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                if (entry.discObject && entry.discObject.material) {
+                    entry.discObject.material.opacity = 0.5;
+                }
+            }
+
+            const { lat, lon } = positionToLatLon(camera.position);
+            const activeTags = getActiveTags();
+            const overlappingFeatures = [];
+            for (const feature of FEATURES) {
+                if (feature.tags && feature.tags.includes('natural')) continue;
+                if (feature.geometry && feature.geometry.type === 'orbit') continue;
+                if (!feature.tags.some(t => activeTags.has(t))) continue;
+                if (featureEnabledState.has(feature.id) && !featureEnabledState.get(feature.id)) continue;
+
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                let overlaps = false;
+                if (type === 'hemisphere') {
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const hPos = latLonToPosition(hLat, hLon, 1);
+                    const curPos = latLonToPosition(lat, lon, 1);
+                    if (hPos.dot(curPos) > 0) overlaps = true;
+                } else {
+                    const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);
+                    const d = distanceBetween(lat, lon, feature.lat, feature.lon);
+                    if (d < detectionRadius) overlaps = true;
+                }
+                if (overlaps) overlappingFeatures.push(feature);
+            }
+
+            highlightedFeatureIds.clear();
+            if (overlappingFeatures.length > 0) {
+                const highestTier = Math.min(...overlappingFeatures.map(f => f.tier || 3));
+                overlappingFeatures.forEach(f => {
+                    if ((f.tier || 3) === highestTier) {
+                        highlightedFeatureIds.add(f.id);
+                    }
+                });
+
+                for (const id of highlightedFeatureIds) {
+                    const entry = featureObjects[id];
+                    if (entry && entry.discObject && entry.discObject.material) {
+                        entry.discObject.material.opacity = 0.9;
+                    }
+                }
+            }
+
+            const statusList = getFeatureStatus(lat, lon);
+            centreOverlapText.textContent = statusList.length ? statusList.join('\n') : 'Open';
+
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                if (entry.label) {
+                    const isLabelVisible = featureActiveState.get(key) && showLabels;
+                    let labelVisible = isLabelVisible;
+                    if (labelVisible) {
+                        const labelWorldPos = new THREE.Vector3();
+                        entry.label.getWorldPosition(labelWorldPos);
+                        const labelDir = labelWorldPos.clone().normalize();
+                        const dot = Math.min(1, Math.max(-1, cameraDir.dot(labelDir)));
+                        const angle = Math.acos(dot);
+                        if (angle > Math.PI / 4) labelVisible = false;
+                    }
+                    entry.label.visible = labelVisible;
+                    if (labelVisible) {
+                        const labelWorldPos = new THREE.Vector3();
+                        entry.label.getWorldPosition(labelWorldPos);
+                        const labelDist = camera.position.distanceTo(labelWorldPos);
+                        const baseScaleY = 0.056 * labelDist;
+                        const baseScaleX = baseScaleY * 4.0;
+                        entry.label.scale.set(baseScaleX, baseScaleY, 1);
+                        entry.label.material.opacity = 1.0;
+                    } else {
+                        entry.label.material.opacity = 0;
+                    }
+                }
+            }
+
+            for (const sat of satelliteList) {
+                if (sat.parentObject.visible) {
+                    sat.group.visible = true;
+                    sat.label.visible = false;
+                    sat.angle += delta * sat.speed;
+                    const r = sat.radius3D;
+                    const inc = sat.inclinationRad;
+                    const cosI = Math.cos(inc);
+                    const sinI = Math.sin(inc);
+                    const x = r * Math.cos(sat.angle);
+                    const y = r * Math.sin(sat.angle) * cosI;
+                    const z = r * Math.sin(sat.angle) * sinI;
+                    sat.group.position.set(x, y, z);
+                    const satZoomScale = Math.max(0.6, Math.min(1.2, (dist - 1.05) / 2.5));
+                    sat.group.scale.setScalar(satZoomScale);
+                    const satWorldPos = new THREE.Vector3();
+                    sat.group.getWorldPosition(satWorldPos);
+                    const labelOffset = satWorldPos.clone().normalize().multiplyScalar(0.12 * satZoomScale);
+                    sat.label.position.copy(satWorldPos).add(labelOffset);
+                    const satLabelDist = cameraWorldPos.distanceTo(sat.label.position);
+                    const satDot = Math.min(1, Math.max(-1, cameraDir.dot(satWorldPos.clone().normalize())));
+                    const satAngle = Math.acos(satDot);
+                    const satLabelVisible = showLabels && (satAngle <= Math.PI / 4);
+                    sat.label.visible = satLabelVisible;
+                    if (satLabelVisible) {
+                        const satLabelScaleY = Math.max(0.015, 0.042 * satLabelDist * satZoomScale);
+                        const satLabelScaleX = satLabelScaleY * 3.5;
+                        sat.label.scale.set(satLabelScaleX, satLabelScaleY, 1);
+                    }
+                } else {
+                    sat.group.visible = false;
+                    sat.label.visible = false;
+                }
+            }
+
+            latSpan.textContent = lat >= 0 ? `${lat.toFixed(2)} deg N` : `${(-lat).toFixed(2)} deg S`;
+            lonSpan.textContent = lonToDisplay(lon);
+            distSpan.textContent = dist.toFixed(3);
+            centreLatLonEl.textContent = `${lat >= 0 ? lat.toFixed(2) + ' deg N' : (-lat).toFixed(2) + ' deg S'}, ${lonToDisplay(lon)}`;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        layersPanel.classList.remove('closed');
+        layersToggle.classList.remove('visible');
+        showMessage('Standard lunar coordinate mapping active', 'info');
+        setTimeout(() => showMessage('', 'hidden'), 4000);
+        console.log('Standard lunar coordinate mapping initialized.');
+    </script>
+</body>
+</html>
