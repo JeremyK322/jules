@@ -918,6 +918,7 @@
             activeLayers.clear();
 
             for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
+                categoryDiscState.set(catName, true);
                 const catDiv = document.createElement('div');
                 catDiv.className = 'category';
                 const header = document.createElement('div');
@@ -1024,6 +1025,7 @@
                         featureCheck.addEventListener('change', (e) => {
                             featureEnabledState.set(feature.id, e.target.checked);
                             updateVisibility(activeLayers);
+                            updateCategoryCheckbox(catName);
                         });
                         const featureDot = document.createElement('span');
                         featureDot.className = 'feature-dot';
@@ -1053,6 +1055,12 @@
                         if (checked) activeLayers.add(layerKey);
                         else activeLayers.delete(layerKey);
                     });
+                    const featCheckboxes = body.querySelectorAll('.feature-item > input[type="checkbox"]');
+                    featCheckboxes.forEach(fcb => {
+                        fcb.checked = checked;
+                        const fid = fcb.dataset.featureId;
+                        if (fid) featureEnabledState.set(fid, checked);
+                    });
                     updateVisibility(activeLayers);
                     updateGlobalToggle();
                     highlightActiveLayerItems();
@@ -1078,6 +1086,7 @@
                 const checked = e.target.checked;
                 const allSubChecks = layerList.querySelectorAll('.layer-item > input[type="checkbox"]');
                 const allCatChecks = layerList.querySelectorAll('.category-header > input[type="checkbox"]');
+                const allFeatChecks = layerList.querySelectorAll('.feature-item > input[type="checkbox"]');
                 allSubChecks.forEach(cb => {
                     cb.checked = checked;
                     const layerKey = cb.dataset.layerKey;
@@ -1085,6 +1094,11 @@
                     else activeLayers.delete(layerKey);
                 });
                 allCatChecks.forEach(cb => { cb.checked = checked; });
+                allFeatChecks.forEach(fcb => {
+                    fcb.checked = checked;
+                    const fid = fcb.dataset.featureId;
+                    if (fid) featureEnabledState.set(fid, checked);
+                });
                 updateVisibility(activeLayers);
                 highlightActiveLayerItems();
             });
@@ -1095,6 +1109,12 @@
         function applyDiscVisibility() {
             for (const [fid, entry] of Object.entries(featureObjects)) {
                 if (!entry.discObject) continue;
+                const isActive = featureActiveState.get(fid) === true;
+                if (!isActive) {
+                    entry.discObject.visible = false;
+                    continue;
+                }
+
                 const feature = FEATURES.find(f => f.id === fid);
                 if (!feature) continue;
                 let belongsToCategory = null;
@@ -1108,10 +1128,9 @@
                     }
                     if (belongsToCategory) break;
                 }
-                if (belongsToCategory && categoryDiscState.has(belongsToCategory)) {
-                    const discsVisible = categoryDiscState.get(belongsToCategory);
-                    entry.discObject.visible = discsVisible;
-                }
+
+                const categoryDiscsOn = !categoryDiscState.has(belongsToCategory) || categoryDiscState.get(belongsToCategory);
+                entry.discObject.visible = isActive && categoryDiscsOn;
             }
         }
 
