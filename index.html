@@ -889,7 +889,7 @@
                     tags: feature.tags || []
                 };
                 featureActiveState.set(feature.id, false);
-                featureEnabledState.set(feature.id, true);
+                featureEnabledState.set(feature.id, false);
 
                 if (currentMoon) {
                     if (discObject) currentMoon.add(discObject);
@@ -983,14 +983,6 @@
                     cb.checked = false;
                     cb.dataset.layerKey = layerKey;
                     cb.dataset.category = catName;
-                    cb.addEventListener('change', (e) => {
-                        if (e.target.checked) activeLayers.add(layerKey);
-                        else activeLayers.delete(layerKey);
-                        updateVisibility(activeLayers);
-                        updateCategoryCheckbox(catName);
-                        updateGlobalToggle();
-                        highlightActiveLayerItems();
-                    });
 
                     const dot = document.createElement('span');
                     dot.className = 'color-dot';
@@ -1020,12 +1012,28 @@
                         featureItem.className = 'feature-item';
                         const featureCheck = document.createElement('input');
                         featureCheck.type = 'checkbox';
-                        featureCheck.checked = true;
+                        featureCheck.checked = false;
                         featureCheck.dataset.featureId = feature.id;
+                        featureCheck.dataset.layerKey = layerKey;
                         featureCheck.addEventListener('change', (e) => {
-                            featureEnabledState.set(feature.id, e.target.checked);
+                            const isChecked = e.target.checked;
+                            featureEnabledState.set(feature.id, isChecked);
+
+                            const allLayerFeatChecks = featureList.querySelectorAll('input[type="checkbox"]');
+                            const anyChecked = Array.from(allLayerFeatChecks).some(fcb => fcb.checked);
+
+                            if (anyChecked) {
+                                activeLayers.add(layerKey);
+                                cb.checked = true;
+                            } else {
+                                activeLayers.delete(layerKey);
+                                cb.checked = false;
+                            }
+
                             updateVisibility(activeLayers);
                             updateCategoryCheckbox(catName);
+                            updateGlobalToggle();
+                            highlightActiveLayerItems();
                         });
                         const featureDot = document.createElement('span');
                         featureDot.className = 'feature-dot';
@@ -1038,6 +1046,24 @@
                         featureList.appendChild(featureItem);
                     }
                     body.appendChild(featureList);
+
+                    cb.addEventListener('change', (e) => {
+                        const isChecked = e.target.checked;
+                        if (isChecked) activeLayers.add(layerKey);
+                        else activeLayers.delete(layerKey);
+
+                        const featChecks = featureList.querySelectorAll('input[type="checkbox"]');
+                        featChecks.forEach(fcb => {
+                            fcb.checked = isChecked;
+                            const fid = fcb.dataset.featureId;
+                            if (fid) featureEnabledState.set(fid, isChecked);
+                        });
+
+                        updateVisibility(activeLayers);
+                        updateCategoryCheckbox(catName);
+                        updateGlobalToggle();
+                        highlightActiveLayerItems();
+                    });
 
                     layerDiv.addEventListener('click', (e) => {
                         if (e.target.type === 'checkbox') return;
@@ -1174,6 +1200,8 @@
                         entry.satellite.label.visible = false;
                     }
                 }
+                applyDiscVisibility();
+                updateGlobalToggle();
                 return;
             }
 
