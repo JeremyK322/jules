@@ -1,122 +1,183 @@
 // moonLayers.js
 // Comprehensive Moon Viewer data - natural lunar surface features, historical/recent landing sites, and active orbits
-// Updated 25 Aug 2026 - tier system, color deconfliction, minerals layer populated
+// Updated with OST Article VI State Responsibility data model & legal mechanism protocols
+
+export const STATE_DEFS = {
+  USA: {
+    name: 'United States',
+    color: '#2b82c9',
+    flag: '🇺🇸',
+    note: 'Article VI national responsibility for state (NASA) and commercial authorized entities (CLPS).'
+  },
+  USSR: {
+    name: 'USSR (Historical)',
+    color: '#cc0000',
+    flag: '🛠️',
+    note: 'Historical Article VI state responsibility (1959–1991 Soviet lunar program).'
+  },
+  Russia: {
+    name: 'Russian Federation',
+    color: '#e63946',
+    flag: '🇷🇺',
+    note: 'Post-1991 Article VI state responsibility (Roscosmos).'
+  },
+  China: {
+    name: 'China (CNSA)',
+    color: '#ffb703',
+    flag: '🇨🇳',
+    note: 'Article VI national responsibility for state agencies (CNSA / CLEP).'
+  },
+  India: {
+    name: 'India (ISRO)',
+    color: '#fb8500',
+    flag: '🇮🇳',
+    note: 'Article VI national responsibility for state agency (ISRO).'
+  },
+  Japan: {
+    name: 'Japan (JAXA / Commercial)',
+    color: '#ff4d6d',
+    flag: '🇯🇵',
+    note: 'Article VI national responsibility for state (JAXA) and private licensed operators (ispace).'
+  },
+  SouthKorea: {
+    name: 'South Korea (KARI)',
+    color: '#00a896',
+    flag: '🇰🇷',
+    note: 'Article VI national responsibility for state agency (KARI).'
+  },
+  ESA: {
+    name: 'ESA (Member States)',
+    color: '#00b4d8',
+    flag: '🇪🇺',
+    note: 'Intergovernmental organization. Responsibility shared by ESA and member states under Article VI and Article XIII.'
+  },
+  Israel: {
+    name: 'Israel',
+    color: '#48cae4',
+    flag: '🇮🇱',
+    note: 'Article VI national authorization and continuing supervision for non-governmental entity (SpaceIL).'
+  },
+  Pakistan: {
+    name: 'Pakistan (SUPARCO)',
+    color: '#2a9d8f',
+    flag: '🇵🇰',
+    note: 'Article VI national responsibility for payload operator SUPARCO (joint mission with CNSA).'
+  }
+};
 
 export const FEATURES = [
   // ============================================================
-  // PHYSICAL FEATURES - Maria / Seas
+  // PHYSICAL FEATURES - Maria / Seas (state: null -> Article II Non-Appropriation)
   // ============================================================
-  { id: 'mare_tranquillitatis', name: 'Mare Tranquillitatis', lat: 8.5, lon: 31.4, radius_km: 437, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_imbrium', name: 'Mare Imbrium', lat: 32.8, lon: -15.6, radius_km: 570, tier: 3, tags: ['maria', 'helium3'] },
-  { id: 'mare_serenitatis', name: 'Mare Serenitatis', lat: 28.0, lon: 17.5, radius_km: 374, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_crisium', name: 'Mare Crisium', lat: 17.0, lon: 59.1, radius_km: 281, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'oceanus_procellarum', name: 'Oceanus Procellarum', lat: 18.4, lon: -57.4, radius_km: 1200, tier: 3, tags: ['maria', 'helium3'] },
-  { id: 'mare_orientale', name: 'Mare Orientale', lat: -19.4, lon: -92.8, radius_km: 164, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_nectaris', name: 'Mare Nectaris', lat: -15.2, lon: 35.5, radius_km: 167, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_humorum', name: 'Mare Humorum', lat: -24.4, lon: -38.6, radius_km: 195, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_moscoviense', name: 'Mare Moscoviense (Far Side)', lat: 27.3, lon: 147.9, radius_km: 138, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_ingenii', name: 'Mare Ingenii (Far Side)', lat: -33.7, lon: 163.5, radius_km: 159, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_frigoris', name: 'Mare Frigoris (Sea of Cold)', lat: 56.0, lon: 1.4, radius_km: 450, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'mare_fecunditatis', name: 'Mare Fecunditatis (Sea of Fertility)', lat: -7.8, lon: 51.3, radius_km: 500, tier: 3, tags: ['natural', 'maria'] },
-  { id: 'sinus_iridum', name: 'Sinus Iridum (Bay of Rainbows)', lat: 44.1, lon: -31.5, radius_km: 236, tier: 3, tags: ['natural', 'maria'] },
+  { id: 'mare_tranquillitatis', name: 'Mare Tranquillitatis', lat: 8.5, lon: 31.4, radius_km: 437, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_imbrium', name: 'Mare Imbrium', lat: 32.8, lon: -15.6, radius_km: 570, tier: 3, tags: ['maria', 'helium3'], state: null },
+  { id: 'mare_serenitatis', name: 'Mare Serenitatis', lat: 28.0, lon: 17.5, radius_km: 374, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_crisium', name: 'Mare Crisium', lat: 17.0, lon: 59.1, radius_km: 281, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'oceanus_procellarum', name: 'Oceanus Procellarum', lat: 18.4, lon: -57.4, radius_km: 1200, tier: 3, tags: ['maria', 'helium3'], state: null },
+  { id: 'mare_orientale', name: 'Mare Orientale', lat: -19.4, lon: -92.8, radius_km: 164, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_nectaris', name: 'Mare Nectaris', lat: -15.2, lon: 35.5, radius_km: 167, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_humorum', name: 'Mare Humorum', lat: -24.4, lon: -38.6, radius_km: 195, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_moscoviense', name: 'Mare Moscoviense (Far Side)', lat: 27.3, lon: 147.9, radius_km: 138, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_ingenii', name: 'Mare Ingenii (Far Side)', lat: -33.7, lon: 163.5, radius_km: 159, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_frigoris', name: 'Mare Frigoris (Sea of Cold)', lat: 56.0, lon: 1.4, radius_km: 450, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'mare_fecunditatis', name: 'Mare Fecunditatis (Sea of Fertility)', lat: -7.8, lon: 51.3, radius_km: 500, tier: 3, tags: ['natural', 'maria'], state: null },
+  { id: 'sinus_iridum', name: 'Sinus Iridum (Bay of Rainbows)', lat: 44.1, lon: -31.5, radius_km: 236, tier: 3, tags: ['natural', 'maria'], state: null },
 
   // ============================================================
-  // PHYSICAL FEATURES - Major Craters
+  // PHYSICAL FEATURES - Major Craters (state: null)
   // ============================================================
-  { id: 'tycho', name: 'Tycho Crater', lat: -43.3, lon: -11.2, radius_km: 85, tier: 3, tags: ['craters', 'geology'] },
-  { id: 'copernicus', name: 'Copernicus Crater', lat: 9.6, lon: -20.1, radius_km: 93, tier: 3, tags: ['craters', 'geology'] },
-  { id: 'aristarchus', name: 'Aristarchus Crater', lat: 23.7, lon: -47.4, radius_km: 40, tier: 2, tags: ['craters', 'geology', 'science_interest'] },
-  { id: 'plato', name: 'Plato Crater', lat: 51.6, lon: -9.3, radius_km: 101, tier: 3, tags: ['natural', 'craters'] },
-  { id: 'clavius', name: 'Clavius Crater', lat: -58.4, lon: -14.4, radius_km: 225, tier: 3, tags: ['natural', 'craters'] },
-  { id: 'kepler', name: 'Kepler Crater', lat: 8.1, lon: -38.0, radius_km: 31, tier: 3, tags: ['natural', 'craters'] },
-  { id: 'archimedes', name: 'Archimedes Crater', lat: 29.7, lon: -4.0, radius_km: 83, tier: 3, tags: ['natural', 'craters'] },
-  { id: 'tsiolkovskiy', name: 'Tsiolkovskiy Crater (Far Side)', lat: -20.4, lon: 129.1, radius_km: 185, tier: 2, tags: ['craters', 'science_interest'] },
-  { id: 'jackson', name: 'Jackson Crater (Far Side)', lat: 22.1, lon: -163.3, radius_km: 71, tier: 3, tags: ['natural', 'craters'] },
-  { id: 'korolev', name: 'Korolev Basin/Crater (Far Side)', lat: -4.0, lon: -157.4, radius_km: 437, tier: 3, tags: ['natural', 'craters', 'basins'] },
+  { id: 'tycho', name: 'Tycho Crater', lat: -43.3, lon: -11.2, radius_km: 85, tier: 3, tags: ['craters', 'geology'], state: null },
+  { id: 'copernicus', name: 'Copernicus Crater', lat: 9.6, lon: -20.1, radius_km: 93, tier: 3, tags: ['craters', 'geology'], state: null },
+  { id: 'aristarchus', name: 'Aristarchus Crater', lat: 23.7, lon: -47.4, radius_km: 40, tier: 2, tags: ['craters', 'geology', 'science_interest'], state: null },
+  { id: 'plato', name: 'Plato Crater', lat: 51.6, lon: -9.3, radius_km: 101, tier: 3, tags: ['natural', 'craters'], state: null },
+  { id: 'clavius', name: 'Clavius Crater', lat: -58.4, lon: -14.4, radius_km: 225, tier: 3, tags: ['natural', 'craters'], state: null },
+  { id: 'kepler', name: 'Kepler Crater', lat: 8.1, lon: -38.0, radius_km: 31, tier: 3, tags: ['natural', 'craters'], state: null },
+  { id: 'archimedes', name: 'Archimedes Crater', lat: 29.7, lon: -4.0, radius_km: 83, tier: 3, tags: ['natural', 'craters'], state: null },
+  { id: 'tsiolkovskiy', name: 'Tsiolkovskiy Crater (Far Side)', lat: -20.4, lon: 129.1, radius_km: 185, tier: 2, tags: ['craters', 'science_interest'], state: null },
+  { id: 'jackson', name: 'Jackson Crater (Far Side)', lat: 22.1, lon: -163.3, radius_km: 71, tier: 3, tags: ['natural', 'craters'], state: null },
+  { id: 'korolev', name: 'Korolev Basin/Crater (Far Side)', lat: -4.0, lon: -157.4, radius_km: 437, tier: 3, tags: ['natural', 'craters', 'basins'], state: null },
 
   // ============================================================
-  // PHYSICAL FEATURES - Mountains, Basins, Valleys & Scarps
+  // PHYSICAL FEATURES - Mountains, Basins, Valleys & Scarps (state: null)
   // ============================================================
-  { id: 'montes_apenninus', name: 'Montes Apenninus', lat: 18.9, lon: 3.7, radius_km: 300, tier: 3, tags: ['mountains', 'geology'] },
-  { id: 'montes_caucasus', name: 'Montes Caucasus', lat: 38.4, lon: 10.0, radius_km: 260, tier: 3, tags: ['natural', 'mountains'] },
-  { id: 'montes_alpes', name: 'Montes Alpes', lat: 46.4, lon: -0.8, radius_km: 180, tier: 3, tags: ['natural', 'mountains'] },
-  { id: 'spa_basin', name: 'South Pole-Aitken Basin', lat: -53.0, lon: -169.0, radius_km: 1250, tier: 2, tags: ['basins', 'science_interest', 'data_value'] },
-  { id: 'mons_huygens', name: 'Mons Huygens (Major Massif)', lat: 19.9, lon: -2.9, radius_km: 15, tier: 3, tags: ['mountains', 'geology'] },
-  { id: 'hadley_rille', name: 'Hadley Rille (Apollo 15 site)', lat: 25.8, lon: 3.2, radius_km: 40, tier: 3, tags: ['valles', 'geology'] },
-  { id: 'rupes_recta', name: 'Rupes Recta (Straight Wall)', lat: -22.1, lon: -7.8, radius_km: 50, tier: 3, tags: ['valles', 'geology'] },
+  { id: 'montes_apenninus', name: 'Montes Apenninus', lat: 18.9, lon: 3.7, radius_km: 300, tier: 3, tags: ['mountains', 'geology'], state: null },
+  { id: 'montes_caucasus', name: 'Montes Caucasus', lat: 38.4, lon: 10.0, radius_km: 260, tier: 3, tags: ['natural', 'mountains'], state: null },
+  { id: 'montes_alpes', name: 'Montes Alpes', lat: 46.4, lon: -0.8, radius_km: 180, tier: 3, tags: ['natural', 'mountains'], state: null },
+  { id: 'spa_basin', name: 'South Pole-Aitken Basin', lat: -53.0, lon: -169.0, radius_km: 1250, tier: 2, tags: ['basins', 'science_interest', 'data_value'], state: null },
+  { id: 'mons_huygens', name: 'Mons Huygens (Major Massif)', lat: 19.9, lon: -2.9, radius_km: 15, tier: 3, tags: ['mountains', 'geology'], state: null },
+  { id: 'hadley_rille', name: 'Hadley Rille (Apollo 15 site)', lat: 25.8, lon: 3.2, radius_km: 40, tier: 3, tags: ['valles', 'geology'], state: null },
+  { id: 'rupes_recta', name: 'Rupes Recta (Straight Wall)', lat: -22.1, lon: -7.8, radius_km: 50, tier: 3, tags: ['valles', 'geology'], state: null },
 
   // ============================================================
   // SPATIAL - Soft Landings (Crewed Apollo) - Tier 1 Heritage
   // ============================================================
-  { id: 'apollo_11', name: 'Apollo 11 (Tranquility Base)', lat: 0.674, lon: 23.473, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'political', 'crewed'] },
-  { id: 'apollo_12', name: 'Apollo 12', lat: -3.013, lon: -23.422, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'crewed'] },
-  { id: 'apollo_14', name: 'Apollo 14', lat: -3.645, lon: -17.472, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'crewed'] },
-  { id: 'apollo_15', name: 'Apollo 15 (Hadley-Apennine)', lat: 26.132, lon: 3.633, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'crewed'] },
-  { id: 'apollo_16', name: 'Apollo 16 (Descartes)', lat: -8.973, lon: 15.500, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'crewed'] },
-  { id: 'apollo_17', name: 'Apollo 17 (Taurus-Littrow)', lat: 20.191, lon: 30.772, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage', 'crewed'] },
+  { id: 'apollo_11', name: 'Apollo 11 (Tranquility Base)', lat: 0.674, lon: 23.473, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'political', 'crewed'] },
+  { id: 'apollo_12', name: 'Apollo 12', lat: -3.013, lon: -23.422, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'crewed'] },
+  { id: 'apollo_14', name: 'Apollo 14', lat: -3.645, lon: -17.472, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'crewed'] },
+  { id: 'apollo_15', name: 'Apollo 15 (Hadley-Apennine)', lat: 26.132, lon: 3.633, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'crewed'] },
+  { id: 'apollo_16', name: 'Apollo 16 (Descartes)', lat: -8.973, lon: 15.500, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'crewed'] },
+  { id: 'apollo_17', name: 'Apollo 17 (Taurus-Littrow)', lat: 20.191, lon: 30.772, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage', 'crewed'] },
 
   // ============================================================
   // SPATIAL - Soft Landings (Robotic Historic & Recent)
-  // Tier 1 for heritage, Tier 2 for active/private operations
   // ============================================================
-  { id: 'luna_9', name: 'Luna 9 (first soft landing)', lat: 7.08, lon: -64.37, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_13', name: 'Luna 13', lat: 18.87, lon: -62.05, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'surveyor_1', name: 'Surveyor 1', lat: -2.47, lon: -43.34, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'surveyor_3', name: 'Surveyor 3', lat: -3.016, lon: -23.418, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'surveyor_5', name: 'Surveyor 5', lat: 1.455, lon: 23.194, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'surveyor_6', name: 'Surveyor 6', lat: 0.474, lon: -1.427, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'surveyor_7', name: 'Surveyor 7', lat: -40.981, lon: -11.513, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_16', name: 'Luna 16', lat: -0.51, lon: 56.36, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_17', name: 'Luna 17 / Lunokhod 1', lat: 38.24, lon: -35.00, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_20', name: 'Luna 20', lat: 3.79, lon: 56.62, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_21', name: 'Luna 21 / Lunokhod 2', lat: 25.85, lon: 30.45, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'luna_24', name: 'Luna 24', lat: 12.71, lon: 62.21, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'change_3', name: "Chang'e 3 / Yutu", lat: 44.12, lon: -19.51, radius_km: 10, tier: 1, owner: 'CNSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'change_4', name: "Chang'e 4 / Yutu-2 (Far Side)", lat: -45.46, lon: 177.59, radius_km: 10, tier: 1, owner: 'CNSA', articles: [9], tags: ['landing', 'heritage', 'political'] },
-  { id: 'change_5', name: "Chang'e 5", lat: 43.06, lon: -51.92, radius_km: 10, tier: 1, owner: 'CNSA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'blue_ghost_1', name: 'Blue Ghost Mission 1 (Firefly)', lat: 18.56, lon: 61.81, radius_km: 10, tier: 2, owner: 'NASA/Firefly', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
-  { id: 'chandrayaan3', name: 'Chandrayaan-3 / Vikram', lat: -69.37, lon: 32.32, radius_km: 10, tier: 1, owner: 'ISRO', articles: [9], tags: ['landing', 'heritage', 'political'] },
-  { id: 'slim', name: 'SLIM (Japan)', lat: -13.32, lon: 25.25, radius_km: 10, tier: 1, owner: 'JAXA', articles: [9], tags: ['landing', 'heritage'] },
-  { id: 'im1_odysseus', name: 'IM-1 Odysseus', lat: -80.13, lon: 1.44, radius_km: 10, tier: 2, owner: 'NASA/Intuitive Machines', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
-  { id: 'im2_athena', name: 'IM-2 Athena', lat: -84.79, lon: 29.20, radius_km: 10, tier: 2, owner: 'NASA/Intuitive Machines', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
-  { id: 'change_6', name: "Chang'e 6 (Far Side sample)", lat: -41.64, lon: -153.99, radius_km: 10, tier: 1, owner: 'CNSA', articles: [9], tags: ['landing', 'heritage', 'political'] },
+  { id: 'luna_9', name: 'Luna 9 (first soft landing)', lat: 7.08, lon: -64.37, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_13', name: 'Luna 13', lat: 18.87, lon: -62.05, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'surveyor_1', name: 'Surveyor 1', lat: -2.47, lon: -43.34, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'surveyor_3', name: 'Surveyor 3', lat: -3.016, lon: -23.418, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'surveyor_5', name: 'Surveyor 5', lat: 1.455, lon: 23.194, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'surveyor_6', name: 'Surveyor 6', lat: 0.474, lon: -1.427, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'surveyor_7', name: 'Surveyor 7', lat: -40.981, lon: -11.513, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_16', name: 'Luna 16', lat: -0.51, lon: 56.36, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_17', name: 'Luna 17 / Lunokhod 1', lat: 38.24, lon: -35.00, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_20', name: 'Luna 20', lat: 3.79, lon: 56.62, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_21', name: 'Luna 21 / Lunokhod 2', lat: 25.85, lon: 30.45, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'luna_24', name: 'Luna 24', lat: 12.71, lon: 62.21, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'change_3', name: "Chang'e 3 / Yutu", lat: 44.12, lon: -19.51, radius_km: 10, tier: 1, owner: 'CNSA', state: 'China', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'change_4', name: "Chang'e 4 / Yutu-2 (Far Side)", lat: -45.46, lon: 177.59, radius_km: 10, tier: 1, owner: 'CNSA', state: 'China', articles: [6, 9], tags: ['landing', 'heritage', 'political'] },
+  { id: 'change_5', name: "Chang'e 5", lat: 43.06, lon: -51.92, radius_km: 10, tier: 1, owner: 'CNSA', state: 'China', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'blue_ghost_1', name: 'Blue Ghost Mission 1 (Firefly)', lat: 18.56, lon: 61.81, radius_km: 10, tier: 2, owner: 'Firefly Aerospace / NASA CLPS', state: 'USA', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
+  { id: 'chandrayaan3', name: 'Chandrayaan-3 / Vikram', lat: -69.37, lon: 32.32, radius_km: 10, tier: 1, owner: 'ISRO', state: 'India', articles: [6, 9], tags: ['landing', 'heritage', 'political'] },
+  { id: 'slim', name: 'SLIM (Japan)', lat: -13.32, lon: 25.25, radius_km: 10, tier: 1, owner: 'JAXA', state: 'Japan', articles: [6, 9], tags: ['landing', 'heritage'] },
+  { id: 'im1_odysseus', name: 'IM-1 Odysseus', lat: -80.13, lon: 1.44, radius_km: 10, tier: 2, owner: 'Intuitive Machines / NASA CLPS', state: 'USA', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
+  { id: 'im2_athena', name: 'IM-2 Athena', lat: -84.79, lon: 29.20, radius_km: 10, tier: 2, owner: 'Intuitive Machines / NASA CLPS', state: 'USA', articles: [6, 9], private: true, tags: ['landing', 'heritage'] },
+  { id: 'change_6', name: "Chang'e 6 (Far Side sample)", lat: -41.64, lon: -153.99, radius_km: 10, tier: 1, owner: 'CNSA', state: 'China', articles: [6, 9], tags: ['landing', 'heritage', 'political'] },
 
   // ============================================================
   // SPATIAL - Major Impacts
   // ============================================================
-  { id: 'luna_2', name: 'Luna 2 (first impact)', lat: 29.1, lon: 0.0, radius_km: 10, tier: 1, owner: 'RFSA', articles: [9], tags: ['impact', 'heritage', 'political'] },
-  { id: 'ranger_7', name: 'Ranger 7', lat: -10.63, lon: -20.68, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['impact', 'heritage'] },
-  { id: 'lcross', name: 'LCROSS (Cabeus)', lat: -84.72, lon: -49.36, radius_km: 10, tier: 2, owner: 'NASA', articles: [9], tags: ['impact', 'water_ice', 'science_interest'] },
-  { id: 'chandrayaan2_crash', name: 'Chandrayaan-2 Vikram crash', lat: -70.88, lon: 22.78, radius_km: 10, tier: 2, owner: 'ISRO', articles: [9], tags: ['impact'] },
-  { id: 'luna_25_crash', name: 'Luna 25 crash', lat: -69.55, lon: 61.4, radius_km: 10, tier: 2, owner: 'RFSA', articles: [9], tags: ['impact'] },
-  { id: 'hakuto_r_crash', name: 'Hakuto-R M1 crash', lat: 47.58, lon: 44.09, radius_km: 10, tier: 2, owner: 'JAXA/ispace', articles: [6, 9], private: true, tags: ['impact'] },
-  { id: 'hakuto_r_m2', name: 'Hakuto-R M2 Resilience crash', lat: 60.44, lon: -4.59, radius_km: 10, tier: 2, owner: 'JAXA/ispace', articles: [6, 9], private: true, tags: ['impact'] },
-  { id: 'peregrine_impact', name: 'Peregrine Mission 1', lat: 35.2, lon: -30.5, radius_km: 10, tier: 2, owner: 'NASA/Astrobotic', articles: [6, 9], private: true, tags: ['impact'] },
-  { id: 'beresheet', name: 'Beresheet (Israel, 2019 crash)', lat: 32.6, lon: -19.5, radius_km: 10, tier: 2, owner: 'Israel/IAI', articles: [6, 9], private: true, tags: ['impact', 'heritage'] },
-  { id: 'smart_1', name: 'SMART-1 (ESA, 2006 intentional impact)', lat: 34.2, lon: -46.2, radius_km: 10, tier: 1, owner: 'ESA', articles: [9], tags: ['impact', 'heritage'] },
-  { id: 'grail_ebb_flow', name: 'GRAIL (Ebb & Flow, 2012 impact)', lat: 75.6, lon: -26.4, radius_km: 10, tier: 1, owner: 'NASA', articles: [9], tags: ['impact', 'heritage'] },
-  { id: 'chandrayaan1_mip', name: 'Chandrayaan-1 MIP (2008 impact)', lat: -89.76, lon: 39.0, radius_km: 10, tier: 1, owner: 'ISRO', articles: [9], tags: ['impact', 'heritage'] },
+  { id: 'luna_2', name: 'Luna 2 (first impact)', lat: 29.1, lon: 0.0, radius_km: 10, tier: 1, owner: 'Soviet Space Program', state: 'USSR', articles: [6, 9], tags: ['impact', 'heritage', 'political'] },
+  { id: 'ranger_7', name: 'Ranger 7', lat: -10.63, lon: -20.68, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['impact', 'heritage'] },
+  { id: 'lcross', name: 'LCROSS (Cabeus)', lat: -84.72, lon: -49.36, radius_km: 10, tier: 2, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['impact', 'water_ice', 'science_interest'] },
+  { id: 'chandrayaan2_crash', name: 'Chandrayaan-2 Vikram crash', lat: -70.88, lon: 22.78, radius_km: 10, tier: 2, owner: 'ISRO', state: 'India', articles: [6, 9], tags: ['impact'] },
+  { id: 'luna_25_crash', name: 'Luna 25 crash', lat: -69.55, lon: 61.4, radius_km: 10, tier: 2, owner: 'Roscosmos', state: 'Russia', articles: [6, 9], tags: ['impact'] },
+  { id: 'hakuto_r_crash', name: 'Hakuto-R M1 crash', lat: 47.58, lon: 44.09, radius_km: 10, tier: 2, owner: 'ispace / JAXA', state: 'Japan', articles: [6, 9], private: true, tags: ['impact'] },
+  { id: 'hakuto_r_m2', name: 'Hakuto-R M2 Resilience crash', lat: 60.44, lon: -4.59, radius_km: 10, tier: 2, owner: 'ispace / JAXA', state: 'Japan', articles: [6, 9], private: true, tags: ['impact'] },
+  { id: 'peregrine_impact', name: 'Peregrine Mission 1', lat: 35.2, lon: -30.5, radius_km: 10, tier: 2, owner: 'Astrobotic / NASA CLPS', state: 'USA', articles: [6, 9], private: true, tags: ['impact'] },
+  { id: 'beresheet', name: 'Beresheet (Israel, 2019 crash)', lat: 32.6, lon: -19.5, radius_km: 10, tier: 2, owner: 'SpaceIL / IAI', state: 'Israel', articles: [6, 9], private: true, tags: ['impact', 'heritage'] },
+  { id: 'smart_1', name: 'SMART-1 (ESA, 2006 intentional impact)', lat: 34.2, lon: -46.2, radius_km: 10, tier: 1, owner: 'ESA', state: 'ESA', articles: [6, 9], tags: ['impact', 'heritage'] },
+  { id: 'grail_ebb_flow', name: 'GRAIL (Ebb & Flow, 2012 impact)', lat: 75.6, lon: -26.4, radius_km: 10, tier: 1, owner: 'NASA', state: 'USA', articles: [6, 9], tags: ['impact', 'heritage'] },
+  { id: 'chandrayaan1_mip', name: 'Chandrayaan-1 MIP (2008 impact)', lat: -89.76, lon: 39.0, radius_km: 10, tier: 1, owner: 'ISRO', state: 'India', articles: [6, 9], tags: ['impact', 'heritage'] },
 
   // ============================================================
-  // EXTRACTABLE - Water Ice / PSRs (Tier 1 due to sensitivity + science value)
+  // EXTRACTABLE - Water Ice / PSRs (state: null)
   // ============================================================
-  { id: 'shackleton', name: 'Shackleton Crater', lat: -89.67, lon: 129.78, radius_km: 21, tier: 1, owner: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
-  { id: 'cabeus', name: 'Cabeus Crater', lat: -85.33, lon: -42.13, radius_km: 50, tier: 1, owner: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
-  { id: 'shoemaker', name: 'Shoemaker Crater', lat: -88.14, lon: 45.91, radius_km: 26, tier: 1, owner: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
-  { id: 'haworth', name: 'Haworth Crater', lat: -86.9, lon: -4.0, radius_km: 26, tier: 1, owner: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
+  { id: 'shackleton', name: 'Shackleton Crater', lat: -89.67, lon: 129.78, radius_km: 21, tier: 1, owner: null, state: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
+  { id: 'cabeus', name: 'Cabeus Crater', lat: -85.33, lon: -42.13, radius_km: 50, tier: 1, owner: null, state: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
+  { id: 'shoemaker', name: 'Shoemaker Crater', lat: -88.14, lon: 45.91, radius_km: 26, tier: 1, owner: null, state: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
+  { id: 'haworth', name: 'Haworth Crater', lat: -86.9, lon: -4.0, radius_km: 26, tier: 1, owner: null, state: null, articles: [9], tags: ['water_ice', 'psr', 'science_interest', 'sensitive'] },
 
   // ============================================================
-  // EXTRACTABLE - Mineral / Metal Regions (newly populated)
+  // EXTRACTABLE - Mineral / Metal Regions (state: null)
   // ============================================================
-  { id: 'mineral_tranq', name: 'Mare Tranquillitatis ilmenite-rich basalts', lat: 8.5, lon: 31.4, radius_km: 220, tier: 2, owner: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
-  { id: 'mineral_proc', name: 'Oceanus Procellarum Ti-rich basalts', lat: 18.4, lon: -57.4, radius_km: 260, tier: 2, owner: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
-  { id: 'mineral_imbrium', name: 'Mare Imbrium Ti-rich basalts', lat: 32.8, lon: -15.6, radius_km: 240, tier: 2, owner: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
-  { id: 'mineral_seren', name: 'Mare Serenitatis Ti-rich basalts', lat: 28.0, lon: 17.5, radius_km: 180, tier: 2, owner: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
-  { id: 'mineral_spa', name: 'South Pole-Aitken Basin Mg-suite anomalies', lat: -53.0, lon: -169.0, radius_km: 400, tier: 2, owner: null, source: 'Lunar Prospector / spectral observations', tags: ['minerals'] },
+  { id: 'mineral_tranq', name: 'Mare Tranquillitatis ilmenite-rich basalts', lat: 8.5, lon: 31.4, radius_km: 220, tier: 2, owner: null, state: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
+  { id: 'mineral_proc', name: 'Oceanus Procellarum Ti-rich basalts', lat: 18.4, lon: -57.4, radius_km: 260, tier: 2, owner: null, state: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
+  { id: 'mineral_imbrium', name: 'Mare Imbrium Ti-rich basalts', lat: 32.8, lon: -15.6, radius_km: 240, tier: 2, owner: null, state: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
+  { id: 'mineral_seren', name: 'Mare Serenitatis Ti-rich basalts', lat: 28.0, lon: 17.5, radius_km: 180, tier: 2, owner: null, state: null, source: 'Clementine UVVIS spectral data', tags: ['minerals'] },
+  { id: 'mineral_spa', name: 'South Pole-Aitken Basin Mg-suite anomalies', lat: -53.0, lon: -169.0, radius_km: 400, tier: 2, owner: null, state: null, source: 'Lunar Prospector / spectral observations', tags: ['minerals'] },
 
   // ============================================================
-  // ELECTROMAGNETIC / ENVIRONMENTAL - Radio Quiet Zone (Far Side)
-  // Tier 1 protected site with ITU source
+  // ELECTROMAGNETIC / ENVIRONMENTAL - Radio Quiet Zone (state: null)
   // ============================================================
   {
     id: 'far_side_radio',
@@ -124,6 +185,7 @@ export const FEATURES = [
     tags: ['radio_quiet', 'em_radio'],
     tier: 1,
     owner: null,
+    state: null,
     articles: [9],
     source: 'ITU Radio Regulations, Article 22.22; OST Article IX',
     geometry: {
@@ -136,13 +198,16 @@ export const FEATURES = [
   },
 
   // ============================================================
-  // SPATIAL - Orbital Assets (Tier 2 - coordination required)
+  // SPATIAL - Orbital Assets
   // ============================================================
   {
     id: 'lro_orbit',
     name: 'LRO (Lunar Reconnaissance Orbiter)',
     tags: ['orbits'],
     tier: 2,
+    owner: 'NASA',
+    state: 'USA',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 50,
@@ -158,6 +223,9 @@ export const FEATURES = [
     name: 'Danuri / KPLO',
     tags: ['orbits'],
     tier: 2,
+    owner: 'KARI',
+    state: 'SouthKorea',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 100,
@@ -173,6 +241,9 @@ export const FEATURES = [
     name: 'Chandrayaan-2 Orbiter',
     tags: ['orbits'],
     tier: 2,
+    owner: 'ISRO',
+    state: 'India',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 100,
@@ -188,6 +259,9 @@ export const FEATURES = [
     name: 'Queqiao Relay (L2 Halo)',
     tags: ['lagrange'],
     tier: 2,
+    owner: 'CNSA',
+    state: 'China',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 3500,
@@ -204,6 +278,9 @@ export const FEATURES = [
     name: 'Queqiao-2 Relay',
     tags: ['lagrange'],
     tier: 2,
+    owner: 'CNSA',
+    state: 'China',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 2500,
@@ -220,6 +297,10 @@ export const FEATURES = [
     name: 'CAPSTONE (NRHO)',
     tags: ['lagrange'],
     tier: 2,
+    owner: 'Advanced Space / NASA',
+    state: 'USA',
+    articles: [6, 9],
+    private: true,
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 4000,
@@ -236,6 +317,9 @@ export const FEATURES = [
     name: 'ARTEMIS P1 (NASA)',
     tags: ['orbits'],
     tier: 2,
+    owner: 'NASA',
+    state: 'USA',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 100,
@@ -251,6 +335,9 @@ export const FEATURES = [
     name: 'ARTEMIS P2 (NASA)',
     tags: ['orbits'],
     tier: 2,
+    owner: 'NASA',
+    state: 'USA',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 200,
@@ -263,9 +350,12 @@ export const FEATURES = [
   },
   {
     id: 'lunar_trailblazer',
-    name: 'Lunar Trailblazer (NASA / water mapping)',
+    name: 'Lunar Trailblazer (NASA)',
     tags: ['orbits', 'science_interest'],
     tier: 2,
+    owner: 'NASA / Caltech',
+    state: 'USA',
+    articles: [6, 9],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 100,
@@ -281,6 +371,10 @@ export const FEATURES = [
     name: "ICUBE-Q (Pakistan / Chang'e 6 relay)",
     tags: ['orbits'],
     tier: 2,
+    owner: 'SUPARCO / CNSA',
+    state: 'Pakistan',
+    articles: [6, 9],
+    joint_states: ['Pakistan', 'China'],
     geometry: {
       type: 'orbit',
       radius_km: 1737.4 + 200,

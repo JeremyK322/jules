@@ -191,6 +191,14 @@
             flex-shrink: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
+        .feature-item .state-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-left: -4px;
+        }
         #gear {
             position: absolute; top: 20px; right: 20px; z-index: 30;
             font-size: 0.9rem; font-weight: bold; color: #fff;
@@ -291,6 +299,13 @@
             display: flex; align-items: center; justify-content: space-between;
             gap: 16px; font-size: 0.95rem; padding: 4px 0;
             border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .settings-item.highlight-item {
+            background: rgba(85,170,255,0.12);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(85,170,255,0.3);
+            margin: 4px 0;
         }
         .settings-item:last-child { border-bottom: none; }
         .settings-item .label { color: #ccc; }
@@ -415,6 +430,59 @@
             font-size: 0.9rem;
         }
 
+        /* State Legend Panel */
+        #state-legend-panel {
+            position: absolute;
+            top: 70px;
+            right: 280px;
+            background: rgba(10, 14, 28, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #55aaff;
+            border-radius: 10px;
+            padding: 12px 14px;
+            min-width: 220px;
+            max-width: 280px;
+            z-index: 35;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            user-select: none;
+        }
+        #state-legend-panel.visible { display: block; }
+        .state-legend-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #77ccff;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .state-legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .state-legend-list::-webkit-scrollbar { width: 3px; }
+        .state-legend-list::-webkit-scrollbar-thumb { background: #55aaff; border-radius: 3px; }
+        .state-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: #ddd;
+        }
+        .state-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
         @media (max-width: 500px) {
             #message { top: 12px; font-size: 0.75rem; padding: 4px 12px; }
             #layers-panel { top: 10px; left: 10px; padding: 10px 12px; min-width: 180px; max-width: 280px; font-size: 0.8rem; }
@@ -472,6 +540,15 @@
             <div><span class="label">Sens</span><span class="value" id="sens-display">1.00</span></div>
             <div><span class="label">Rot</span><span class="value" id="rot-state">OFF</span></div>
         </div>
+    </div>
+
+    <!-- State Responsibility Legend Panel (Visible when State Mode ON) -->
+    <div id="state-legend-panel">
+        <div class="state-legend-title">
+            <span>Art. VI State Parties</span>
+            <span style="font-size: 0.75rem; color: #aaa;">OST Map</span>
+        </div>
+        <div class="state-legend-list" id="state-legend-list"></div>
     </div>
 
     <!-- Help Button & Modal -->
@@ -590,6 +667,13 @@
             <span class="label"> Reset View</span>
             <button class="action-btn" id="reset-view-btn">Reset</button>
         </div>
+        <div class="settings-item highlight-item">
+            <span class="label" style="font-weight: bold; color: #77ccff;" title="Switch assets from resource colors to OST Article VI State Responsibility colors">Art. VI State Mode</span>
+            <div class="toggle">
+                <span class="toggle-label" id="state-mode-label" style="color: #77ccff;">OFF</span>
+                <div class="toggle-switch" id="state-mode-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
         <div class="settings-item">
             <span class="label"> Lock N/S Pole</span>
             <div class="toggle">
@@ -626,7 +710,7 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { FEATURES, LAYER_DEFS, CATEGORIES, TIER_DEFS } from './moonLayers.js';
+        import { FEATURES, LAYER_DEFS, CATEGORIES, TIER_DEFS, STATE_DEFS } from './moonLayers.js';
 
         const msgEl = document.getElementById('message');
         const fileInput = document.getElementById('file-input');
@@ -638,6 +722,12 @@
         const rotLabel = document.getElementById('rot-label');
         const lockToggle = document.getElementById('lock-toggle');
         const lockLabel = document.getElementById('lock-label');
+        const stateModeToggle = document.getElementById('state-mode-toggle');
+        const stateModeLabel = document.getElementById('state-mode-label');
+        const stateLegendPanel = document.getElementById('state-legend-panel');
+        const stateLegendList = document.getElementById('state-legend-list');
+
+        let isStateModeActive = false;
         const distSpan = document.getElementById('dist');
         const latSpan = document.getElementById('lat-display');
         const lonSpan = document.getElementById('lon-display');
@@ -855,6 +945,22 @@
             for (const feature of filtered) {
                 const lines = [];
                 lines.push(feature.name);
+
+                // Article VI State Responsibility line
+                if (feature.state && STATE_DEFS[feature.state]) {
+                    const st = STATE_DEFS[feature.state];
+                    let stLine = `Art. VI State Responsibility: ${st.name}`;
+                    if (feature.joint_states && feature.joint_states.length > 1) {
+                        stLine += ` (Joint: ${feature.joint_states.join(', ')})`;
+                    }
+                    lines.push(stLine);
+                    if (st.note) {
+                        lines.push(`  └ Note: ${st.note}`);
+                    }
+                } else if (feature.state === null && !feature.tags.includes('natural')) {
+                    lines.push('Art. II: Surface area not subject to national appropriation');
+                }
+
                 if (feature.tier && TIER_DEFS[feature.tier]) {
                     lines.push(`Tier ${feature.tier} – ${TIER_DEFS[feature.tier].label}`);
                 }
@@ -862,8 +968,8 @@
                     for (const article of feature.articles) {
                         let text = '';
                         if (article === 6) {
-                            const reason = feature.private ? 'Private mission' : 'State responsibility';
-                            text = `Art.6 – ${reason}`;
+                            const reason = feature.private ? 'Private authorized mission' : 'State responsibility';
+                            text = `Art. 6 – ${reason}`;
                         } else if (article === 9) {
                             let reason = '';
                             for (const tag of feature.tags || []) {
@@ -873,10 +979,10 @@
                                 }
                             }
                             if (!reason) reason = 'Consult before disturbance';
-                            text = `Art.9 – ${reason}`;
+                            text = `Art. 9 – ${reason}`;
                         }
                         if (text) {
-                            if (feature.owner) text += ` – ${feature.owner}`;
+                            if (feature.owner) text += ` (${feature.owner})`;
                             lines.push(text);
                         }
                     }
@@ -1069,6 +1175,24 @@
             updateGlobalToggle();
         }
 
+        function buildStateLegendUI() {
+            stateLegendList.innerHTML = '';
+            for (const [key, st] of Object.entries(STATE_DEFS)) {
+                const item = document.createElement('div');
+                item.className = 'state-legend-item';
+                item.title = st.note || '';
+                const colorBox = document.createElement('span');
+                colorBox.className = 'state-legend-color';
+                colorBox.style.backgroundColor = st.color;
+                const nameLabel = document.createElement('span');
+                nameLabel.textContent = `${st.flag || ''} ${st.name}`;
+                item.appendChild(colorBox);
+                item.appendChild(nameLabel);
+                stateLegendList.appendChild(item);
+            }
+        }
+        buildStateLegendUI();
+
         function buildLayerUI() {
             layerList.innerHTML = '';
             activeLayers.clear();
@@ -1194,10 +1318,21 @@
                         const featureDot = document.createElement('span');
                         featureDot.className = 'feature-dot';
                         featureDot.style.backgroundColor = def.color || '#ff5555';
-                        const featureLabel = document.createElement('span');
-                        featureLabel.textContent = feature.name;
+                        featureDot.title = `Resource Category: ${def.label}`;
+
                         featureItem.appendChild(featureCheck);
                         featureItem.appendChild(featureDot);
+
+                        if (feature.state && STATE_DEFS[feature.state]) {
+                            const stDot = document.createElement('span');
+                            stDot.className = 'state-dot';
+                            stDot.style.backgroundColor = STATE_DEFS[feature.state].color;
+                            stDot.title = `Art. VI Responsible State: ${STATE_DEFS[feature.state].name}`;
+                            featureItem.appendChild(stDot);
+                        }
+
+                        const featureLabel = document.createElement('span');
+                        featureLabel.textContent = feature.name;
                         featureItem.appendChild(featureLabel);
                         featureList.appendChild(featureItem);
                     }
@@ -1286,6 +1421,16 @@
             });
 
             highlightActiveLayerItems();
+        }
+
+        function getFeatureColor(feature, primaryLayerKey) {
+            if (isStateModeActive && feature.state && STATE_DEFS[feature.state]) {
+                return STATE_DEFS[feature.state].color;
+            }
+            if (primaryLayerKey && LAYER_DEFS[primaryLayerKey]) {
+                return LAYER_DEFS[primaryLayerKey].color;
+            }
+            return '#ff5555';
         }
 
         function applyDiscVisibility() {
@@ -1392,7 +1537,7 @@
                         entry.satellite.label.visible = true;
                     }
 
-                    const color = LAYER_DEFS[primaryKey].color || '#ff5555';
+                    const color = getFeatureColor(feature, primaryKey);
                     if (entry.discObject && entry.discObject.material) entry.discObject.material.color.set(color);
                 } else {
                     featureActiveState.set(fid, false);
@@ -1563,6 +1708,20 @@
 
         resetViewBtn.addEventListener('click', (e) => { e.stopPropagation(); resetView(); });
 
+        function updateStateModeUI() {
+            stateModeToggle.classList.toggle('on', isStateModeActive);
+            stateModeLabel.textContent = isStateModeActive ? 'ON' : 'OFF';
+            stateLegendPanel.classList.toggle('visible', isStateModeActive);
+            updateVisibility(activeLayers);
+        }
+        stateModeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isStateModeActive = !isStateModeActive;
+            updateStateModeUI();
+            showMessage(isStateModeActive ? 'Art. VI State Responsibility Mode ON' : 'Resource Category Mode ON', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1800);
+        });
+
         function updateLockUI() {
             const on = isPoleLocked;
             lockToggle.classList.toggle('on', on);
@@ -1720,7 +1879,6 @@
             for (const sat of satelliteList) {
                 if (sat.parentObject.visible) {
                     sat.group.visible = true;
-                    sat.label.visible = false;
                     sat.angle += delta * sat.speed;
                     const r = sat.radius3D;
                     const inc = sat.inclinationRad;
@@ -1732,6 +1890,7 @@
                     sat.group.position.set(x, y, z);
                     const satZoomScale = Math.max(0.6, Math.min(1.2, (dist - 1.05) / 2.5));
                     sat.group.scale.setScalar(satZoomScale);
+
                     const satWorldPos = new THREE.Vector3();
                     sat.group.getWorldPosition(satWorldPos);
                     const labelOffset = satWorldPos.clone().normalize().multiplyScalar(0.12 * satZoomScale);
