@@ -409,8 +409,8 @@
             z-index: 10;
             border: 1px solid rgba(85, 170, 255, 0.25);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            min-width: 280px;
-            max-width: 330px;
+            min-width: 300px;
+            max-width: 360px;
             user-select: none;
         }
         .hud-header {
@@ -455,7 +455,7 @@
             display: flex;
             align-items: flex-start;
             gap: 8px;
-            max-height: 160px;
+            max-height: 220px;
             overflow-y: auto;
         }
         .hud-status-container::-webkit-scrollbar { width: 3px; }
@@ -1023,8 +1023,6 @@
             const overlappingFeatures = [];
 
             for (const feature of FEATURES) {
-                if (feature.tags && feature.tags.includes('natural')) continue;
-                if (feature.geometry && feature.geometry.type === 'orbit') continue;
                 if (!feature.tags.some(t => activeTags.has(t))) continue;
                 if (featureEnabledState.has(feature.id) && !featureEnabledState.get(feature.id)) continue;
 
@@ -1041,9 +1039,19 @@
                         overlaps = true;
                         distKm = distanceBetween(lat, lon, hLat, hLon);
                     }
+                } else if (type === 'orbit') {
+                    const entry = featureObjects[feature.id];
+                    if (entry && entry.satellite && entry.satellite.group) {
+                        const satLatLon = positionToLatLon(entry.satellite.group.position);
+                        distKm = distanceBetween(lat, lon, satLatLon.lat, satLatLon.lon);
+                        if (distKm < 800) overlaps = true;
+                    } else {
+                        distKm = 500;
+                        overlaps = true;
+                    }
                 } else {
                     const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
-                    const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);
+                    const detectionRadius = Math.max(featureRadius, 150);
                     distKm = distanceBetween(lat, lon, feature.lat, feature.lon);
                     if (distKm < detectionRadius) overlaps = true;
                 }
@@ -1054,50 +1062,50 @@
 
             if (overlappingFeatures.length === 0) return null;
 
-            // Pick the single closest feature to the current crosshairs location
+            // Pick the single closest feature to the current location
             overlappingFeatures.sort((a, b) => a.distKm - b.distKm);
             const { feature, distKm } = overlappingFeatures[0];
 
+            // 1. Name
             let html = `<div class="hud-feature-title">${feature.name}</div>`;
-            html += `<div class="hud-feature-dist">Distance: ${distKm.toFixed(1)} km</div>`;
 
+            // 2. Category layer
+            let primaryLayerKey = null;
+            for (const key of layerPriority) {
+                if (activeLayers.has(key)) {
+                    const def = LAYER_DEFS[key];
+                    if (def && feature.tags.some(t => def.tags.includes(t))) {
+                        primaryLayerKey = key;
+                        break;
+                    }
+                }
+            }
+            const categoryLabel = primaryLayerKey && LAYER_DEFS[primaryLayerKey] ? LAYER_DEFS[primaryLayerKey].label : 'General';
+            html += `<div class="hud-detail-line"><strong>Category:</strong> ${categoryLabel}</div>`;
+
+            // 3. Tier label from TIER_DEFS
+            const tierObj = TIER_DEFS[feature.tier] || TIER_DEFS[3];
+            html += `<div class="hud-detail-line"><strong>Tier:</strong> Tier ${feature.tier || 3} (${tierObj.label})</div>`;
+
+            // 4. Article VI responsibility
             if (feature.state && STATE_DEFS[feature.state]) {
                 const st = STATE_DEFS[feature.state];
                 let stName = st.name;
                 if (feature.joint_states && feature.joint_states.length > 1) {
                     stName += ` (Joint: ${feature.joint_states.join(', ')})`;
                 }
-                html += `<div class="hud-detail-line"><strong>State:</strong> ${st.flag || ''} ${stName}</div>`;
-            } else if (feature.state === null && !feature.tags.includes('natural')) {
-                html += `<div class="hud-detail-line"><strong>Art. II:</strong> Non-appropriated zone</div>`;
+                html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> ${st.flag || ''} ${stName}</div>`;
+            } else {
+                html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> None. Article II. Natural feature not subject to appropriation.</div>`;
             }
 
-            if (feature.tier && TIER_DEFS[feature.tier]) {
-                html += `<div class="hud-detail-line"><strong>Tier:</strong> ${feature.tier} (${TIER_DEFS[feature.tier].label})</div>`;
-            }
+            // 5. Source
+            const sourceText = feature.source || 'Unverified. Pending source confirmation.';
+            html += `<div class="hud-detail-line"><strong>Source:</strong> ${sourceText}</div>`;
 
-            if (feature.articles) {
-                const articleTexts = [];
-                for (const article of feature.articles) {
-                    if (article === 6) {
-                        const reason = feature.private ? 'Private mission' : 'State responsibility';
-                        articleTexts.push(`Art. 6 (${reason})`);
-                    } else if (article === 9) {
-                        let reason = '';
-                        for (const tag of feature.tags || []) {
-                            if (TAG_REASON_MAP[tag]) {
-                                reason = TAG_REASON_MAP[tag];
-                                break;
-                            }
-                        }
-                        if (!reason) reason = 'Due regard';
-                        articleTexts.push(`Art. 9 (${reason})`);
-                    }
-                }
-                if (articleTexts.length > 0) {
-                    html += `<div class="hud-detail-line"><strong>Articles:</strong> ${articleTexts.join(' · ')}</div>`;
-                }
-            }
+            // 6. Notes (One line only)
+            const noteText = feature.note || 'No additional note.';
+            html += `<div class="hud-detail-line"><strong>Notes:</strong> ${noteText}</div>`;
 
             return {
                 html,
