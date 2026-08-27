@@ -342,7 +342,7 @@
         }
         .slider-value { min-width: 32px; text-align: center; color: #ddd; font-size: 0.9rem; }
 
-        /* Info Display (bottom-right) with collapse functionality */
+        /* Info Display (bottom-right) with collapse functionality - hidden by default */
         #info-display {
             position: absolute; bottom: 24px; right: 24px;
             color: rgba(255,255,255,0.75);
@@ -350,8 +350,9 @@
             padding: 10px 16px; border-radius: 8px; font-size: 0.85rem;
             font-family: 'Courier New', monospace; z-index: 10;
             border: 1px solid rgba(255,255,255,0.08); line-height: 1.7; min-width: 140px;
-            user-select: none;
+            user-select: none; display: none;
         }
+        #info-display.visible { display: block; }
         #info-display-header {
             display: flex;
             justify-content: space-between;
@@ -392,49 +393,101 @@
         #info-display .label { color: #99b; margin-right: 8px; display: inline-block; min-width: 44px; }
         #info-display .value { color: #dde; font-weight: bold; }
 
-        /* Centre overlap display (bottom-left) */
+        /* Centre overlap display (bottom-left telemetry HUD) */
         #centre-overlap-display {
             position: absolute;
             bottom: 24px;
             left: 24px;
-            color: rgba(255, 255, 255, 0.85);
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(4px);
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-family: 'Courier New', monospace;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(8, 12, 24, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-family: 'Courier New', Courier, monospace;
             pointer-events: none;
             z-index: 10;
-            border: 1px solid rgba(255,255,255,0.08);
-            line-height: 1.6;
-            max-width: 320px;
-            min-width: 160px;
-            transition: opacity 0.2s;
+            border: 1px solid rgba(85, 170, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            min-width: 270px;
+            max-width: 330px;
+            user-select: none;
         }
-        #centre-overlap-display .label {
-            color: #99b;
-            margin-right: 8px;
-            display: inline-block;
-            min-width: 44px;
-        }
-        #centre-overlap-display .value {
-            color: #dde;
+        .hud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
             font-weight: bold;
+            color: #55aaff;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            font-family: Arial, sans-serif;
+        }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .hud-row:last-child {
+            margin-bottom: 0;
+        }
+        .hud-label {
+            color: #8899aa;
+            font-weight: 600;
+            font-size: 0.78rem;
+            min-width: 42px;
+        }
+        .hud-val {
+            color: #77ccff;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        .hud-status-container {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .hud-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #4a8;
+            box-shadow: 0 0 6px rgba(68, 170, 136, 0.6);
+        }
+        .hud-status-dot.active-constraint {
+            background-color: #ff5555;
+            box-shadow: 0 0 8px rgba(255, 85, 85, 0.8);
+        }
+        .hud-status-dot.active-warning {
+            background-color: #ffaa00;
+            box-shadow: 0 0 8px rgba(255, 170, 0, 0.8);
+        }
+        #centre-overlap-text {
+            color: #eeeeee;
+            font-weight: 500;
             word-wrap: break-word;
             white-space: pre-line;
-        }
-        #centre-overlap-display .centre-latlon {
-            color: #88ccff;
-            font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            flex: 1;
         }
 
-        /* State Legend Panel */
+        /* State Legend Panel (bottom-right) */
         #state-legend-panel {
             position: absolute;
-            top: 70px;
-            right: 280px;
+            bottom: 24px;
+            right: 24px;
             background: rgba(10, 14, 28, 0.92);
             backdrop-filter: blur(8px);
             border: 1px solid #55aaff;
@@ -446,6 +499,7 @@
             display: none;
             box-shadow: 0 8px 24px rgba(0,0,0,0.7);
             user-select: none;
+            transition: bottom 0.25s ease;
         }
         #state-legend-panel.visible { display: block; }
         .state-legend-title {
@@ -515,15 +569,22 @@
 
     <div id="layers-toggle" title="Show layers">Layers</div>
 
-    <!-- Centre overlap display (bottom-left) -->
+    <!-- Centre overlap display (bottom-left telemetry HUD) -->
     <div id="centre-overlap-display">
-        <div>
-            <span class="label">Loc:</span>
-            <span class="centre-latlon" id="centre-latlon">Centre of screen</span>
+        <div class="hud-header">
+            <span>⊕ LUNAR TELEMETRY</span>
         </div>
-        <div>
-            <span class="label">Status:</span>
-            <span class="value" id="centre-overlap-text">-</span>
+        <div class="hud-row">
+            <span class="hud-label">LAT:</span>
+            <span class="hud-val" id="centre-lat">0.00° N</span>
+        </div>
+        <div class="hud-row">
+            <span class="hud-label">LON:</span>
+            <span class="hud-val" id="centre-lon">0.00° E</span>
+        </div>
+        <div class="hud-status-container">
+            <span class="hud-status-dot" id="hud-status-dot"></span>
+            <span id="centre-overlap-text">Open</span>
         </div>
     </div>
 
@@ -563,7 +624,8 @@
                 <button class="help-tab-btn active" data-tab="about">About LCM & OST</button>
                 <button class="help-tab-btn" data-tab="settings">Settings</button>
                 <button class="help-tab-btn" data-tab="layers">Layers</button>
-                <button class="help-tab-btn" data-tab="info">Info Displays</button>
+                <button class="help-tab-btn" data-tab="state-mode">Art. VI State Mode & Legend</button>
+                <button class="help-tab-btn" data-tab="info">Debug & Info Panels</button>
             </div>
             <div class="help-content">
                 <!-- Tab 1: Navigation & About LCM -->
@@ -614,6 +676,8 @@
                     <ul>
                         <li><strong>Load GLB:</strong> Load a custom 3D mesh model (`.glb` or `.gltf` file) for the lunar sphere. You can also drag and drop model files anywhere onto the canvas.</li>
                         <li><strong>Reset View:</strong> Resets camera position and target orientation to default coordinates.</li>
+                        <li><strong>Art. VI State Mode:</strong> Switches feature disc/line rendering to OST Article VI State Responsibility colors and toggles the bottom-right State Parties Legend panel.</li>
+                        <li><strong>Info Debug Panel:</strong> Shows or hides the real-time telemetry/camera debug panel at the bottom-right corner of the view.</li>
                         <li><strong>Lock N/S Pole:</strong> Restricts camera orbit control to the equatorial plane (locking vertical North/South polar tilt).</li>
                         <li><strong>Auto-rotate:</strong> Toggles continuous slow rotation of the lunar globe.</li>
                         <li><strong>Glow Opacity:</strong> Adjusts the transparency slider (0.00 to 1.00) for active 3D surface feature discs and highlight overlays.</li>
@@ -632,22 +696,35 @@
                     </ul>
                 </div>
 
-                <!-- Tab 4: Info Displays -->
+                <!-- Tab 4: Art. VI State Mode & Legend -->
+                <div class="help-tab-pane" id="tab-state-mode">
+                    <h3>OST Article VI State Responsibility Mode</h3>
+                    <p><strong>Art. VI State Mode</strong> visualizes state party authorization and supervision responsibilities under the Outer Space Treaty:</p>
+                    <ul>
+                        <li><strong>State Party Color Palette:</strong> Toggling State Mode recolors surface landing sites, bases, and orbital tracks according to responsible State Parties (USA, USSR Historical, Russian Federation, China, India, Japan, South Korea, ESA Member States, Israel, Pakistan).</li>
+                        <li><strong>State Parties Legend Panel:</strong> Appears in the bottom-right corner when State Mode is ON, listing active State Parties and international intergovernmental mechanisms (e.g., ESA joint responsibility under Art. VI & XIII).</li>
+                        <li><strong>Dual Indicator Dots:</strong> Feature sub-lists in the Moon Layers sidebar display both resource category dots and state responsibility dots.</li>
+                        <li><strong>Non-Appropriation Principle (Art. II):</strong> Natural physical landforms (craters, maria, mountain ranges) retain `state: null` designations to reflect OST Article II non-appropriation.</li>
+                    </ul>
+                </div>
+
+                <!-- Tab 5: Info & Debug Panels -->
                 <div class="help-tab-pane" id="tab-info">
-                    <h3>On-Screen Information Panels</h3>
-                    <h4>Bottom-Right Panel (INFO)</h4>
+                    <h3>On-Screen Information & Debug Panels</h3>
+                    <h4>Bottom-Right Info Debug Panel</h4>
+                    <p>Disabled by default, but can be enabled via the <strong>Info Debug Panel</strong> toggle in Settings:</p>
                     <ul>
                         <li><strong>Dist:</strong> Camera distance multiplier relative to the center of the Moon.</li>
                         <li><strong>Lat / Lon:</strong> Latitude (deg N/S) and Longitude (deg E/W) of current camera viewpoint.</li>
                         <li><strong>Sens:</strong> Dynamic orbital rotation sensitivity based on zoom level.</li>
                         <li><strong>Rot:</strong> Auto-rotation state (`ON` / `OFF`).</li>
-                        <li><strong>Collapse Button `[-] / [+]`:</strong> Minimizes the info panel to a compact header bar.</li>
+                        <li><strong>Collapse Button `[-] / [+]`:</strong> Minimizes the debug panel to a compact header bar.</li>
                     </ul>
 
                     <h4>Bottom-Left Panel (Centre Overlap Status)</h4>
                     <ul>
                         <li><strong>Loc:</strong> Coordinates on the lunar surface directly at the center of your screen view.</li>
-                        <li><strong>Status:</strong> Shows active zone constraints, applicable OST Articles (Art. 6 / Art. 9), tier levels, and feature names located at the center crosshairs, or displays <em>"Open"</em> if no active constraints overlap.</li>
+                        <li><strong>Status:</strong> Shows active zone constraints, applicable OST Articles (Art. 6 / Art. 9 / Art. 2), tier levels, state responsibility tags, and feature names located at the center crosshairs, or displays <em>"Open"</em> if no active constraints overlap.</li>
                     </ul>
                 </div>
             </div>
@@ -672,6 +749,13 @@
             <div class="toggle">
                 <span class="toggle-label" id="state-mode-label" style="color: #77ccff;">OFF</span>
                 <div class="toggle-switch" id="state-mode-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label" title="Show or hide camera telemetry and rotation debug panel">Info Debug Panel</span>
+            <div class="toggle">
+                <span class="toggle-label" id="info-debug-label">OFF</span>
+                <div class="toggle-switch" id="info-debug-toggle"><div class="slider"></div></div>
             </div>
         </div>
         <div class="settings-item">
@@ -726,8 +810,11 @@
         const stateModeLabel = document.getElementById('state-mode-label');
         const stateLegendPanel = document.getElementById('state-legend-panel');
         const stateLegendList = document.getElementById('state-legend-list');
+        const infoDebugToggle = document.getElementById('info-debug-toggle');
+        const infoDebugLabel = document.getElementById('info-debug-label');
 
         let isStateModeActive = false;
+        let isInfoDebugActive = false;
         const distSpan = document.getElementById('dist');
         const latSpan = document.getElementById('lat-display');
         const lonSpan = document.getElementById('lon-display');
@@ -742,8 +829,10 @@
         const globalToggle = document.getElementById('global-toggle');
         const infoDisplay = document.getElementById('info-display');
         const infoToggleBtn = document.getElementById('info-toggle-btn');
-        const centreLatLonEl = document.getElementById('centre-latlon');
+        const centreLatEl = document.getElementById('centre-lat');
+        const centreLonEl = document.getElementById('centre-lon');
         const centreOverlapText = document.getElementById('centre-overlap-text');
+        const hudStatusDotEl = document.getElementById('hud-status-dot');
 
         let isInfoCollapsed = false;
         infoToggleBtn.addEventListener('click', (e) => {
@@ -865,7 +954,7 @@
             let normalizedLon = ((lonDeg + 180) % 360 + 360) % 360 - 180;
             const absLon = Math.abs(normalizedLon);
             const dir = normalizedLon >= 0 ? 'E' : 'W';
-            return `${absLon.toFixed(2)} deg ${dir}`;
+            return `${absLon.toFixed(2)}° ${dir}`;
         }
 
         const MOON_RADIUS_KM = 1737.4;
@@ -1712,6 +1801,7 @@
             stateModeToggle.classList.toggle('on', isStateModeActive);
             stateModeLabel.textContent = isStateModeActive ? 'ON' : 'OFF';
             stateLegendPanel.classList.toggle('visible', isStateModeActive);
+            adjustBottomRightPanels();
             updateVisibility(activeLayers);
         }
         stateModeToggle.addEventListener('click', (e) => {
@@ -1721,6 +1811,29 @@
             showMessage(isStateModeActive ? 'Art. VI State Responsibility Mode ON' : 'Resource Category Mode ON', 'success');
             setTimeout(() => showMessage('', 'hidden'), 1800);
         });
+
+        function updateInfoDebugUI() {
+            infoDebugToggle.classList.toggle('on', isInfoDebugActive);
+            infoDebugLabel.textContent = isInfoDebugActive ? 'ON' : 'OFF';
+            infoDisplay.classList.toggle('visible', isInfoDebugActive);
+            adjustBottomRightPanels();
+        }
+        infoDebugToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isInfoDebugActive = !isInfoDebugActive;
+            updateInfoDebugUI();
+            showMessage(isInfoDebugActive ? 'Info Debug Panel Enabled' : 'Info Debug Panel Disabled', 'info');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        });
+
+        function adjustBottomRightPanels() {
+            if (isInfoDebugActive && isStateModeActive) {
+                const infoHeight = infoDisplay.offsetHeight || 160;
+                stateLegendPanel.style.bottom = `${infoHeight + 36}px`;
+            } else {
+                stateLegendPanel.style.bottom = '24px';
+            }
+        }
 
         function updateLockUI() {
             const on = isPoleLocked;
@@ -1778,6 +1891,7 @@
 
         let clock = new THREE.Clock();
         let highlightedFeatureIds = new Set();
+        let lastTelemetryTime = 0;
 
         function animate() {
             requestAnimationFrame(animate);
@@ -1845,8 +1959,28 @@
                 }
             }
 
-            const statusList = getFeatureStatus(lat, lon);
-            centreOverlapText.textContent = statusList.length ? statusList.join('\n') : 'Open';
+            const now = performance.now();
+            if (now - lastTelemetryTime >= 33) {
+                lastTelemetryTime = now;
+                const latStr = lat >= 0 ? `${lat.toFixed(2)}° N` : `${(-lat).toFixed(2)}° S`;
+                const lonStr = lonToDisplay(lon);
+
+                centreLatEl.textContent = latStr;
+                centreLonEl.textContent = lonStr;
+
+                const statusList = getFeatureStatus(lat, lon);
+                if (statusList.length > 0) {
+                    centreOverlapText.textContent = statusList.join('\n');
+                    if (statusList.some(s => s.includes('Tier 1') || s.includes('Art. 9'))) {
+                        hudStatusDotEl.className = 'hud-status-dot active-constraint';
+                    } else {
+                        hudStatusDotEl.className = 'hud-status-dot active-warning';
+                    }
+                } else {
+                    centreOverlapText.textContent = 'Open';
+                    hudStatusDotEl.className = 'hud-status-dot';
+                }
+            }
 
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
@@ -1914,7 +2048,6 @@
             latSpan.textContent = lat >= 0 ? `${lat.toFixed(2)} deg N` : `${(-lat).toFixed(2)} deg S`;
             lonSpan.textContent = lonToDisplay(lon);
             distSpan.textContent = dist.toFixed(3);
-            centreLatLonEl.textContent = `${lat >= 0 ? lat.toFixed(2) + ' deg N' : (-lat).toFixed(2) + ' deg S'}, ${lonToDisplay(lon)}`;
 
             renderer.render(scene, camera);
         }
