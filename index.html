@@ -399,17 +399,17 @@
             bottom: 24px;
             left: 24px;
             color: rgba(255, 255, 255, 0.9);
-            background: rgba(8, 12, 24, 0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(8, 12, 24, 0.88);
+            backdrop-filter: blur(10px);
             padding: 12px 16px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 0.8rem;
-            font-family: 'Courier New', Courier, monospace;
-            pointer-events: none;
+            font-family: Arial, Helvetica, sans-serif;
+            pointer-events: auto;
             z-index: 10;
-            border: 1px solid rgba(85, 170, 255, 0.2);
+            border: 1px solid rgba(85, 170, 255, 0.25);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            min-width: 270px;
+            min-width: 280px;
             max-width: 330px;
             user-select: none;
         }
@@ -424,13 +424,13 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 6px;
             margin-bottom: 8px;
-            font-family: Arial, sans-serif;
         }
         .hud-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 4px;
+            font-family: 'Courier New', Courier, monospace;
         }
         .hud-row:last-child {
             margin-bottom: 0;
@@ -440,6 +440,7 @@
             font-weight: 600;
             font-size: 0.78rem;
             min-width: 42px;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .hud-val {
             color: #77ccff;
@@ -449,17 +450,21 @@
         }
         .hud-status-container {
             margin-top: 8px;
-            padding-top: 6px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: flex-start;
             gap: 8px;
+            max-height: 160px;
+            overflow-y: auto;
         }
+        .hud-status-container::-webkit-scrollbar { width: 3px; }
+        .hud-status-container::-webkit-scrollbar-thumb { background: #55aaff; border-radius: 3px; }
         .hud-status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            margin-top: 5px;
+            margin-top: 4px;
             flex-shrink: 0;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             background-color: #4a8;
@@ -476,11 +481,25 @@
         #centre-overlap-text {
             color: #eeeeee;
             font-weight: 500;
-            word-wrap: break-word;
-            white-space: pre-line;
             font-size: 0.78rem;
-            line-height: 1.45;
+            line-height: 1.4;
             flex: 1;
+        }
+        .hud-feature-title {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+        .hud-feature-dist {
+            font-size: 0.72rem;
+            color: #88aacc;
+            margin-bottom: 4px;
+        }
+        .hud-detail-line {
+            color: #cccccc;
+            font-size: 0.75rem;
+            margin-top: 2px;
         }
 
         /* State Legend Panel (bottom-right) */
@@ -999,7 +1018,7 @@
         }
 
         function getFeatureStatus(lat, lon) {
-            if (activeLayers.size === 0) return [];
+            if (activeLayers.size === 0) return null;
             const activeTags = getActiveTags();
             const overlappingFeatures = [];
 
@@ -1011,74 +1030,80 @@
 
                 const geom = feature.geometry;
                 const type = geom ? geom.type : 'point';
+                let distKm = 0;
                 let overlaps = false;
                 if (type === 'hemisphere') {
                     const hLat = geom.lat ?? 0;
                     const hLon = geom.lon ?? 180;
                     const hPos = latLonToPosition(hLat, hLon, 1);
                     const curPos = latLonToPosition(lat, lon, 1);
-                    if (hPos.dot(curPos) > 0) overlaps = true;
+                    if (hPos.dot(curPos) > 0) {
+                        overlaps = true;
+                        distKm = distanceBetween(lat, lon, hLat, hLon);
+                    }
                 } else {
                     const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
                     const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);
-                    const d = distanceBetween(lat, lon, feature.lat, feature.lon);
-                    if (d < detectionRadius) overlaps = true;
+                    distKm = distanceBetween(lat, lon, feature.lat, feature.lon);
+                    if (distKm < detectionRadius) overlaps = true;
                 }
-                if (overlaps) overlappingFeatures.push(feature);
+                if (overlaps) {
+                    overlappingFeatures.push({ feature, distKm });
+                }
             }
 
-            if (overlappingFeatures.length === 0) return [];
-            const highestTier = Math.min(...overlappingFeatures.map(f => f.tier || 3));
-            const filtered = overlappingFeatures.filter(f => (f.tier || 3) === highestTier);
-            const statuses = [];
-            for (const feature of filtered) {
-                const lines = [];
-                lines.push(feature.name);
+            if (overlappingFeatures.length === 0) return null;
 
-                // Article VI State Responsibility line
-                if (feature.state && STATE_DEFS[feature.state]) {
-                    const st = STATE_DEFS[feature.state];
-                    let stLine = `Art. VI State Responsibility: ${st.name}`;
-                    if (feature.joint_states && feature.joint_states.length > 1) {
-                        stLine += ` (Joint: ${feature.joint_states.join(', ')})`;
-                    }
-                    lines.push(stLine);
-                    if (st.note) {
-                        lines.push(`  └ Note: ${st.note}`);
-                    }
-                } else if (feature.state === null && !feature.tags.includes('natural')) {
-                    lines.push('Art. II: Surface area not subject to national appropriation');
-                }
+            // Pick the single closest feature to the current crosshairs location
+            overlappingFeatures.sort((a, b) => a.distKm - b.distKm);
+            const { feature, distKm } = overlappingFeatures[0];
 
-                if (feature.tier && TIER_DEFS[feature.tier]) {
-                    lines.push(`Tier ${feature.tier} – ${TIER_DEFS[feature.tier].label}`);
+            let html = `<div class="hud-feature-title">${feature.name}</div>`;
+            html += `<div class="hud-feature-dist">Distance: ${distKm.toFixed(1)} km</div>`;
+
+            if (feature.state && STATE_DEFS[feature.state]) {
+                const st = STATE_DEFS[feature.state];
+                let stName = st.name;
+                if (feature.joint_states && feature.joint_states.length > 1) {
+                    stName += ` (Joint: ${feature.joint_states.join(', ')})`;
                 }
-                if (feature.articles) {
-                    for (const article of feature.articles) {
-                        let text = '';
-                        if (article === 6) {
-                            const reason = feature.private ? 'Private authorized mission' : 'State responsibility';
-                            text = `Art. 6 – ${reason}`;
-                        } else if (article === 9) {
-                            let reason = '';
-                            for (const tag of feature.tags || []) {
-                                if (TAG_REASON_MAP[tag]) {
-                                    reason = TAG_REASON_MAP[tag];
-                                    break;
-                                }
+                html += `<div class="hud-detail-line"><strong>State:</strong> ${st.flag || ''} ${stName}</div>`;
+            } else if (feature.state === null && !feature.tags.includes('natural')) {
+                html += `<div class="hud-detail-line"><strong>Art. II:</strong> Non-appropriated zone</div>`;
+            }
+
+            if (feature.tier && TIER_DEFS[feature.tier]) {
+                html += `<div class="hud-detail-line"><strong>Tier:</strong> ${feature.tier} (${TIER_DEFS[feature.tier].label})</div>`;
+            }
+
+            if (feature.articles) {
+                const articleTexts = [];
+                for (const article of feature.articles) {
+                    if (article === 6) {
+                        const reason = feature.private ? 'Private mission' : 'State responsibility';
+                        articleTexts.push(`Art. 6 (${reason})`);
+                    } else if (article === 9) {
+                        let reason = '';
+                        for (const tag of feature.tags || []) {
+                            if (TAG_REASON_MAP[tag]) {
+                                reason = TAG_REASON_MAP[tag];
+                                break;
                             }
-                            if (!reason) reason = 'Consult before disturbance';
-                            text = `Art. 9 – ${reason}`;
                         }
-                        if (text) {
-                            if (feature.owner) text += ` (${feature.owner})`;
-                            lines.push(text);
-                        }
+                        if (!reason) reason = 'Due regard';
+                        articleTexts.push(`Art. 9 (${reason})`);
                     }
                 }
-                statuses.push(lines.join('\n'));
+                if (articleTexts.length > 0) {
+                    html += `<div class="hud-detail-line"><strong>Articles:</strong> ${articleTexts.join(' · ')}</div>`;
+                }
             }
-            return statuses;
+
+            return {
+                html,
+                tier: feature.tier || 3,
+                articles: feature.articles || []
+            };
         }
 
         function createLabelTexture(text, fontSize = 32) {
@@ -1968,16 +1993,16 @@
                 centreLatEl.textContent = latStr;
                 centreLonEl.textContent = lonStr;
 
-                const statusList = getFeatureStatus(lat, lon);
-                if (statusList.length > 0) {
-                    centreOverlapText.textContent = statusList.join('\n');
-                    if (statusList.some(s => s.includes('Tier 1') || s.includes('Art. 9'))) {
+                const statusInfo = getFeatureStatus(lat, lon);
+                if (statusInfo) {
+                    centreOverlapText.innerHTML = statusInfo.html;
+                    if (statusInfo.tier === 1 || statusInfo.articles.includes(9)) {
                         hudStatusDotEl.className = 'hud-status-dot active-constraint';
                     } else {
                         hudStatusDotEl.className = 'hud-status-dot active-warning';
                     }
                 } else {
-                    centreOverlapText.textContent = 'Open';
+                    centreOverlapText.textContent = 'Open (No active constraints)';
                     hudStatusDotEl.className = 'hud-status-dot';
                 }
             }
