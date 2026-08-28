@@ -876,7 +876,7 @@
         controls.dampingFactor = 0.05;
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.1;
-        controls.minDistance = 1.05;
+        controls.minDistance = 1.1;
         controls.maxDistance = 15;
         controls.target.set(0, 0, 0);
         controls.enablePan = false;
@@ -1186,11 +1186,10 @@
 
                 if (type === 'point') {
                     const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
-                    const visualRadiusKm = Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM);
                     const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
                     const targetNormal = pos.clone().normalize();
 
-                    const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
+                    const discGeo = createCurvedDiscGeometry(featureRadiusKm, 1.002);
                     const discMat = new THREE.MeshBasicMaterial({
                         color: new THREE.Color(color),
                         transparent: true,
@@ -1206,7 +1205,7 @@
                     const labelTex = createLabelTexture(feature.name, 30);
                     const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 0, sizeAttenuation: true });
                     labelSprite = new THREE.Sprite(labelMat);
-                    const labelHeight = 1.005 + (visualRadiusKm / MOON_RADIUS_KM) * 0.2;
+                    const labelHeight = 1.005 + (Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM) / MOON_RADIUS_KM) * 0.2;
                     const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
                     labelSprite.position.copy(labelPos);
                     labelSprite.scale.set(0.4, 0.1, 1);
@@ -2015,8 +2014,30 @@
                 }
             }
 
+            // Dynamic disc radius scaling and label positioning based on zoom level (dist: 3.0 -> 1.1)
+            const zoomProgress = Math.max(0, Math.min(1, (dist - 1.1) / (3.0 - 1.1)));
+
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
+                const feature = FEATURES.find(f => f.id === key);
+
+                if (feature && entry.type === 'point') {
+                    const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
+                    const currentR = actualR + zoomProgress * (maxR - actualR);
+                    const scaleS = currentR / actualR;
+
+                    if (entry.discObject) {
+                        entry.discObject.scale.set(scaleS, 1.0, scaleS);
+                    }
+
+                    if (entry.label) {
+                        const targetNormal = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS).normalize();
+                        const labelHeight = 1.005 + (currentR / MOON_RADIUS_KM) * 0.2;
+                        entry.label.position.copy(targetNormal.multiplyScalar(labelHeight));
+                    }
+                }
+
                 if (entry.label) {
                     const isLabelVisible = featureActiveState.get(key) && showLabels;
                     let labelVisible = isLabelVisible;
@@ -2055,7 +2076,7 @@
                     const y = r * Math.sin(sat.angle) * cosI;
                     const z = r * Math.sin(sat.angle) * sinI;
                     sat.group.position.set(x, y, z);
-                    const satZoomScale = Math.max(0.6, Math.min(1.2, (dist - 1.05) / 2.5));
+                    const satZoomScale = Math.max(0.6, Math.min(1.2, (dist - 1.1) / 2.5));
                     sat.group.scale.setScalar(satZoomScale);
 
                     const satWorldPos = new THREE.Vector3();
