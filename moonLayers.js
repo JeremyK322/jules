@@ -177,12 +177,12 @@ export const FEATURES = [
   { id: 'mineral_spa', name: 'South Pole-Aitken Basin Mg-suite anomalies', lat: -53.0, lon: -169.0, radius_km: 400, tier: 2, owner: null, state: null, source: 'Lunar Prospector / spectral observations', note: 'Exposed lower crustal and upper mantle magnesium-rich minerals.' },
 
   // ============================================================
-  // ELECTROMAGNETIC / ENVIRONMENTAL - Radio Quiet Zone (state: null)
+  // ENVIRONMENTAL - Radio Quiet Zone (state: null)
   // ============================================================
   {
     id: 'far_side_radio',
     name: 'Radio Quiet Zone (Far Side)',
-    tags: ['radio_quiet', 'em_radio'],
+    tags: ['radio_quiet'],
     tier: 1,
     owner: null,
     state: null,
@@ -565,13 +565,6 @@ export const LAYER_DEFS = {
     desc: 'Cultural and scientific values of significant views (empty placeholder)'
   },
 
-  // Electromagnetic
-  em_radio: {
-    label: 'EM / Radio Resource',
-    color: '#aa55ee',
-    tags: ['em_radio'],
-    desc: 'Far side radio quiet zone as a spectrum asset'
-  }
 };
 
 // ---- CATEGORIES (order defines layer priority) ----
@@ -580,8 +573,7 @@ export const CATEGORIES = {
   'Extractable': ['water_ice', 'helium3', 'minerals'],
   'Spatial': ['landing', 'launch_sites', 'safety_zones', 'impact', 'orbits', 'lagrange', 'crewed'],
   'Environmental': ['psr', 'science_interest', 'geology', 'radio_quiet', 'sensitive'],
-  'Intangible': ['heritage', 'political', 'data_value', 'view_shed'],
-  'Electromagnetic': ['em_radio']
+  'Intangible': ['heritage', 'political', 'data_value', 'view_shed']
 };
 
 // ---- TIER DEFINITIONS ----
