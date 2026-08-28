@@ -513,6 +513,7 @@
           <div class="memory-editor-col">
             <label>Passes</label>
             <div class="memory-editor-pass-buttons">
+              <button class="btn-primary" id="btnDebateConsolidateMemories" style="margin-bottom:8px; width:100%;">⚔️ Debate & Consolidate (Second Brain + Adze)</button>
               <button class="btn-secondary" id="btnRunMemPass0">Pass 0: Diagnostic</button>
               <button class="btn-secondary" id="btnRunMemPass1">Pass 1: Sort & Merge</button>
               <button class="btn-secondary" id="btnRunMemPass2">Pass 2: Verify</button>
@@ -723,6 +724,67 @@ Rules:
         details.open = true;
       }
 
+      async function runDebateAndConsolidateMemories() {
+        if (memoryEditor.isRunning) return;
+        const workspace = $('memoryInput').value.trim();
+        if (!workspace) {
+          showToast('Load or paste workspace text first.');
+          return;
+        }
+        memoryEditor.isRunning = true;
+        memoryEditor.isOpen = true;
+        $('memoryEditorProgress').textContent = 'Starting Memory Debate & Consolidation...';
+
+        try {
+          // Pass 0: Second Brain Critique & Compression
+          $('memoryEditorProgress').textContent = 'Pass 0: Second Brain critiquing workspace...';
+          const pass0Prompt = `${SECOND_BRAIN_SYS}\n\nTask: Analyze the following memory workspace entries. Your job is to aggressively compress, remove fluff/duplication, flag stale or contradictory entries, and propose a trimmed draft. Output a sharp diagnostic & compression plan.\n\nWORKSPACE:\n${workspace}`;
+          const pass0Output = await callMemoryAPI(pass0Prompt, { thinking: true, reasoningEffort: 'high', maxTokens: 40000 });
+          memoryEditor.outputs[0] = pass0Output;
+          updateMemoryPassOutputUI(0, `[Second Brain Critique]\n${pass0Output}`);
+
+          // Pass 1: Adze Defense & Proposal (Main Thread with Full Context)
+          $('memoryEditorProgress').textContent = 'Pass 1: Adze defending rules & proposing merged draft...';
+          const { prompt: baseSys } = buildSystemPrompt();
+          const adzeSysPrompt = `${MAIN_DEBATE_ROLE_SYS}\n\n${baseSys}`;
+          const pass1UserPrompt = `[Memory Consolidation Request]: Here is Second Brain's compression critique on our workspace:\n\nCRITIQUE:\n${pass0Output}\n\nORIGINAL WORKSPACE:\n${workspace}\n\nReview this critique with our full session history and permanent memories. Defend any commitments or critical context that Second Brain wants to cut. Then produce a consolidated, merged workspace text. Attach source tags [source: ...] to merged entries and preserve commitments.`;
+
+          const pass1Output = await callApi([
+            { role: 'system', content: adzeSysPrompt },
+            ...chatLog.map(e => ({ role: e.role, content: e.content })),
+            { role: 'user', content: pass1UserPrompt }
+          ]);
+          const { cleanedReply: pass1Cleaned } = processActions(pass1Output);
+          memoryEditor.outputs[1] = pass1Cleaned;
+          $('memoryInput').value = pass1Cleaned;
+          updateMemoryPassOutputUI(1, `[Adze Defense & Merged Draft]\n${pass1Cleaned}`);
+
+          // Pass 2: Commitment Verification
+          $('memoryEditorProgress').textContent = 'Pass 2: Verifying commitment preservation...';
+          const commitments = memoryEditor.commitments.length ? memoryEditor.commitments : aiDocs.filter(d => d.type === 'commitment').map(d => d.content);
+          const pass2Prompt = buildMemoryPass2Prompt(pass1Cleaned, commitments);
+          const pass2Output = await callMemoryAPI(pass2Prompt, { thinking: true, reasoningEffort: 'low', maxTokens: 40000 });
+          memoryEditor.outputs[2] = pass2Output;
+          updateMemoryPassOutputUI(2, `[Verification Result]\n${pass2Output}`);
+
+          // Pass 3: Final Format
+          $('memoryEditorProgress').textContent = 'Pass 3: Formatting clean final workspace...';
+          const pass3Prompt = buildMemoryPass3Prompt(pass1Cleaned);
+          const pass3Output = await callMemoryAPI(pass3Prompt, { thinking: false, temperature: 0.2, maxTokens: 40000 });
+          memoryEditor.outputs[3] = pass3Output;
+          $('memoryInput').value = pass3Output;
+          updateMemoryPassOutputUI(3, `[Final Formatted Workspace]\n${pass3Output}`);
+
+          $('memoryEditorProgress').textContent = 'Debate & Consolidation complete!';
+          showToast('Memory Debate & Consolidation complete!');
+        } catch (e) {
+          $('memoryEditorProgress').textContent = `Debate & Consolidation failed: ${e.message}`;
+          updateMemoryPassOutputUI(0, `Error: ${e.message}`);
+        } finally {
+          memoryEditor.isRunning = false;
+        }
+      }
+
       async function runMemoryPass(passNum) {
         if (memoryEditor.isRunning) return;
         const workspace = $('memoryInput').value.trim();
@@ -755,7 +817,6 @@ Rules:
               $('memoryInput').value = output;
               updateMemoryPassOutputUI(1, output);
               break;
-            }
             case 2: {
               const commitments = memoryEditor.commitments.length ? memoryEditor.commitments : aiDocs.filter(d => d.type === 'commitment').map(d => d.content);
               prompt = buildMemoryPass2Prompt(workspace, commitments);
@@ -845,6 +906,7 @@ Rules:
       $('memoryEditorOverlay').addEventListener('click', (e) => {
         if (e.target === $('memoryEditorOverlay')) closeMemoryEditor();
       });
+      $('btnDebateConsolidateMemories').addEventListener('click', runDebateAndConsolidateMemories);
       $('btnRunMemPass0').addEventListener('click', () => runMemoryPass(0));
       $('btnRunMemPass1').addEventListener('click', () => runMemoryPass(1));
       $('btnRunMemPass2').addEventListener('click', () => runMemoryPass(2));
