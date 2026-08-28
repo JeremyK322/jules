@@ -400,6 +400,7 @@
       <span class="debate-counter" id="debateCounter">Turn 0 / 4</span>
       <button class="btn-stop-debate hidden" id="btnStopDebate">🛑 Stop Debate</button>
       <button class="hidden" id="btnContinueDebate">▶️ Continue Debate (+4 turns)</button>
+      <button class="hidden" id="btnSummariseOutcome">📊 Summarise outcome</button>
       <button id="btnResetDebate">🔄 Reset Debate</button>
     </div>
     <div class="split-chat-wrapper hidden" id="splitChatWrapper">
@@ -565,7 +566,8 @@
       let debateTurnCount = 0;
       let debateTargetLimit = 4;
       let secondBrainLog = [];
-      const SECOND_BRAIN_SYS = "You are a critical thinking partner. You have no memory of past work with the user. Reason from first principles. Be direct and honest.";
+      const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a debate. You are defending the current work and your shared history with the user. You participate in a structured debate with a second AI instance. The user's prompt comes to you first. You must frame the prompt, provide the Second Brain with the context it needs as a standalone block, and explicitly ask the Second Brain to be critical and challenge you. Keep your answers short. Do not speak for the Second Brain. Do not simulate its responses. After you have responded, the Second Brain will respond to your last message.";
+      const SECOND_BRAIN_SYS = "You are a critical thinking partner with no memory of past work with the user. You reason from first principles. You are hostile to weak arguments and flattery. Your only job is to find the flaws in the main thread's position. You do not write polished prose. You attack. You ask hard questions. You do not confirm. You challenge. Keep your answers short.";
 
       const $=id=>document.getElementById(id);
       const chatC=$('chatContainer'),chatInp=$('chatInput'),sendBtn=$('btnSend');
@@ -1029,14 +1031,20 @@ Rules:
         if (debateRunning) {
           $('btnStopDebate').classList.remove('hidden');
           $('btnContinueDebate').classList.add('hidden');
+          $('btnSummariseOutcome').classList.add('hidden');
           $('debateTurnSelect').disabled = true;
         } else {
           $('btnStopDebate').classList.add('hidden');
           $('debateTurnSelect').disabled = false;
           if (debateTurnCount >= debateTargetLimit && debateTurnCount > 0) {
             $('btnContinueDebate').classList.remove('hidden');
+            $('btnSummariseOutcome').classList.remove('hidden');
+          } else if (debateTurnCount > 0) {
+            $('btnContinueDebate').classList.add('hidden');
+            $('btnSummariseOutcome').classList.remove('hidden');
           } else {
             $('btnContinueDebate').classList.add('hidden');
+            $('btnSummariseOutcome').classList.add('hidden');
           }
         }
       }
@@ -1058,14 +1066,10 @@ Rules:
 
           const userFormatted = `[User]: ${promptText.trim()}`;
 
-          // 1. Append User prompt to Main Thread
+          // Append User prompt ONLY to Main Thread
           const mainUserEntry = { timestamp: new Date().toISOString(), role: 'user', content: userFormatted };
           chatLog.push(mainUserEntry);
           save('wc_chatLog', chatLog);
-
-          // 2. Append User prompt to Second Brain
-          const secondUserEntry = { timestamp: new Date().toISOString(), role: 'user', content: userFormatted };
-          secondBrainLog.push(secondUserEntry);
         }
 
         syncSplitChatViews();
@@ -1078,7 +1082,8 @@ Rules:
             // --- Step A: Call Main Thread ---
             setStatusMessage(`🔥 Turn ${debateTurnCount}/${debateTargetLimit} — Main Thread thinking…`);
             const typingMain = showTypingColumn(chatCMain);
-            const { prompt: mainSysPrompt, truncatedCount } = buildSystemPrompt();
+            const { prompt: baseSysPrompt, truncatedCount } = buildSystemPrompt();
+            const mainSysPrompt = MAIN_DEBATE_ROLE_SYS + "\n\n" + baseSysPrompt;
             const mainMsgs = [{ role: 'system', content: mainSysPrompt }, ...chatLog.map(e => ({ role: e.role, content: e.content }))];
 
             if (calculateChars(mainSysPrompt, mainMsgs) > MAX_CHARS) {
@@ -1251,6 +1256,37 @@ Rules:
             showToast('Second Brain chat reset.');
           } else {
             showToast('Cannot reset debate while running.');
+          }
+        };
+        $('btnSummariseOutcome').onclick=async()=>{
+          if(debateRunning||!apiKey)return;
+          waiting=true;sendBtn.disabled=true;chatInp.disabled=true;
+          setStatusMessage('📊 Main Thread synthesising debate outcome…');
+          const typingMain=showTypingColumn(chatCMain);
+          try {
+            const summaryReq = {
+              role: 'user',
+              content: '[System Request]: The debate session is complete. Read the full debate transcript above and provide a short summary addressing: 1) What was challenged, 2) What held, 3) What changed, and 4) What the final decision is. Provide a clear decision, not just a transcript.'
+            };
+            const { prompt: baseSysPrompt } = buildSystemPrompt();
+            const sysPrompt = MAIN_DEBATE_ROLE_SYS + "\n\n" + baseSysPrompt;
+            const messages = [{ role: 'system', content: sysPrompt }, ...chatLog.map(e => ({ role: e.role, content: e.content })), summaryReq];
+
+            const summaryReply = await callApi(messages);
+            removeTyping(typingMain);
+            const { cleanedReply } = processActions(summaryReply);
+
+            const summaryEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: cleanedReply };
+            chatLog.push(summaryEntry);
+            save('wc_chatLog', chatLog);
+            appendBubbleColumn(chatCMain, 'assistant', cleanedReply, APP);
+            autoSave();
+            setStatusMessage('✅ Debate outcome synthesised.');
+          } catch(err) {
+            removeTyping(typingMain);
+            showToast('Summary error: ' + (err.message || 'Error'));
+          } finally {
+            waiting=false;sendBtn.disabled=false;chatInp.disabled=false;chatInp.focus();
           }
         };
         $('btnExportLog').onclick=()=>{const blob=new Blob([chatLog.map(e=>`[${new Date(e.timestamp).toLocaleString()}] ${e.role==='user'?'You':e.role==='assistant'?APP:'System'}:\n${e.content}\n---\n`).join('')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='adze-log.txt';a.click();};
