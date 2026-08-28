@@ -671,7 +671,7 @@ Rules:
 - Preserve all commitments verbatim. Never summarise or reword them.
 - For every merged section or paragraph, attach a source tag like [source: original-title-or-id].
 - Do not delete information. If uncertain whether to merge, keep the entry separate and flag it.
-- Output only the consolidated workspace document, no preamble.\n\nDIAGNOSTIC:\n${diagnostic || 'No diagnostic available.'}\n\nWORKSPACE:\n${workspace}`;
+- CRITICAL: Output ONLY the actual consolidated memory workspace document content. Do NOT output meta-reports, commentary, status summaries, or conversational preamble/postscript.\n\nDIAGNOSTIC:\n${diagnostic || 'No diagnostic available.'}\n\nWORKSPACE:\n${workspace}`;
       }
 
       function buildMemoryPass2Prompt(workspace, commitments) {
@@ -751,7 +751,7 @@ Rules:
           $('memoryEditorProgress').textContent = '⚡ Pass 2/4: The Adze is reviewing critique with full context & defending key rules...';
           const { prompt: baseSys } = buildSystemPrompt();
           const adzeSysPrompt = `${MAIN_DEBATE_ROLE_SYS}\n\n${baseSys}`;
-          const pass1UserPrompt = `[Memory Consolidation Request]: Here is Second Brain's compression critique on our workspace:\n\nCRITIQUE:\n${pass0Output}\n\nORIGINAL WORKSPACE:\n${workspace}\n\nReview this critique with our full session history and permanent memories. Defend any commitments or critical context that Second Brain wants to cut. Then produce a consolidated, merged workspace text. Attach source tags [source: ...] to merged entries and preserve commitments.`;
+          const pass1UserPrompt = `[Memory Consolidation Request]: Here is Second Brain's compression critique on our workspace:\n\nCRITIQUE:\n${pass0Output}\n\nORIGINAL WORKSPACE:\n${workspace}\n\nReview this critique with our full session history and permanent memories. Defend any commitments or critical context that Second Brain wants to cut. Output ONLY the clean, final consolidated memory workspace document text itself. Do NOT output a meta-report, executive summary, commentary, or conversational intros/outros.`;
 
           const pass1Output = await callApi([
             { role: 'system', content: adzeSysPrompt },
@@ -778,6 +778,20 @@ Rules:
           memoryEditor.outputs[3] = pass3Output;
           $('memoryInput').value = pass3Output;
           updateMemoryPassOutputUI(3, pass3Output, 'Pass 3: ✨ Final Formatted Workspace');
+
+          // Record the consolidation debate in main session history (chatLog)
+          chatLog.push({
+            timestamp: new Date().toISOString(),
+            role: 'user',
+            content: `[Memory Consolidation Debate]: Initiated multi-pass consolidation on AI Workspace.`
+          });
+          chatLog.push({
+            timestamp: new Date().toISOString(),
+            role: 'assistant',
+            content: `[Memory Consolidation Report & Result]:\n\n### Second Brain Critique (Pass 0):\n${pass0Output}\n\n### Consolidated AI Workspace Output (Final):\n${pass3Output}`
+          });
+          save('wc_chatLog', chatLog);
+          appendBubble('system', '🧠 Memory Consolidation Debate recorded in session chat history.');
 
           $('memoryEditorProgress').textContent = '✅ Automated Memory Debate & Consolidation complete!';
           showToast('Memory Debate & Consolidation complete!');
