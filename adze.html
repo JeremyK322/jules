@@ -986,14 +986,24 @@ Rules:
           debateBar.classList.remove('active');
           splitWrapper.classList.add('hidden');
           chatC.classList.remove('hidden');
+          chatC.innerHTML = '';
+          restoreChatHistory();
         }
       }
 
       function syncSplitChatViews() {
         chatCMain.innerHTML = '';
         chatCSecond.innerHTML = '';
-        chatLog.forEach(m => appendBubbleColumn(chatCMain, m.role, m.content, m.role === 'assistant' ? APP : m.role === 'user' ? 'You' : 'System'));
-        secondBrainLog.forEach(m => appendBubbleColumn(chatCSecond, m.role, m.content, m.role === 'assistant' ? 'Second Brain' : m.role === 'user' ? 'User / Main' : 'System'));
+        chatLog.forEach(m => {
+          let label = m.role === 'assistant' ? APP : m.role === 'user' ? 'You' : 'System';
+          if (m.role === 'user' && m.content.startsWith('[Second Brain]:')) label = 'Second Brain';
+          appendBubbleColumn(chatCMain, m.role, m.content, label);
+        });
+        secondBrainLog.forEach(m => {
+          let label = m.role === 'assistant' ? 'Second Brain' : m.role === 'user' ? 'User' : 'System';
+          if (m.role === 'user' && m.content.startsWith('[Main Thread]:')) label = 'Main Thread';
+          appendBubbleColumn(chatCSecond, m.role, m.content, label);
+        });
         scrollSplitChats();
       }
 
@@ -1042,6 +1052,10 @@ Rules:
         updateDebateUI();
 
         if (promptText && promptText.trim()) {
+          // Starting a new debate: Reset Second Brain context to debate brief only (isolated from past chat session history)
+          secondBrainLog = [];
+          debateTurnCount = 0;
+
           const userFormatted = `[User]: ${promptText.trim()}`;
 
           // 1. Append User prompt to Main Thread
@@ -1096,6 +1110,7 @@ Rules:
             // Feed Main's response into Second Brain context as user message prefix
             const mainMsgForSecond = { timestamp: new Date().toISOString(), role: 'user', content: `[Main Thread]: ${mainCleaned}` };
             secondBrainLog.push(mainMsgForSecond);
+            appendBubbleColumn(chatCSecond, 'user', `[Main Thread]: ${mainCleaned}`, 'Main Thread');
 
             const secondMsgs = [{ role: 'system', content: SECOND_BRAIN_SYS }, ...secondBrainLog.map(e => ({ role: e.role, content: e.content }))];
 
@@ -1121,6 +1136,7 @@ Rules:
             // Feed Second Brain's response back to Main Thread context
             const secondMsgForMain = { timestamp: new Date().toISOString(), role: 'user', content: `[Second Brain]: ${secondReply}` };
             chatLog.push(secondMsgForMain);
+            appendBubbleColumn(chatCMain, 'user', `[Second Brain]: ${secondReply}`, 'Second Brain');
             save('wc_chatLog', chatLog);
             autoSave();
           }
