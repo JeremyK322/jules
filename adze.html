@@ -400,6 +400,7 @@
       <span class="debate-counter" id="debateCounter">Turn 0 / 4</span>
       <button class="btn-stop-debate hidden" id="btnStopDebate">🛑 Stop Debate</button>
       <button class="hidden" id="btnContinueDebate">▶️ Continue Debate (+4 turns)</button>
+      <button id="btnResetDebate">🔄 Reset Debate</button>
     </div>
     <div class="split-chat-wrapper hidden" id="splitChatWrapper">
       <div class="chat-column">
@@ -1223,6 +1224,17 @@ Rules:
             debateTargetLimit += 4;
             updateDebateUI();
             runDebateFlow();
+          }
+        };
+        $('btnResetDebate').onclick=()=>{
+          if(!debateRunning){
+            secondBrainLog=[];
+            debateTurnCount=0;
+            updateDebateUI();
+            syncSplitChatViews();
+            showToast('Second Brain chat reset.');
+          } else {
+            showToast('Cannot reset debate while running.');
           }
         };
         $('btnExportLog').onclick=()=>{const blob=new Blob([chatLog.map(e=>`[${new Date(e.timestamp).toLocaleString()}] ${e.role==='user'?'You':e.role==='assistant'?APP:'System'}:\n${e.content}\n---\n`).join('')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='adze-log.txt';a.click();};
