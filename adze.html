@@ -821,6 +821,7 @@ Rules:
               $('memoryInput').value = output;
               updateMemoryPassOutputUI(1, output);
               break;
+            }
             case 2: {
               const commitments = memoryEditor.commitments.length ? memoryEditor.commitments : aiDocs.filter(d => d.type === 'commitment').map(d => d.content);
               prompt = buildMemoryPass2Prompt(workspace, commitments);
