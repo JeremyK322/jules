@@ -430,13 +430,19 @@
       <h3>⚙️ Settings</h3>
       <label>DeepSeek API Key</label>
       <input type="password" id="apiKeyInput" placeholder="sk-...">
+      <label style="margin-top:10px;">xAI / Grok API Key (Optional)</label>
+      <input type="password" id="xaiApiKeyInput" placeholder="xai-...">
       <div class="btn-row" style="margin-top:8px;"><button class="btn-secondary" id="btnClearKey">Clear</button><button class="btn-primary" id="btnSaveKey">Save</button></div>
       <hr style="border-color:var(--border-subtle); margin:16px 0;">
       <label>Model</label>
       <select id="modelSelect" style="margin-bottom:12px;">
-        <option value="deepseek-v4-flash">Flash (fast, cheap)</option>
-        <option value="deepseek-v4-pro">Pro (deeper, pricier)</option>
+        <option value="deepseek-v4-flash">DeepSeek Flash (fast, cheap)</option>
+        <option value="deepseek-v4-pro">DeepSeek Pro (deeper, pricier)</option>
+        <option value="grok-beta">xAI Grok Beta (Search Enabled)</option>
+        <option value="grok-2-latest">xAI Grok 2 Latest (Search Enabled)</option>
       </select>
+      <div class="toggle-row" id="webSearchRow"><label for="webSearchToggle">🌐 Grok Web Search Tool</label><label class="toggle-switch"><input type="checkbox" id="webSearchToggle" checked><span class="toggle-slider"></span></label></div>
+      <p style="font-size:0.68rem;color:var(--text-muted);margin-bottom:10px;">Enables real-time web browsing, search synthesis, and citation links when Grok is active.</p>
       <div class="toggle-row" id="thinkingRow"><label for="thinkingToggle">Thinking Mode</label><label class="toggle-switch"><input type="checkbox" id="thinkingToggle"><span class="toggle-slider"></span></label></div>
       <p style="font-size:0.68rem;color:var(--text-muted);">Works with both Flash and Pro. Thinking tokens are billed as output.</p>
       <hr style="border-color:var(--border-subtle); margin:16px 0;">
@@ -587,11 +593,14 @@
       resizeCanvas();createGlowbugs();requestAnimationFrame(animationLoop);
 
       // ── App state ──────────────────────────────
-      const APP = "The Adze"; const MAX_CHARS = 4_000_000; const API = 'https://api.deepseek.com/v1/chat/completions';
+      const APP = "The Adze"; const MAX_CHARS = 4_000_000;
+      const API_DEEPSEEK = 'https://api.deepseek.com/v1/chat/completions';
+      const API_XAI = 'https://api.x.ai/v1/chat/completions';
+      const API = API_DEEPSEEK;
       const MAX_TOKENS = 40000; const HARDCODED_API_KEY = '';
       let documents=[], chatLog=[], savedScenes=[], aiDocs=[], aiDocsArchive=[];
-      let apiKey=HARDCODED_API_KEY; let waiting=false, sessionCount=0, lastCategory='';
-      let currentModel='deepseek-v4-flash'; let thinkingEnabled=false; let currentTemp=0.8;
+      let apiKey=HARDCODED_API_KEY; let xaiApiKey=''; let waiting=false, sessionCount=0, lastCategory='';
+      let currentModel='deepseek-v4-flash'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
 
       // ── Second Brain / Debate State ────────────
       let debateModeActive = false;
@@ -674,9 +683,13 @@
           body.temperature = temperature;
           body.top_p = 1.0;
         }
-        const res = await fetch(API, {
+        const isGrok = model.startsWith('grok');
+        const endpoint = isGrok ? API_XAI : API_DEEPSEEK;
+        const key = isGrok ? (xaiApiKey || apiKey) : apiKey;
+
+        const res = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
           body: JSON.stringify(body)
         });
         if (!res.ok) {
@@ -1135,7 +1148,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       function migrateOldData(){const oldChapters=load('wc_chapters',null);if(oldChapters&&Array.isArray(oldChapters)&&oldChapters.length){const migrated=oldChapters.map(ch=>({id:ch.id||'doc_'+Date.now()+Math.random().toString(36),title:ch.name||'Untitled chapter',type:'published',content:ch.content||'',summary:'',locked:ch.locked||false,timestamp:new Date().toISOString()}));documents=[...migrated,...documents];save('wc_documents',documents);localStorage.removeItem(INSTANCE+'_wc_chapters');showToast('Migrated old chapters into documents.');}}
       function restoreFromBackupData(d){apiKey=d.apiKey||HARDCODED_API_KEY;documents=(d.documents||[]).map(doc=>({id:doc.id,title:doc.title,type:doc.type||'draft',content:doc.content,summary:doc.summary||'',locked:doc.locked||false,timestamp:doc.timestamp||new Date().toISOString()}));chatLog=d.chatLog||[];savedScenes=(d.savedScenes||[]).map(s=>({...s,tag:s.tag||'draft'}));aiDocs=(d.aiDocs||[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));aiDocsArchive=d.aiDocsArchive||[];sessionCount=(d.sessionCount||0)+1;lastCategory=d.lastCategory||'';currentModel=d.currentModel||'deepseek-v4-flash';thinkingEnabled=d.thinkingEnabled||false;currentTemp=d.currentTemp||0.8;save('wc_apiKey',apiKey);save('wc_documents',documents);save('wc_chatLog',chatLog);save('wc_savedScenes',savedScenes);save('wc_aiDocs',aiDocs);save('wc_aiDocsArchive',aiDocsArchive);save('wc_sessionCount',sessionCount);save('wc_lastCategory',lastCategory);save('wc_model',currentModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();apiKey?enableChat():disableChat();renderDocuments();renderSavedScenes();renderAiWorkspace();chatC.innerHTML='';restoreChatHistory();renderWelcome();updateContextBar();updatePeakIndicator();updateTempPill();showUndoButtonIfArchive();autoSave();}
 
-      async function generateSummary(content){if(!apiKey)throw new Error('API key not set.');const prompt=`Summarize the following document concisely. Include key terms, numbers, dates, and main topics. Keep under 150 words.\n\nDocument:\n${content}`;const messages=[{role:'system',content:'You are a precise summarizer.'},{role:'user',content:prompt}];const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:currentModel,messages,temperature:0.3,max_tokens:200})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`API error ${res.status}`);}const data=await res.json();return data.choices?.[0]?.message?.content?.trim()||'';}
+      async function generateSummary(content){const activeKey=(currentModel.startsWith('grok')?xaiApiKey:apiKey)||apiKey;if(!activeKey)throw new Error('API key not set.');const prompt=`Summarize the following document concisely. Include key terms, numbers, dates, and main topics. Keep under 150 words.\n\nDocument:\n${content}`;const messages=[{role:'system',content:'You are a precise summarizer.'},{role:'user',content:prompt}];const endpoint=currentModel.startsWith('grok')?API_XAI:API_DEEPSEEK;const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${activeKey}`},body:JSON.stringify({model:currentModel,messages,temperature:0.3,max_tokens:200})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`API error ${res.status}`);}const data=await res.json();return data.choices?.[0]?.message?.content?.trim()||'';}
 
       function processActions(reply){let applied=false;const markerRegex=/###\s*(ADD|UPDATE|DELETE):\s*(.+?)\s*\n([\s\S]*?)###\s*END/gi;let cleanReply=reply;let match;while((match=markerRegex.exec(reply))!==null){const action=match[1].toUpperCase();const fullTitle=match[2].trim();const content=match[3].trim();if(applyMarkerAction(action,fullTitle,content)){applied=true;}cleanReply=cleanReply.replace(match[0],'');}return{cleanedReply:cleanReply.trim(),actionsApplied:applied};}
       function parseTitleAndType(fullTitle){let title=fullTitle;let type='memory';const typeMatch=fullTitle.match(/\s*\|\s*type:\s*(commitment|memory|note)\s*$/i);if(typeMatch){title=fullTitle.slice(0,typeMatch.index).trim();type=typeMatch[1].toLowerCase();}return{title,type};}
@@ -1158,7 +1171,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       function renderSavedScenes(){const container=$('savedScenesList');if(!savedScenes.length){container.innerHTML='<div style="padding:10px;color:var(--text-muted);font-size:0.7rem;">No saved scenes.</div>';return;}const groups={};savedScenes.forEach(s=>{const cat=s.category||'Uncategorized';if(!groups[cat])groups[cat]=[];groups[cat].push(s);});const sortedCats=Object.keys(groups).sort();let html='';sortedCats.forEach(cat=>{const scenes=groups[cat].sort((a,b)=>a.title.localeCompare(b.title));html+=`<div class="category-group"><div class="category-group-title">📌 ${esc(cat)}</div>`;scenes.forEach(sc=>{const tag=sc.tag||'draft';html+=`<div class="scene-item" data-id="${sc.id}"><span class="scene-icon">📄</span><span class="scene-name">${esc(sc.title)}</span><span class="tag-${tag==='draft'?'draft':'canon'}">${tag.toUpperCase()}</span><button class="toggle-tag-btn" data-id="${sc.id}">toggle</button><button class="scene-delete" data-id="${sc.id}">✕</button></div>`;});html+='</div>';});container.innerHTML=html;container.querySelectorAll('.scene-item').forEach(el=>el.addEventListener('click',e=>{if(!e.target.closest('.scene-delete')&&!e.target.closest('.toggle-tag-btn'))openSavedScene(savedScenes.find(s=>s.id===el.dataset.id));}));container.querySelectorAll('.toggle-tag-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const s=savedScenes.find(s=>s.id===btn.dataset.id);if(s){s.tag=s.tag==='draft'?'canon':'draft';save('wc_savedScenes',savedScenes);renderSavedScenes();updateContextBar();autoSave();}}));container.querySelectorAll('.scene-delete').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();savedScenes=savedScenes.filter(s=>s.id!==btn.dataset.id);save('wc_savedScenes',savedScenes);renderSavedScenes();updateContextBar();autoSave();}));}
       function openSavedScene(sc){$('previewTitle').textContent=`📌 ${sc.category} / ${sc.title} [${(sc.tag||'draft').toUpperCase()}]`;$('previewMeta').textContent='Saved scene · '+new Date(sc.timestamp).toLocaleString();$('previewContent').textContent=sc.content;$('previewOverlay').style.display='flex';}
 
-      function updateApiDot(){if($('apiDot'))$('apiDot').className='api-dot '+(apiKey?'set':'unset');if($('apiStatus'))$('apiStatus').innerHTML=`<span class="api-dot ${apiKey?'set':'unset'}"></span> API key`;}
+      function updateApiDot(){const hasKey = apiKey || xaiApiKey; if($('apiDot'))$('apiDot').className='api-dot '+(hasKey?'set':'unset');if($('apiStatus'))$('apiStatus').innerHTML=`<span class="api-dot ${hasKey?'set':'unset'}"></span> API key`;}
       function enableChat(){chatInp.disabled=false;sendBtn.disabled=false;chatInp.placeholder='Talk to your writing partner…';}
       function disableChat(){chatInp.disabled=true;sendBtn.disabled=true;chatInp.placeholder='Set API key in Settings first…';}
       function appendSystemBubble(content){const w=document.querySelector('.welcome-message');if(w)w.remove();const div=document.createElement('div');div.className='chat-message system';div.innerHTML=`<div class="msg-label">System</div><div class="msg-content">${esc(content)}</div>`;chatC.appendChild(div);}
@@ -1202,14 +1215,21 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
 
       // ── Single API Request Helper ───────────────
       async function callApi(messages) {
+        const isGrok = currentModel.startsWith('grok');
+        const endpoint = isGrok ? API_XAI : API_DEEPSEEK;
+        const key = isGrok ? (xaiApiKey || apiKey) : apiKey;
+
         const body = { model: currentModel, messages, temperature: currentTemp, max_tokens: MAX_TOKENS };
-        if (thinkingEnabled) {
+        if (isGrok && webSearchEnabled) {
+          body.tools = [{ type: "web_search" }];
+        } else if (!isGrok && thinkingEnabled) {
           body.reasoning_effort = 'high';
           body.thinking = { type: 'enabled' };
         }
-        const res = await fetch(API, {
+
+        const res = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
           body: JSON.stringify(body)
         });
         if (!res.ok) {
@@ -1218,6 +1238,12 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
         }
         const data = await res.json();
         let reply = data.choices?.[0]?.message?.content || '(no response)';
+
+        const citations = data.choices?.[0]?.message?.citations || data.citations;
+        if (citations && citations.length > 0) {
+          reply += '\n\n**Sources & Citations:**\n' + citations.map((c, i) => `[${i+1}] [${c.title || c.url}](${c.url})`).join('\n');
+        }
+
         return reply.replace(/^\s*\[\d{12}\]\s*/, '');
       }
 
@@ -1462,6 +1488,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
         if(window.electronAPI&&window.electronAPI.loadData){try{const result=await window.electronAPI.loadData();if(result.success&&result.data&&result.data.version){restoreFromBackupData(result.data);loadedFromFile=true;}}catch(e){console.warn('Could not load from auto‑save file, falling back to localStorage',e);}}
         if(!loadedFromFile){
           apiKey=load('wc_apiKey','')||HARDCODED_API_KEY;
+          xaiApiKey=load('wc_xai_apiKey','');
           documents=load('wc_documents',[]);migrateOldData();
           chatLog=load('wc_chatLog',[]);
           savedScenes=load('wc_savedScenes',[]).map(s=>({...s,tag:s.tag||'draft'}));
@@ -1472,18 +1499,19 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           lastCategory=load('wc_lastCategory','');
           currentModel=load('wc_model','deepseek-v4-flash');
           thinkingEnabled=load('wc_thinking',false);
+          webSearchEnabled=load('wc_webSearch',true);
           currentTemp=load('wc_temp',0.8);
-          updateApiDot();apiKey?enableChat():disableChat();
+          updateApiDot();(apiKey||xaiApiKey)?enableChat():disableChat();
           renderDocuments();renderSavedScenes();renderAiWorkspace();
           restoreChatHistory();renderWelcome();updateContextBar();
         }
         updatePeakIndicator();updateTempPill();
         const sidebarHidden=load('wc_sidebarHidden',false);
         if(sidebarHidden){sidebar.classList.add('hidden');toggleBtn.textContent='▶';}else{sidebar.classList.remove('hidden');toggleBtn.textContent='◀';}
-        $('btnSettings').onclick=()=>{$('apiKeyInput').value=apiKey;$('modelSelect').value=currentModel;$('thinkingToggle').checked=thinkingEnabled;$('tempSlider').value=currentTemp;$('tempValue').textContent=currentTemp.toFixed(1);$('tempLabel').textContent=getTempLabel(currentTemp);$('settingsOverlay').style.display='flex';};
+        $('btnSettings').onclick=()=>{$('apiKeyInput').value=apiKey;$('xaiApiKeyInput').value=xaiApiKey;$('modelSelect').value=currentModel;$('thinkingToggle').checked=thinkingEnabled;$('webSearchToggle').checked=webSearchEnabled;$('tempSlider').value=currentTemp;$('tempValue').textContent=currentTemp.toFixed(1);$('tempLabel').textContent=getTempLabel(currentTemp);$('settingsOverlay').style.display='flex';};
         $('btnCloseSettings').onclick=()=>$('settingsOverlay').style.display='none';
-        $('btnSaveKey').onclick=()=>{apiKey=$('apiKeyInput').value.trim()||HARDCODED_API_KEY;currentModel=$('modelSelect').value;thinkingEnabled=$('thinkingToggle').checked;currentTemp=parseFloat($('tempSlider').value);save('wc_apiKey',apiKey);save('wc_model',currentModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();apiKey?enableChat():disableChat();$('settingsOverlay').style.display='none';updatePeakIndicator();updateTempPill();autoSave();showToast(`Model: ${currentModel==='deepseek-v4-pro'?'Pro':'Flash'}${thinkingEnabled?' + Thinking':''} · Temp ${currentTemp.toFixed(1)}`);};
-        $('btnClearKey').onclick=()=>{apiKey='';save('wc_apiKey','');updateApiDot();disableChat();$('settingsOverlay').style.display='none';autoSave();};
+        $('btnSaveKey').onclick=()=>{apiKey=$('apiKeyInput').value.trim()||HARDCODED_API_KEY;xaiApiKey=$('xaiApiKeyInput').value.trim();currentModel=$('modelSelect').value;thinkingEnabled=$('thinkingToggle').checked;webSearchEnabled=$('webSearchToggle').checked;currentTemp=parseFloat($('tempSlider').value);save('wc_apiKey',apiKey);save('wc_xai_apiKey',xaiApiKey);save('wc_model',currentModel);save('wc_thinking',thinkingEnabled);save('wc_webSearch',webSearchEnabled);save('wc_temp',currentTemp);updateApiDot();(apiKey||xaiApiKey)?enableChat():disableChat();$('settingsOverlay').style.display='none';updatePeakIndicator();updateTempPill();autoSave();showToast(`Model: ${currentModel}${currentModel.startsWith('grok')&&(webSearchEnabled?' + Web Search':'')} · Temp ${currentTemp.toFixed(1)}`);};
+        $('btnClearKey').onclick=()=>{apiKey='';xaiApiKey='';save('wc_apiKey','');save('wc_xai_apiKey','');updateApiDot();disableChat();$('settingsOverlay').style.display='none';autoSave();};
         $('tempSlider').addEventListener('input',()=>{const val=parseFloat($('tempSlider').value);$('tempValue').textContent=val.toFixed(1);$('tempLabel').textContent=getTempLabel(val);});
         $('btnViewLog').onclick=()=>{$('logContent').innerHTML=chatLog.map(e=>`<div class="log-entry"><div class="log-time">${new Date(e.timestamp).toLocaleString()}</div><span class="log-role ${e.role}">${e.role==='user'?'You':e.role==='assistant'?APP:'System'}</span><div class="log-content">${esc(e.content)}</div></div>`).join('')||'No entries.';$('logOverlay').style.display='flex';};
         $('btnCloseLog').onclick=()=>$('logOverlay').style.display='none';
