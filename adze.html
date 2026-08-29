@@ -1337,6 +1337,32 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
         return reply.replace(/^\s*\[\d{12}\]\s*/, '');
       }
 
+      async function callApiWithRetry(messages, maxRetries = 1) {
+        let attempts = 0;
+        let lastError = null;
+
+        while (attempts <= maxRetries) {
+          attempts++;
+          try {
+            const reply = await callApi(messages);
+            if (reply && reply !== '(no response)' && !isNonAsciiHeavy(reply)) {
+              return reply;
+            }
+            console.warn(`[API Attempt ${attempts} Warning]: Received empty or invalid response: "${reply}". Retrying...`);
+            if (attempts <= maxRetries) {
+              showToast(`⚠️ Invalid/empty response on attempt ${attempts}. Retrying stage...`);
+            }
+          } catch (err) {
+            lastError = err;
+            console.warn(`[API Attempt ${attempts} Error]: ${err.message}. Retrying...`);
+            if (attempts <= maxRetries) {
+              showToast(`⚠️ API error on attempt ${attempts}. Retrying stage...`);
+            }
+          }
+        }
+        throw new Error(lastError ? lastError.message : 'API failed after 2 attempts (no response or non-ASCII output). Stopping debate.');
+      }
+
       function calculateChars(sysPrompt, messagesArray) {
         let chars = sysPrompt.length;
         messagesArray.forEach(m => chars += (m.content || '').length);
@@ -1482,7 +1508,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
               break;
             }
 
-            let mainReply = await callApi(mainMsgs);
+            let mainReply = await callApiWithRetry(mainMsgs);
             removeTyping(typingMain);
 
             let mainStoppedForClarification = false;
@@ -1552,7 +1578,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
               break;
             }
 
-            let secondReply = await callApi(secondMsgs);
+            let secondReply = await callApiWithRetry(secondMsgs);
             removeTyping(typingSecond);
 
             let secondStoppedForClarification = false;
