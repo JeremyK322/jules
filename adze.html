@@ -504,9 +504,12 @@
       <div class="memory-editor-container">
 
         <!-- Action Control Bar & Stage Stepper -->
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; background:var(--surface-bg); padding:10px 14px; border-radius:8px; border:1px solid var(--border-color); flex-wrap:wrap;">
-          <button class="btn-primary" id="btnRunRelayPipeline" style="font-weight:600; padding:6px 14px;">⚡ Run 3-Stage Relay</button>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; background:var(--surface-bg); padding:10px 14px; border-radius:8px; border:1px solid var(--border-color); flex-wrap:wrap;">
           <button class="btn-secondary" id="btnLoadWorkspace" style="padding:6px 12px;">📥 Load Workspace</button>
+          <button class="btn-primary" id="btnRunStage1" style="padding:6px 12px;">🧠 Stage 1: SB Diagnosis</button>
+          <button class="btn-primary" id="btnRunStage2" style="padding:6px 12px; background:#4f46e5;">📖 Stage 2: Adze Review</button>
+          <button class="btn-primary" id="btnRunStage3" style="padding:6px 12px; background:#059669;">✨ Stage 3: QC Check</button>
+          <button class="btn-secondary" id="btnRunRelayPipeline" style="padding:6px 12px; border:1px dashed var(--border-color);">⚡ Auto Full Relay</button>
 
           <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:0.75rem;">
             <span id="stepTag1" style="padding:3px 8px; border-radius:4px; background:var(--chip-bg); color:var(--text-muted);">Stage 1: Second Brain</span>
@@ -538,6 +541,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label style="font-weight:600;">Pipeline Reports & Change Log</label>
               <div style="display:flex; gap:6px;">
+                <button class="btn-secondary" id="btnSendProposalToChat" style="padding:2px 8px; font-size:0.7rem; background:var(--accent-color); color:#fff;" title="Send Second Brain's proposed changes into main chat to discuss with The Adze">💬 Send SB Proposal to Chat</button>
                 <button class="btn-secondary" id="btnTabChangeLog" style="padding:2px 8px; font-size:0.7rem;">Change Log</button>
                 <button class="btn-secondary" id="btnTabQualityCheck" style="padding:2px 8px; font-size:0.7rem;">Quality Check</button>
               </div>
@@ -762,7 +766,7 @@ Rules:
         details.open = true;
       }
 
-      async function runThreeStageRelayPipeline() {
+      async function runStage1SecondBrain() {
         if (memoryEditor.isRunning) return;
         const rawWorkspace = memoryEditor.originalWorkspaceText || $('memoryInput').value.trim();
         if (!rawWorkspace) {
@@ -771,32 +775,50 @@ Rules:
         }
 
         memoryEditor.isRunning = true;
-        memoryEditor.isOpen = true;
         updateStageStepper(1);
-        $('memoryEditorProgress').textContent = '⚡ Stage 1/3: Second Brain is analyzing raw workspace (Context-Stripped)...';
+        $('memoryEditorProgress').textContent = '⚡ Stage 1: Second Brain analyzing raw workspace (Context-Stripped)...';
 
         try {
-          // ── STAGE 1: Second Brain (Context-Stripped) ──
-          // Pass A: Diagnostic (find duplicate blocks, contradictory statuses, stale triggers, privacy leaks, hedging, unresolved flags)
+          // Pass A: Diagnostic
           const stage1DiagPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Perform a strict diagnostic scan on this RAW WORKSPACE. You have NO chat history, NO documents, and NO user identity context.\n\nScrutinize and report on:\n1. Duplicate or near-duplicate blocks.\n2. Contradictory statuses or conflicting facts.\n3. Stale triggers or outdated reminders.\n4. Privacy leaks or sensitive raw disclosures.\n5. Hedging language or unresolved open flags.\n\nRAW WORKSPACE:\n${rawWorkspace}`;
 
           const diagOutput = await callMemoryAPI(stage1DiagPrompt, { thinking: true, reasoningEffort: 'high', maxTokens: 40000 });
           memoryEditor.stage1Diagnostic = diagOutput;
 
-          // Pass B: Proposed Lean Skeleton & Archive List
-          $('memoryEditorProgress').textContent = '⚡ Stage 1/3: Second Brain is constructing proposed lean skeleton & archive list...';
+          // Pass B: Proposed Lean Skeleton
+          $('memoryEditorProgress').textContent = '⚡ Stage 1: Constructing proposed lean skeleton & archive list...';
           const stage1SkelPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Based on your diagnostic scan, construct a PROPOSED LEAN SKELETON of the workspace and an ARCHIVE/DELETE list.\n\nRules:\n- Merge duplicate sections into restructured headings.\n- List items to be archived or deleted.\n- Flag unresolved questions that need user context.\n- Output ONLY the proposed skeleton and archive list.\n\nDIAGNOSTIC:\n${diagOutput}\n\nRAW WORKSPACE:\n${rawWorkspace}`;
 
           const skelOutput = await callMemoryAPI(stage1SkelPrompt, { thinking: true, reasoningEffort: 'high', maxTokens: 40000 });
           memoryEditor.stage1Skeleton = skelOutput;
 
-          // Render Stage 1 output
-          renderMemoryReportTab('sb_proposal', `### Second Brain Diagnostic\n${diagOutput}\n\n---\n\n### Second Brain Proposed Skeleton & Archive List\n${skelOutput}`);
+          const combinedProposal = `### Second Brain Diagnostic (Context-Stripped)\n${diagOutput}\n\n---\n\n### Second Brain Proposed Skeleton & Archive List\n${skelOutput}`;
+          renderMemoryReportTab('sb_proposal', combinedProposal);
 
-          // ── STAGE 2: The Adze (Full Context Resolution) ──
-          updateStageStepper(2);
-          $('memoryEditorProgress').textContent = '⚡ Stage 2/3: The Adze is resolving conflicts using full session history & permanent context...';
+          $('memoryEditorProgress').textContent = '⏸️ Stage 1 Complete! Review Second Brain Proposal. Click "Stage 2: Adze Review" or "Send SB Proposal to Chat" to discuss first.';
+          showToast('Stage 1 Complete!');
+        } catch (e) {
+          $('memoryEditorProgress').textContent = `Stage 1 failed: ${e.message}`;
+        } finally {
+          memoryEditor.isRunning = false;
+        }
+      }
 
+      async function runStage2AdzeReview() {
+        if (memoryEditor.isRunning) return;
+        const rawWorkspace = memoryEditor.originalWorkspaceText || $('memoryInput').value.trim();
+        const skelOutput = memoryEditor.stage1Skeleton || memoryEditor.stage1Diagnostic;
+
+        if (!skelOutput) {
+          showToast('Please run Stage 1: SB Diagnosis first.');
+          return;
+        }
+
+        memoryEditor.isRunning = true;
+        updateStageStepper(2);
+        $('memoryEditorProgress').textContent = '⚡ Stage 2: The Adze resolving conflicts with full session history & permanent context...';
+
+        try {
           const { prompt: baseSys } = buildSystemPrompt();
           const adzeSysPrompt = `${MAIN_DEBATE_ROLE_SYS}\n\n${baseSys}`;
           const stage2UserPrompt = `[Memory Consolidation Stage 2 Request]:
@@ -824,7 +846,6 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
 
           const { cleanedReply: stage2Cleaned } = processActions(stage2Output);
 
-          // Split final workspace and change log if formatted with headers
           let finalWorkspace = stage2Cleaned;
           let changeLogText = stage2Cleaned;
           if (stage2Cleaned.includes('## Consolidated Workspace') && stage2Cleaned.includes('## Consolidation Change Log')) {
@@ -836,17 +857,37 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           memoryEditor.stage2Workspace = finalWorkspace;
           memoryEditor.stage3ChangeLog = changeLogText;
           $('memoryInput').value = finalWorkspace;
+          $('editorLeftLabel').textContent = 'Final Consolidated Workspace (The Adze)';
 
-          // ── STAGE 3: Review, Quality Check & User Approval ──
-          updateStageStepper(3);
-          $('memoryEditorProgress').textContent = '⚡ Stage 3/3: Running Second Brain Quality Check on final workspace...';
+          renderMemoryReportTab('change_log', changeLogText);
 
+          $('memoryEditorProgress').textContent = '⏸️ Stage 2 Complete! The Adze has resolved context & produced the consolidated workspace. Click "Stage 3: QC Check".';
+          showToast('Stage 2 Complete!');
+        } catch (e) {
+          $('memoryEditorProgress').textContent = `Stage 2 failed: ${e.message}`;
+        } finally {
+          memoryEditor.isRunning = false;
+        }
+      }
+
+      async function runStage3QualityCheck() {
+        if (memoryEditor.isRunning) return;
+        const finalWorkspace = memoryEditor.stage2Workspace || $('memoryInput').value.trim();
+        if (!finalWorkspace) {
+          showToast('No consolidated workspace text to check. Run Stage 2 first.');
+          return;
+        }
+
+        memoryEditor.isRunning = true;
+        updateStageStepper(3);
+        $('memoryEditorProgress').textContent = '⚡ Stage 3: Second Brain Quality Check on final workspace...';
+
+        try {
           const qcPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Perform a final quality check on this consolidated workspace. Check for formatting errors, missed structural duplications, or unparsed markers. Be direct.\n\nCONSOLIDATED WORKSPACE:\n${finalWorkspace}`;
           const qcOutput = await callMemoryAPI(qcPrompt, { thinking: false, temperature: 0.2, maxTokens: 40000 });
           memoryEditor.stage3QualityCheck = qcOutput;
 
-          // Render outputs into tabs
-          renderMemoryReportTab('change_log', changeLogText);
+          renderMemoryReportTab('quality_check', qcOutput);
 
           // Record in session chat log
           chatLog.push({
@@ -857,19 +898,40 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           chatLog.push({
             timestamp: new Date().toISOString(),
             role: 'assistant',
-            content: `[3-Stage Consolidation Summary]:\n\n${changeLogText}`
+            content: `[3-Stage Consolidation Summary]:\n\n${memoryEditor.stage3ChangeLog || 'Consolidation completed.'}`
           });
           save('wc_chatLog', chatLog);
           appendBubble('system', '🧠 3-Stage Consolidation Relay completed and recorded in session history.');
 
-          $('memoryEditorProgress').textContent = '✅ Stage 3 Complete! Review output and click "Approve & Commit".';
-          showToast('3-Stage Memory Relay Complete!');
+          $('memoryEditorProgress').textContent = '✅ Stage 3 Complete! Review final workspace & change log, then click "Approve & Commit".';
+          showToast('Stage 3 QC Complete!');
         } catch (e) {
-          $('memoryEditorProgress').textContent = `Pipeline failed: ${e.message}`;
-          showToast(`Relay failed: ${e.message}`);
+          $('memoryEditorProgress').textContent = `Stage 3 failed: ${e.message}`;
         } finally {
           memoryEditor.isRunning = false;
         }
+      }
+
+      async function runThreeStageRelayPipeline() {
+        await runStage1SecondBrain();
+        if (memoryEditor.stage1Skeleton || memoryEditor.stage1Diagnostic) {
+          await runStage2AdzeReview();
+          if (memoryEditor.stage2Workspace) {
+            await runStage3QualityCheck();
+          }
+        }
+      }
+
+      function sendProposalToChat() {
+        const proposal = memoryEditor.stage1Skeleton || memoryEditor.stage1Diagnostic;
+        if (!proposal) {
+          showToast('No Second Brain proposal available yet. Run Stage 1 first.');
+          return;
+        }
+        closeMemoryEditor();
+        const chatPrompt = `Here is Second Brain's proposed memory consolidation critique and skeleton (context-stripped). Let's review and discuss these open flags before committing:\n\n${proposal}`;
+        chatInp.value = chatPrompt;
+        showToast('Proposal pasted into chat. Hit Send to discuss with The Adze!');
       }
 
       function updateStageStepper(stage) {
@@ -1020,7 +1082,11 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       $('memoryEditorOverlay').addEventListener('click', (e) => {
         if (e.target === $('memoryEditorOverlay')) closeMemoryEditor();
       });
+      $('btnRunStage1').addEventListener('click', runStage1SecondBrain);
+      $('btnRunStage2').addEventListener('click', runStage2AdzeReview);
+      $('btnRunStage3').addEventListener('click', runStage3QualityCheck);
       $('btnRunRelayPipeline').addEventListener('click', runThreeStageRelayPipeline);
+      $('btnSendProposalToChat').addEventListener('click', sendProposalToChat);
 
       // Tab switching event listeners
       $('btnTabInput').addEventListener('click', () => {
