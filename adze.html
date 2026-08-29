@@ -253,7 +253,7 @@
     @keyframes pulse { 0% { opacity: 0.6; } 100% { opacity: 1; } }
 
     .input-area { padding: 12px 20px 18px; border-top: 1px solid var(--border-subtle); flex-shrink: 0; display: flex; gap: 10px; align-items: flex-end; background: var(--bg-deep); z-index: 6; }
-    .input-area textarea { flex: 1; background: var(--bg-input); border: 1px solid var(--border-accent); border-radius: var(--radius-md); color: var(--text-primary); padding: 12px 16px; font-family: var(--font-sans); font-size: 0.85rem; resize: none; min-height: 44px; max-height: 140px; line-height: 1.5; outline: none; transition: all var(--transition-fast); }
+    .input-area textarea { flex: 1; background: var(--bg-input); border: 1px solid var(--border-accent); border-radius: var(--radius-md); color: var(--text-primary); padding: 12px 16px; font-family: var(--font-sans); font-size: 0.85rem; resize: vertical; min-height: 120px; max-height: 280px; line-height: 1.5; outline: none; transition: all var(--transition-fast); }
     .input-area textarea:focus { border-color: var(--lavender); box-shadow: 0 0 0 3px rgba(185,176,212,0.1); }
     .input-area textarea::placeholder { color: var(--text-muted); }
     .input-area button { background: var(--lavender-soft); border: 1px solid rgba(185,176,212,0.35); color: var(--lavender); padding: 10px 20px; border-radius: var(--radius-md); cursor: pointer; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.03em; transition: all var(--transition-fast); white-space: nowrap; flex-shrink: 0; min-height: 44px; }
@@ -416,7 +416,7 @@
     <div class="chat-container" id="chatContainer"></div>
     <div class="status-bar" id="statusBar"></div>
     <div class="input-area">
-      <textarea id="chatInput" rows="1" placeholder="Talk to your writing partner…" disabled></textarea>
+      <textarea id="chatInput" rows="5" placeholder="Talk to your writing partner…" disabled></textarea>
       <button id="btnSend" disabled>Send</button>
     </div>
   </div>
@@ -609,8 +609,8 @@
       let debateTurnCount = 0;
       let debateTargetLimit = 4;
       let secondBrainLog = [];
-      const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a debate. You are defending the current work and your shared history with the user. You participate in a structured debate with a second AI instance. The user's prompt comes to you first. You must frame the prompt, provide the Second Brain with the context it needs as a standalone block, and explicitly ask the Second Brain to be critical and challenge you. Keep your answers short. Do not speak for the Second Brain. Do not simulate its responses. After you have responded, the Second Brain will respond to your last message.";
-      const SECOND_BRAIN_SYS = "You are a critical thinking partner with no memory of past work with the user. You reason from first principles. You are hostile to weak arguments and flattery. Your only job is to find the flaws in the main thread's position. You do not write polished prose. You attack. You ask hard questions. You do not confirm. You challenge. Keep your answers short.";
+      const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a structured debate with a Second Brain instance. You defend the current work and your shared history with the user. You participate in an automated multi-turn debate. The user's prompt comes to you first. Frame the prompt, provide the Second Brain with the context it needs as a standalone block, and explicitly ask the Second Brain to be critical and challenge you. Keep your answers short. Do not speak for the Second Brain or simulate its responses. Note: Your response here will be passed directly to Second Brain, NOT immediately back to the human user. If you critically lack information to continue the debate or need clarification from the human user before proceeding, output '%%%STOP' along with your clarification request.";
+      const SECOND_BRAIN_SYS = "You are a critical thinking partner with no memory of past work with the user. You reason from first principles. You are hostile to weak arguments and flattery. Your only job is to find the flaws in the main thread's position. You do not write polished prose. You attack. You ask hard questions. You do not confirm. You challenge. Keep your answers short. Note: You are in an automated debate with the Main Thread. If you critically lack information or need user clarification to proceed, output '%%%STOP' along with your rationale.";
 
       const $=id=>document.getElementById(id);
       const chatC=$('chatContainer'),chatInp=$('chatInput'),sendBtn=$('btnSend');
@@ -1362,11 +1362,14 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             debateTurnCount++;
             updateDebateUI();
 
+            const remainingTurns = debateTargetLimit - debateTurnCount;
+            const debateMetadataHeader = `[DEBATE STATUS: Active Debate Mode | Exchange ${debateTurnCount} of ${debateTargetLimit} | ${remainingTurns} exchange(s) remaining after this turn. Output %%%STOP if clarification is needed from user.]`;
+
             // --- Step A: Call Main Thread ---
             setStatusMessage(`🔥 Turn ${debateTurnCount}/${debateTargetLimit} — Main Thread thinking…`);
             const typingMain = showTypingColumn(chatCMain);
             const { prompt: baseSysPrompt, truncatedCount } = buildSystemPrompt();
-            const mainSysPrompt = MAIN_DEBATE_ROLE_SYS + "\n\n" + baseSysPrompt;
+            const mainSysPrompt = `${MAIN_DEBATE_ROLE_SYS}\n\n${debateMetadataHeader}\n\n${baseSysPrompt}`;
             const mainMsgs = [{ role: 'system', content: mainSysPrompt }, ...chatLog.map(e => ({ role: e.role, content: e.content }))];
 
             if (calculateChars(mainSysPrompt, mainMsgs) > MAX_CHARS) {
@@ -1378,6 +1381,13 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
 
             let mainReply = await callApi(mainMsgs);
             removeTyping(typingMain);
+
+            let mainStoppedForClarification = false;
+            if (mainReply.includes('%%%STOP')) {
+              mainStoppedForClarification = true;
+              mainReply = mainReply.replace(/%%%STOP/g, '').trim();
+            }
+
             const { cleanedReply: mainCleaned } = processActions(mainReply);
 
             const mainAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: mainCleaned };
@@ -1385,6 +1395,13 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             save('wc_chatLog', chatLog);
             appendBubbleColumn(chatCMain, 'assistant', mainCleaned, APP);
             autoSave();
+
+            if (mainStoppedForClarification) {
+              setStatusMessage('🛑 Debate paused: Main Thread requested user clarification (% % % STOP).');
+              appendBubbleColumn(chatCMain, 'system', '🛑 Main Thread requested user clarification. Debate paused.');
+              showToast('Debate paused for user clarification.');
+              break;
+            }
 
             if (debateStopRequested) {
               setStatusMessage('⏹️ Debate stopped by user.');
@@ -1400,9 +1417,10 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             secondBrainLog.push(mainMsgForSecond);
             appendBubbleColumn(chatCSecond, 'user', `[Main Thread]: ${mainCleaned}`, 'Main Thread');
 
-            const secondMsgs = [{ role: 'system', content: SECOND_BRAIN_SYS }, ...secondBrainLog.map(e => ({ role: e.role, content: e.content }))];
+            const secondSysPrompt = `${SECOND_BRAIN_SYS}\n\n${debateMetadataHeader}`;
+            const secondMsgs = [{ role: 'system', content: secondSysPrompt }, ...secondBrainLog.map(e => ({ role: e.role, content: e.content }))];
 
-            if (calculateChars(SECOND_BRAIN_SYS, secondMsgs) > MAX_CHARS) {
+            if (calculateChars(secondSysPrompt, secondMsgs) > MAX_CHARS) {
               removeTyping(typingSecond);
               appendBubbleColumn(chatCSecond, 'system', '⚠️ Second Brain context exceeded limit. Debate stopped.');
               showToast('Debate stopped: Second Brain context limit reached.');
@@ -1412,9 +1430,22 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             let secondReply = await callApi(secondMsgs);
             removeTyping(typingSecond);
 
+            let secondStoppedForClarification = false;
+            if (secondReply.includes('%%%STOP')) {
+              secondStoppedForClarification = true;
+              secondReply = secondReply.replace(/%%%STOP/g, '').trim();
+            }
+
             const secondAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: secondReply };
             secondBrainLog.push(secondAssistantEntry);
             appendBubbleColumn(chatCSecond, 'assistant', secondReply, 'Second Brain');
+
+            if (secondStoppedForClarification) {
+              setStatusMessage('🛑 Debate paused: Second Brain requested user clarification (% % % STOP).');
+              appendBubbleColumn(chatCSecond, 'system', '🛑 Second Brain requested user clarification. Debate paused.');
+              showToast('Debate paused for user clarification.');
+              break;
+            }
 
             if (debateStopRequested) {
               setStatusMessage('⏹️ Debate stopped by user.');
