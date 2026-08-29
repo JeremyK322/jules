@@ -609,8 +609,8 @@
       let debateTurnCount = 0;
       let debateTargetLimit = 4;
       let secondBrainLog = [];
-      const MAIN_DEBATE_ROLE_SYS = "### MODE OVERRIDE: ACTIVE DEBATE MODE ###\nYou are the Main Thread in an automated multi-turn debate against a Second Brain instance. Your response here will be sent DIRECTLY TO SECOND BRAIN, not back to the human user. Frame the prompt, present your arguments to Second Brain, and ask Second Brain to challenge you. Keep responses concise and focused. Do NOT ask the human user for input unless you emit %%%STOP.\nIf you critically lack information or require user clarification, output '%%%STOP' in your message to immediately pause the debate.";
-      const SECOND_BRAIN_SYS = "### MODE OVERRIDE: ACTIVE DEBATE MODE ###\nYou are Second Brain, an adversarial critical partner with zero context of past user work. You reason from first principles. Your response here will be sent DIRECTLY TO THE MAIN THREAD, not back to the human user. Attack weak logic, challenge assertions, and stay concise. Do NOT address the human user directly.\nIf you critically lack information or require user clarification, output '%%%STOP' in your message to immediately pause the debate.";
+      const MAIN_DEBATE_ROLE_SYS = "### MODE OVERRIDE: ACTIVE DEBATE MODE ###\nYou are the Main Thread in an automated multi-turn debate against a Second Brain instance. Your response here will be sent DIRECTLY TO SECOND BRAIN, not back to the human user. Frame the prompt, present your arguments to Second Brain, and ask Second Brain to challenge you. Keep responses concise and focused. Do NOT address the human user directly or ask the human user for input unless you emit %%%STOP.\nCRITICAL RULE: Memory and workspace tools are disabled during Debate Mode. Do not attempt to use ADD, UPDATE, or DELETE markers until the debate ends and you have returned to normal mode.\nIf you critically lack information or require user clarification, output '%%%STOP' in your message to immediately pause the debate.";
+      const SECOND_BRAIN_SYS = "### MODE OVERRIDE: ACTIVE DEBATE MODE ###\nYou are Second Brain, an adversarial critical partner with zero context of past user work. You reason from first principles. Your response here will be sent DIRECTLY TO THE MAIN THREAD, not back to the human user. Attack weak logic, challenge assertions, and stay concise. Do NOT address the human user directly.\nCRITICAL RULE: Memory and workspace tools are disabled during Debate Mode. Do not attempt to use ADD, UPDATE, or DELETE markers.\nIf you critically lack information or require user clarification, output '%%%STOP' in your message to immediately pause the debate.";
 
       const $=id=>document.getElementById(id);
       const chatC=$('chatContainer'),chatInp=$('chatInput'),sendBtn=$('btnSend');
@@ -1178,6 +1178,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           out += `### IDENTITY OVERRIDE: ACTIVE DEBATE MODE ###\n`;
           out += `You are the Main Thread in an automated side-by-side debate against Second Brain. You defend the current work and your shared history with the user.\n`;
           out += `CRITICAL INSTRUCTION: Your response will be passed directly to Second Brain as part of an automated debate loop. Do NOT address the human user directly, do NOT ask the human user questions in your text, and do NOT simulate Second Brain's responses.\n`;
+          out += `CRITICAL RULE: Memory and workspace tools are disabled during Debate Mode. Do not attempt to use ADD, UPDATE, or DELETE markers until the debate ends and you have returned to normal mode.\n`;
           out += `If you critically lack information to continue the debate or need human user clarification before proceeding, you MUST output '%%%STOP' in your response.\n\n`;
         } else {
           out += `### IDENTITY (CANON — DO NOT OVERRIDE) ###\n`;
@@ -1366,24 +1367,26 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             updateDebateUI();
 
             const remainingTurns = debateTargetLimit - debateTurnCount;
-            const debateTurnHeader = `[DEBATE TURN METADATA: Active Debate Mode | Exchange ${debateTurnCount} of ${debateTargetLimit} | ${remainingTurns} exchange(s) remaining after this turn | Recipient: Second Brain. Emit %%%STOP if user clarification is required.]`;
+            const debateTurnHeaderMain = `[DEBATE TURN METADATA: Active Debate Mode | Exchange ${debateTurnCount} of ${debateTargetLimit} | ${remainingTurns} exchange(s) remaining after this turn | Recipient: Second Brain. Memory tools disabled. Emit %%%STOP if user clarification is required.]`;
 
             // --- Step A: Call Main Thread ---
             setStatusMessage(`🔥 Turn ${debateTurnCount}/${debateTargetLimit} — Main Thread thinking…`);
             const typingMain = showTypingColumn(chatCMain);
             const { prompt: baseSysPrompt } = buildSystemPrompt(true);
-            const mainSysPrompt = `${debateTurnHeader}\n\n${MAIN_DEBATE_ROLE_SYS}\n\n${baseSysPrompt}`;
+            const mainSysPrompt = `${debateTurnHeaderMain}\n\n${MAIN_DEBATE_ROLE_SYS}\n\n${baseSysPrompt}`;
 
             // Build Main Thread messages array, prepending turn header to the active prompt if user
             const mainMsgs = [
               { role: 'system', content: mainSysPrompt },
               ...chatLog.map((e, idx) => {
                 if (idx === chatLog.length - 1 && e.role === 'user') {
-                  return { role: e.role, content: `${debateTurnHeader}\n\n${e.content}` };
+                  return { role: e.role, content: `${debateTurnHeaderMain}\n\n${e.content}` };
                 }
                 return { role: e.role, content: e.content };
               })
             ];
+
+            console.log(`[Debate Main Prompt Turn ${debateTurnCount}/${debateTargetLimit}]`, JSON.stringify(mainMsgs, null, 2));
 
             if (calculateChars(mainSysPrompt, mainMsgs) > MAX_CHARS) {
               removeTyping(typingMain);
@@ -1409,6 +1412,14 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             appendBubbleColumn(chatCMain, 'assistant', mainCleaned, APP);
             autoSave();
 
+            // Heuristic check: Did Main Thread accidentally break out to address human user directly?
+            const lowerMain = mainCleaned.toLowerCase();
+            const userBreakoutPattern = /(want me to|shall i write|would you like me to|let me know if you want|should i generate|would you prefer)/i;
+            if (userBreakoutPattern.test(lowerMain) && !mainStoppedForClarification) {
+              console.warn('[Debate Heuristic Warning]: Main Thread appears to address user directly in debate mode:', mainCleaned);
+              appendBubbleColumn(chatCMain, 'system', '⚠️ Heuristic Alert: Main Thread addressed user directly mid-debate instead of Second Brain.');
+            }
+
             if (mainStoppedForClarification) {
               setStatusMessage('🛑 Debate paused: Main Thread requested user clarification (% % % STOP).');
               appendBubbleColumn(chatCMain, 'system', '🛑 Main Thread requested user clarification. Debate paused.');
@@ -1425,14 +1436,14 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             setStatusMessage(`🧠 Turn ${debateTurnCount}/${debateTargetLimit} — Second Brain thinking…`);
             const typingSecond = showTypingColumn(chatCSecond);
 
-            const secondTurnHeader = `[DEBATE TURN METADATA: Active Debate Mode | Exchange ${debateTurnCount} of ${debateTargetLimit} | ${remainingTurns} exchange(s) remaining after this turn | Recipient: Main Thread. Emit %%%STOP if user clarification is required.]`;
+            const secondTurnHeader = `[DEBATE TURN METADATA: Active Debate Mode | Exchange ${debateTurnCount} of ${debateTargetLimit} | ${remainingTurns} exchange(s) remaining after this turn | Recipient: Main Thread. Memory tools disabled. Emit %%%STOP if user clarification is required.]`;
 
             // Feed Main's response into Second Brain context as user message prefix
             const mainMsgForSecond = { timestamp: new Date().toISOString(), role: 'user', content: `[Main Thread]: ${mainCleaned}` };
             secondBrainLog.push(mainMsgForSecond);
             appendBubbleColumn(chatCSecond, 'user', `[Main Thread]: ${mainCleaned}`, 'Main Thread');
 
-            const secondSysPrompt = `${SECOND_BRAIN_SYS}\n\n${secondTurnHeader}`;
+            const secondSysPrompt = `${secondTurnHeader}\n\n${SECOND_BRAIN_SYS}`;
             const secondMsgs = [
               { role: 'system', content: secondSysPrompt },
               ...secondBrainLog.map((e, idx) => {
@@ -1442,6 +1453,8 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
                 return { role: e.role, content: e.content };
               })
             ];
+
+            console.log(`[Debate Second Prompt Turn ${debateTurnCount}/${debateTargetLimit}]`, JSON.stringify(secondMsgs, null, 2));
 
             if (calculateChars(secondSysPrompt, secondMsgs) > MAX_CHARS) {
               removeTyping(typingSecond);
