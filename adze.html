@@ -561,10 +561,17 @@
         </div>
 
         <!-- Approval & Commitment Bar -->
-        <div class="btn-row" style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-color); display:flex; gap:10px; align-items:center;">
-          <input type="text" id="memoryTitleInput" placeholder="Title for committed workspace (optional)" style="flex:1; padding:6px 10px; border-radius:6px; background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-primary);">
-          <button class="btn-primary" id="btnApproveCommitWorkspace" style="background:var(--accent-color); font-weight:600; padding:6px 16px;">✅ Approve & Commit to Permanent Memory</button>
-          <button class="btn-secondary" id="btnCancelMemoryEditor">Close</button>
+        <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="text" id="memoryCorrectionInput" placeholder="Optional correction instruction for Stage 2 re-run (e.g. 'Keep chapter 4 notes, do not archive')..." style="flex:1; padding:6px 10px; border-radius:6px; background:var(--bg-input); border:1px solid var(--border-accent); color:var(--text-primary); font-size:0.8rem;">
+            <button class="btn-secondary" id="btnApplyCorrectionStage2" style="padding:6px 12px; font-size:0.75rem;">✏️ Re-run Stage 2 with Correction</button>
+          </div>
+          <div class="btn-row" style="margin:0; display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+            <input type="text" id="memoryTitleInput" placeholder="Title for committed workspace (optional)" style="flex:1; padding:6px 10px; border-radius:6px; background:var(--bg-input); border:1px solid var(--border-accent); color:var(--text-primary); margin:0;">
+            <button class="btn-danger" id="btnRejectConsolidation" style="padding:6px 16px;">❌ Reject & Keep Original</button>
+            <button class="btn-primary" id="btnApproveCommitWorkspace" style="background:var(--accent-color); font-weight:600; padding:6px 16px;">✅ Approve & Commit to Permanent Memory</button>
+            <button class="btn-secondary" id="btnCancelMemoryEditor">Close</button>
+          </div>
         </div>
 
       </div>
@@ -773,6 +780,17 @@ Rules:
         details.open = true;
       }
 
+      function enforceConsolidationMarkerLockout(text) {
+        let clean = text;
+        const markerRegex = /###\s*(ADD|UPDATE|DELETE):\s*(.+?)\s*\n([\s\S]*?)###\s*END/gi;
+        if (markerRegex.test(text)) {
+          console.warn('[Consolidation Warning]: Memory markers detected during consolidation! Stripping markers.');
+          clean = text.replace(markerRegex, '').trim();
+          showToast('⚠️ Memory markers stripped during consolidation pass.');
+        }
+        return clean;
+      }
+
       async function runStage1SecondBrain() {
         if (memoryEditor.isRunning) return;
         const rawWorkspace = memoryEditor.originalWorkspaceText || $('memoryInput').value.trim();
@@ -783,26 +801,46 @@ Rules:
 
         memoryEditor.isRunning = true;
         updateStageStepper(1);
-        $('memoryEditorProgress').textContent = '⚡ Stage 1: Second Brain analyzing raw workspace (Context-Stripped)...';
+
+        const sbRolePrompt = "You are the structural critic. You have no memory of past work with the user beyond what is in this input. Your job is to find the weak spots in the raw memory text. You do not create the final. You do not merge contradictions. You flag. You propose. Keep answers structured. End at the skeleton.";
 
         try {
-          // Pass A: Diagnostic
-          const stage1DiagPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Perform a strict diagnostic scan on this RAW WORKSPACE. You have NO chat history, NO documents, and NO user identity context.\n\nScrutinize and report on:\n1. Duplicate or near-duplicate blocks.\n2. Contradictory statuses or conflicting facts.\n3. Stale triggers or outdated reminders.\n4. Privacy leaks or sensitive raw disclosures.\n5. Hedging language or unresolved open flags.\n\nRAW WORKSPACE:\n${rawWorkspace}`;
+          // Pass 1 of 2: Diagnostic
+          const header1 = "[MEMORY CONSOLIDATION ACTIVE | Stage 1 of 3: Second Brain structural critique | Pass 1 of 2. Output is a proposal only. Do not emit ADD, UPDATE, or DELETE markers. Your role in this pass: diagnose weak spots.]";
+          $('memoryEditorProgress').textContent = '⚡ Stage 1 (Pass 1/2): Second Brain diagnostic scan...';
+          const stage1DiagPrompt = `${header1}\n\n${sbRolePrompt}\n\nTask: Perform a strict diagnostic scan on this RAW WORKSPACE.\n\nScrutinize and report on:\n1. Duplicate or near-duplicate blocks.\n2. Contradictory statuses or conflicting facts.\n3. Stale triggers or outdated reminders.\n4. Privacy leaks or sensitive disclosures.\n5. Unresolved open flags.\n\nRAW WORKSPACE:\n${rawWorkspace}`;
 
-          const diagOutput = await callMemoryAPI(stage1DiagPrompt, { thinking: true, reasoningEffort: 'high', maxTokens: 40000 });
+          console.log('[Memory Pipeline Stage 1 Pass 1 Prompt]', stage1DiagPrompt);
+          let diagOutput = await callMemoryAPI(stage1DiagPrompt, { thinking: true, maxTokens: 40000 });
+          diagOutput = enforceConsolidationMarkerLockout(diagOutput);
+
+          if (diagOutput.includes('%%%STOP')) {
+            memoryEditor.stage1Diagnostic = diagOutput.replace(/%%%STOP/g, '').trim();
+            $('memoryEditorProgress').textContent = '🛑 Stage 1 paused: Second Brain requested clarification (%%%STOP).';
+            return;
+          }
           memoryEditor.stage1Diagnostic = diagOutput;
 
-          // Pass B: Proposed Lean Skeleton
-          $('memoryEditorProgress').textContent = '⚡ Stage 1: Constructing proposed lean skeleton & archive list...';
-          const stage1SkelPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Based on your diagnostic scan, construct a PROPOSED LEAN SKELETON of the workspace and an ARCHIVE/DELETE list.\n\nRules:\n- Merge duplicate sections into restructured headings.\n- List items to be archived or deleted.\n- Flag unresolved questions that need user context.\n- Output ONLY the proposed skeleton and archive list.\n\nDIAGNOSTIC:\n${diagOutput}\n\nRAW WORKSPACE:\n${rawWorkspace}`;
+          // Pass 2 of 2: Lean Skeleton
+          const header2 = "[MEMORY CONSOLIDATION ACTIVE | Stage 1 of 3: Second Brain structural critique | Pass 2 of 2. Output is a proposal only. End at skeleton. Do not emit ADD, UPDATE, or DELETE markers.]";
+          $('memoryEditorProgress').textContent = '⚡ Stage 1 (Pass 2/2): Constructing proposed lean skeleton...';
+          const stage1SkelPrompt = `${header2}\n\n${sbRolePrompt}\n\nTask: Based on your diagnostic scan, construct a PROPOSED LEAN SKELETON of the workspace and an ARCHIVE/DELETE list. End at the skeleton. Do not produce a final workspace.\n\nDIAGNOSTIC:\n${diagOutput}\n\nRAW WORKSPACE:\n${rawWorkspace}`;
 
-          const skelOutput = await callMemoryAPI(stage1SkelPrompt, { thinking: true, reasoningEffort: 'high', maxTokens: 40000 });
+          console.log('[Memory Pipeline Stage 1 Pass 2 Prompt]', stage1SkelPrompt);
+          let skelOutput = await callMemoryAPI(stage1SkelPrompt, { thinking: true, maxTokens: 40000 });
+          skelOutput = enforceConsolidationMarkerLockout(skelOutput);
+
+          if (skelOutput.includes('%%%STOP')) {
+            memoryEditor.stage1Skeleton = skelOutput.replace(/%%%STOP/g, '').trim();
+            $('memoryEditorProgress').textContent = '🛑 Stage 1 paused: Second Brain requested clarification (%%%STOP).';
+            return;
+          }
           memoryEditor.stage1Skeleton = skelOutput;
 
-          const combinedProposal = `### Second Brain Diagnostic (Context-Stripped)\n${diagOutput}\n\n---\n\n### Second Brain Proposed Skeleton & Archive List\n${skelOutput}`;
+          const combinedProposal = `### Second Brain Diagnostic (Pass 1/2)\n${diagOutput}\n\n---\n\n### Second Brain Proposed Skeleton & Archive List (Pass 2/2)\n${skelOutput}`;
           renderMemoryReportTab('sb_proposal', combinedProposal);
 
-          $('memoryEditorProgress').textContent = '⏸️ Stage 1 Complete! Review Second Brain Proposal. Click "Stage 2: Adze Review" or "Send SB Proposal to Chat" to discuss first.';
+          $('memoryEditorProgress').textContent = '⏸️ Stage 1 Complete! Review Second Brain Proposal, then click "Stage 2: Adze Review".';
           showToast('Stage 1 Complete!');
         } catch (e) {
           $('memoryEditorProgress').textContent = `Stage 1 failed: ${e.message}`;
@@ -811,64 +849,76 @@ Rules:
         }
       }
 
-      async function runStage2AdzeReview() {
+      async function runStage2AdzeReview(correctionInstruction) {
         if (memoryEditor.isRunning) return;
         const rawWorkspace = memoryEditor.originalWorkspaceText || $('memoryInput').value.trim();
         const skelOutput = memoryEditor.stage1Skeleton || memoryEditor.stage1Diagnostic;
 
-        if (!skelOutput) {
+        if (!skelOutput && !correctionInstruction) {
           showToast('Please run Stage 1: SB Diagnosis first.');
           return;
         }
 
         memoryEditor.isRunning = true;
         updateStageStepper(2);
-        $('memoryEditorProgress').textContent = '⚡ Stage 2: The Adze resolving conflicts with full session history & permanent context...';
+        $('memoryEditorProgress').textContent = correctionInstruction
+          ? '⚡ Stage 2 (Pass 1/1): Re-running Stage 2 with user correction...'
+          : '⚡ Stage 2 (Pass 1/1): The Adze resolving flags with full session history & documents...';
+
+        const adzeRolePrompt = "You are the reviewer. You have full context. You resolve the Second Brain's flags using the chat history and documents. You decide what is archived, merged, or deleted. You write the change log. Your output is a draft, not a commitment. Do not emit memory tags during this stage. The user approves or rejects what you produce.";
+        const headerStage2 = "[MEMORY CONSOLIDATION ACTIVE | Stage 2 of 3: Adze review | Pass 1 of 1. Output is a draft for user approval. Not committed memory. Do not emit ADD, UPDATE, or DELETE markers.]";
 
         try {
-          const { prompt: baseSys } = buildSystemPrompt();
-          const adzeSysPrompt = `${MAIN_DEBATE_ROLE_SYS}\n\n${baseSys}`;
-          const stage2UserPrompt = `[Memory Consolidation Stage 2 Request]:
+          const { prompt: baseSys } = buildSystemPrompt(true);
+          const adzeSysPrompt = `${headerStage2}\n\n${adzeRolePrompt}\n\n${baseSys}`;
+          let stage2UserPrompt = `[Memory Consolidation Stage 2 Request]:
 The Second Brain has analyzed our workspace with ZERO context and generated the following proposed changes and archive list:
 
-SECOND BRAIN PROPOSED CHANGES & DIAGNOSTIC:
-${skelOutput}
+SECOND BRAIN PROPOSED SKELETON & DIAGNOSTIC:
+${skelOutput || 'None'}
 
 RAW WORKSPACE:
 ${rawWorkspace}
 
 YOUR TASK AS THE ADZE (With full chat history & permanent documents):
 1. Resolve conflicts Second Brain flagged by checking our actual conversation context and commitments.
-2. Verify if flagged duplications are real duplicates or updated/amended versions.
-3. Check stale triggers against real conversation history.
-4. Resolve open flags based on the real status of each item.
-5. Produce the FINAL CONSOLIDATED WORKSPACE text under the header "## Consolidated Workspace".
-6. Produce a detailed CHANGE LOG (what was merged, archived, deleted, or kept open) under the header "## Consolidation Change Log".`;
+2. Produce the DRAFT CONSOLIDATED WORKSPACE text under the header "## Consolidated Workspace Draft".
+3. Produce a detailed CHANGE LOG (what was merged, archived, deleted, or kept open) under the header "## Consolidation Change Log".`;
 
+          if (correctionInstruction) {
+            stage2UserPrompt += `\n\nUSER CORRECTION INSTRUCTION:\n${correctionInstruction}`;
+          }
+
+          console.log('[Memory Pipeline Stage 2 Prompt]', adzeSysPrompt);
           const stage2Output = await callApi([
             { role: 'system', content: adzeSysPrompt },
             ...chatLog.map(e => ({ role: e.role, content: e.content })),
             { role: 'user', content: stage2UserPrompt }
           ]);
 
-          const { cleanedReply: stage2Cleaned } = processActions(stage2Output);
+          let cleanedOutput = enforceConsolidationMarkerLockout(stage2Output);
 
-          let finalWorkspace = stage2Cleaned;
-          let changeLogText = stage2Cleaned;
-          if (stage2Cleaned.includes('## Consolidated Workspace') && stage2Cleaned.includes('## Consolidation Change Log')) {
-            const parts = stage2Cleaned.split('## Consolidation Change Log');
-            finalWorkspace = parts[0].replace('## Consolidated Workspace', '').trim();
+          if (cleanedOutput.includes('%%%STOP')) {
+            cleanedOutput = cleanedOutput.replace(/%%%STOP/g, '').trim();
+            $('memoryEditorProgress').textContent = '🛑 Stage 2 paused: The Adze requested clarification (%%%STOP).';
+          }
+
+          let finalWorkspace = cleanedOutput;
+          let changeLogText = cleanedOutput;
+          if (cleanedOutput.includes('## Consolidated Workspace Draft') && cleanedOutput.includes('## Consolidation Change Log')) {
+            const parts = cleanedOutput.split('## Consolidation Change Log');
+            finalWorkspace = parts[0].replace('## Consolidated Workspace Draft', '').trim();
             changeLogText = '## Consolidation Change Log\n' + parts[1].trim();
           }
 
           memoryEditor.stage2Workspace = finalWorkspace;
           memoryEditor.stage3ChangeLog = changeLogText;
           $('memoryInput').value = finalWorkspace;
-          $('editorLeftLabel').textContent = 'Final Consolidated Workspace (The Adze)';
+          $('editorLeftLabel').textContent = 'Draft Consolidated Workspace (Pending Approval)';
 
           renderMemoryReportTab('change_log', changeLogText);
 
-          $('memoryEditorProgress').textContent = '⏸️ Stage 2 Complete! The Adze has resolved context & produced the consolidated workspace. Click "Stage 3: QC Check".';
+          $('memoryEditorProgress').textContent = '⏸️ Stage 2 Complete! Click "Stage 3: QC Check".';
           showToast('Stage 2 Complete!');
         } catch (e) {
           $('memoryEditorProgress').textContent = `Stage 2 failed: ${e.message}`;
@@ -887,36 +937,44 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
 
         memoryEditor.isRunning = true;
         updateStageStepper(3);
-        $('memoryEditorProgress').textContent = '⚡ Stage 3: Second Brain Quality Check on final workspace...';
+        $('memoryEditorProgress').textContent = '⚡ Stage 3 (Pass 1/1): Format & Structural Release Gate check...';
+
+        const headerStage3 = "[MEMORY CONSOLIDATION ACTIVE | Stage 3 of 3: Format & Release Gate | Pass 1 of 1. Output is structural check only. Not committed memory. Do not emit ADD, UPDATE, or DELETE markers.]";
 
         try {
-          const qcPrompt = `${SECOND_BRAIN_SYS}\n\nTask: Perform a final quality check on this consolidated workspace. Check for formatting errors, missed structural duplications, or unparsed markers. Be direct.\n\nCONSOLIDATED WORKSPACE:\n${finalWorkspace}`;
-          const qcOutput = await callMemoryAPI(qcPrompt, { thinking: false, temperature: 0.2, maxTokens: 40000 });
+          const qcPrompt = `${headerStage3}\n\nTask: Perform a structural quality check on this draft workspace. Check for formatting errors, unparsed markers, or structural duplications. Do NOT re-think content. Be direct.\n\nDRAFT WORKSPACE:\n${finalWorkspace}`;
+          console.log('[Memory Pipeline Stage 3 Prompt]', qcPrompt);
+          let qcOutput = await callMemoryAPI(qcPrompt, { thinking: false, temperature: 0.2, maxTokens: 40000 });
+          qcOutput = enforceConsolidationMarkerLockout(qcOutput);
+
           memoryEditor.stage3QualityCheck = qcOutput;
-
           renderMemoryReportTab('quality_check', qcOutput);
+          renderPreCommitChecklist();
 
-          // Record in session chat log
-          chatLog.push({
-            timestamp: new Date().toISOString(),
-            role: 'user',
-            content: `[3-Stage Memory Consolidation Relay]: Executed multi-stage memory consolidation.`
-          });
-          chatLog.push({
-            timestamp: new Date().toISOString(),
-            role: 'assistant',
-            content: `[3-Stage Consolidation Summary]:\n\n${memoryEditor.stage3ChangeLog || 'Consolidation completed.'}`
-          });
-          save('wc_chatLog', chatLog);
-          appendBubble('system', '🧠 3-Stage Consolidation Relay completed and recorded in session history.');
-
-          $('memoryEditorProgress').textContent = '✅ Stage 3 Complete! Review final workspace & change log, then click "Approve & Commit".';
-          showToast('Stage 3 QC Complete!');
+          $('memoryEditorProgress').textContent = '✅ Stage 3 Complete! Review Pre-Commit Checklist below, then click "Approve & Commit".';
+          showToast('Stage 3 QC Complete! Pending User Approval.');
         } catch (e) {
           $('memoryEditorProgress').textContent = `Stage 3 failed: ${e.message}`;
         } finally {
           memoryEditor.isRunning = false;
         }
+      }
+
+      function renderPreCommitChecklist() {
+        const outputs = $('memoryEditorOutputs');
+        const changeLog = memoryEditor.stage3ChangeLog || 'No change log generated.';
+        const checklistHTML = `
+<div style="background:var(--bg-elevated); padding:12px; border-radius:6px; border:1px solid var(--border-accent); margin-top:10px;">
+  <h4 style="color:var(--lavender); margin-bottom:8px;">📋 Pre-Commit Checklist (Pending User Approval)</h4>
+  <p><strong>Version:</strong> Consolidated Workspace v${aiDocsArchive.length + 1}</p>
+  <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+  <hr style="border-color:var(--border-subtle); margin:8px 0;">
+  <div style="max-height:180px; overflow-y:auto; font-size:0.75rem;">
+    <strong>Change Log & Audit Trail:</strong>
+    <pre style="white-space:pre-wrap; margin-top:4px;">${esc(changeLog)}</pre>
+  </div>
+</div>`;
+        outputs.innerHTML += checklistHTML;
       }
 
       async function runThreeStageRelayPipeline() {
@@ -1079,18 +1137,46 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
         showToast('Undid last workspace save.');
       }
 
+      function rejectConsolidation() {
+        if (memoryEditor.originalWorkspaceText) {
+          $('memoryInput').value = memoryEditor.originalWorkspaceText;
+        }
+        memoryEditor.stage1Diagnostic = '';
+        memoryEditor.stage1Skeleton = '';
+        memoryEditor.stage2Workspace = '';
+        memoryEditor.stage3ChangeLog = '';
+        memoryEditor.stage3QualityCheck = '';
+        $('memoryEditorOutputs').innerHTML = '<div style="color:var(--text-muted); font-style:italic; padding:20px; text-align:center;">Consolidation rejected by user. Raw workspace kept unchanged.</div>';
+        closeMemoryEditor();
+        showToast('❌ Consolidation rejected. Original workspace kept unchanged.');
+      }
+
+      async function applyCorrectionAndRerunStage2() {
+        const correction = $('memoryCorrectionInput').value.trim();
+        if (!correction) {
+          showToast('Please type a correction instruction first.');
+          return;
+        }
+        await runStage2AdzeReview(correction);
+        if (memoryEditor.stage2Workspace) {
+          await runStage3QualityCheck();
+        }
+      }
+
       // Event listeners for Memory Editor
       $('btnOpenMemoryEditor').addEventListener('click', openMemoryEditor);
       $('btnCloseMemoryEditor').addEventListener('click', closeMemoryEditor);
       $('btnCancelMemoryEditor').addEventListener('click', closeMemoryEditor);
       $('btnLoadWorkspace').addEventListener('click', loadCurrentWorkspace);
       $('btnApproveCommitWorkspace').addEventListener('click', saveMemoryWorkspace);
+      $('btnRejectConsolidation').addEventListener('click', rejectConsolidation);
+      $('btnApplyCorrectionStage2').addEventListener('click', applyCorrectionAndRerunStage2);
       $('btnUndoConsolidation').addEventListener('click', undoLastConsolidation);
       $('memoryEditorOverlay').addEventListener('click', (e) => {
         if (e.target === $('memoryEditorOverlay')) closeMemoryEditor();
       });
       $('btnRunStage1').addEventListener('click', runStage1SecondBrain);
-      $('btnRunStage2').addEventListener('click', runStage2AdzeReview);
+      $('btnRunStage2').addEventListener('click', () => runStage2AdzeReview());
       $('btnRunStage3').addEventListener('click', runStage3QualityCheck);
       $('btnRunRelayPipeline').addEventListener('click', runThreeStageRelayPipeline);
       $('btnSendProposalToChat').addEventListener('click', sendProposalToChat);
