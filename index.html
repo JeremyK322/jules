@@ -1,0 +1,3493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lunar Constraint Map - Planning Mode</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050510;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #fff;
+        }
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.75);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid #6688aa;
+            z-index: 20;
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        #message.error { border-color: #ff5555; background: rgba(60,0,0,0.85); }
+        #message.success { border-color: #55ff88; background: rgba(0,60,30,0.85); }
+        #message.hidden { opacity: 0; pointer-events: none; }
+        #layers-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(10,10,30,0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #445566;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-width: 240px;
+            max-width: 340px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        #layers-panel.closed { transform: translateX(-120%); opacity: 0; pointer-events: none; }
+        #layers-panel::-webkit-scrollbar { width: 4px; }
+        #layers-panel::-webkit-scrollbar-track { background: transparent; }
+        #layers-panel::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .layers-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #445566;
+            padding-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .layers-header .title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #aac;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .layers-header .title input[type="checkbox"] {
+            accent-color: #ff5555;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .layers-header .close-btn {
+            background: none; border: none; color: #778; font-size: 1.4rem;
+            cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.2s, transform 0.2s;
+        }
+        .layers-header .close-btn:hover { color: #fff; transform: scale(1.2); }
+        .category {
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(68,85,102,0.2);
+            padding-bottom: 4px;
+        }
+        .category:last-child { border-bottom: none; }
+        .category-header {
+            display: flex; align-items: center; gap: 6px; cursor: pointer;
+            padding: 4px 0; color: #99b; font-weight: 600; font-size: 0.85rem;
+            letter-spacing: 0.5px; transition: color 0.2s;
+        }
+        .category-header:hover { color: #cce; }
+        .category-header .arrow {
+            font-size: 0.7rem; transition: transform 0.25s; display: inline-block;
+        }
+        .category-header .arrow.open { transform: rotate(90deg); }
+        .category-header .cat-name { flex: 1; }
+        .category-header input[type="checkbox"] {
+            accent-color: #ff5555;
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+        .category-header .cat-count {
+            font-weight: 400; color: #667; font-size: 0.75rem;
+            background: #1a1a2e; padding: 0 8px; border-radius: 10px;
+        }
+        .category-header .disc-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #99b;
+            user-select: none;
+        }
+        .category-header .disc-toggle input[type="checkbox"] {
+            width: 12px;
+            height: 12px;
+            accent-color: #4a8;
+            margin: 0;
+        }
+        .category-body {
+            padding-left: 22px; overflow: hidden; max-height: 0; transition: max-height 0.3s ease;
+        }
+        .category-body.open { max-height: 2000px; }
+        .layer-item {
+            display: flex; align-items: center; gap: 8px; padding: 3px 0;
+            font-size: 0.82rem; color: #bbb; cursor: pointer; transition: color 0.2s;
+        }
+        .layer-item:hover { color: #fff; }
+        .layer-item input[type="checkbox"] {
+            accent-color: #ff5555; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0;
+        }
+        .layer-item .color-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .layer-item .sub-count {
+            margin-left: auto; color: #667; font-size: 0.75rem;
+        }
+        .layer-item .layer-arrow {
+            font-size: 0.65rem;
+            transition: transform 0.25s;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .layer-item .layer-arrow.open { transform: rotate(90deg); }
+        .layer-item.active-layer {
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .feature-list {
+            padding-left: 26px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .feature-list.open { max-height: 1200px; }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            font-size: 0.78rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .feature-item:hover { color: #fff; }
+        .feature-item input[type="checkbox"] {
+            accent-color: #44aaff;
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .feature-item .feature-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .feature-item .state-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-left: -4px;
+        }
+        .user-site-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+            font-size: 0.82rem;
+            color: #bbb;
+            cursor: pointer;
+            transition: color 0.2s;
+            border-left: 2px solid transparent;
+            padding-left: 4px;
+        }
+        .user-site-item:hover { color: #fff; }
+        .user-site-item .color-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .user-site-item .tier-badge {
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #667;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .user-site-item .delete-btn {
+            background: none; border: none; color: #667; cursor: pointer;
+            font-size: 0.9rem; padding: 0 4px; transition: color 0.2s;
+        }
+        .user-site-item .delete-btn:hover { color: #ff5555; }
+        #gear {
+            position: absolute; top: 20px; right: 20px; z-index: 30;
+            font-size: 0.9rem; font-weight: bold; color: #fff;
+            background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
+            padding: 8px 16px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #6688aa; transition: background 0.2s, transform 0.2s;
+            user-select: none;
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+        }
+        #gear:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
+        #gear input { display: none; }
+        #planning-btn {
+            position: absolute; top: 20px; right: 125px; z-index: 30;
+            font-size: 0.9rem; font-weight: bold; color: #fff;
+            background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
+            padding: 8px 14px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #6688aa; transition: background 0.2s, transform 0.2s;
+            user-select: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+        }
+        #planning-btn:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
+        #help-btn {
+            position: absolute; top: 20px; right: 230px; z-index: 30;
+            font-size: 0.9rem; font-weight: bold; color: #fff;
+            background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
+            padding: 8px 14px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #6688aa; transition: background 0.2s, transform 0.2s;
+            user-select: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+        }
+        #help-btn:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
+
+        /* Help Modal */
+        #help-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(6px);
+            z-index: 100; display: none; align-items: center; justify-content: center;
+        }
+        #help-modal-overlay.visible { display: flex; }
+        #help-modal {
+            background: rgba(12, 15, 30, 0.96); border: 1px solid #6688aa;
+            border-radius: 12px; width: 90%; max-width: 650px; height: 80vh; max-height: 550px;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+        }
+        .help-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 20px; border-bottom: 1px solid #445566; background: rgba(255,255,255,0.03);
+            flex-shrink: 0;
+        }
+        .help-header .title { font-size: 1.1rem; font-weight: bold; color: #b8c8ee; letter-spacing: 0.5px; }
+        .help-header .close-btn { background: none; border: none; color: #889; font-size: 1.4rem; cursor: pointer; transition: color 0.2s; }
+        .help-header .close-btn:hover { color: #fff; }
+        .help-tabs {
+            display: flex; border-bottom: 1px solid #445566; background: rgba(0,0,0,0.3);
+            overflow-x: auto; flex-shrink: 0;
+        }
+        .help-tab-btn {
+            padding: 10px 16px; background: none; border: none; color: #88a; font-size: 0.85rem;
+            font-weight: bold; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .help-tab-btn:hover { color: #ccd; }
+        .help-tab-btn.active { color: #55aaff; border-bottom-color: #55aaff; background: rgba(85,170,255,0.1); }
+        .help-content {
+            padding: 18px 22px; overflow-y: auto; font-size: 0.88rem; line-height: 1.6; color: #ddd; flex: 1;
+        }
+        .help-content::-webkit-scrollbar { width: 4px; }
+        .help-content::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .help-tab-pane { display: none; }
+        .help-tab-pane.active { display: block; }
+        .help-tab-pane h3 { color: #88ccff; margin-top: 0; font-size: 1.05rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 10px; }
+        .help-tab-pane h4 { color: #aaccff; margin: 14px 0 4px 0; font-size: 0.92rem; }
+        .help-tab-pane p { margin: 6px 0; }
+        .help-tab-pane ul { padding-left: 20px; margin: 6px 0; }
+        .help-tab-pane li { margin-bottom: 6px; }
+        .article-box {
+            background: rgba(255,255,255,0.05); border-left: 3px solid #55aaff; padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+        }
+        .article-box strong { color: #77ccff; }
+        #layers-toggle {
+            position: absolute; top: 20px; left: 20px; z-index: 15;
+            font-size: 1rem; font-weight: bold;
+            background: rgba(10,10,30,0.8); backdrop-filter: blur(4px);
+            padding: 8px 14px; border-radius: 12px; cursor: pointer;
+            border: 2px solid #445566; transition: background 0.2s, transform 0.2s, opacity 0.3s;
+            user-select: none; display: none; opacity: 0; color: #fff;
+        }
+        #layers-toggle:hover { background: rgba(40,40,80,0.9); border-color: #6688aa; transform: scale(1.05); }
+        #layers-toggle.visible { display: block; opacity: 1; }
+        #settings-panel {
+            position: absolute; top: 65px; right: 20px;
+            background: rgba(10,10,30,0.92); backdrop-filter: blur(8px);
+            border: 1px solid #6688aa; border-radius: 12px; padding: 16px 20px;
+            min-width: 240px; z-index: 40; display: none;
+            flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        #settings-panel .settings-header-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #b8c8ee;
+            text-align: center;
+            border-bottom: 1px solid #445566;
+            padding-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        #settings-panel.visible { display: flex; }
+        .settings-item {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px; font-size: 0.95rem; padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .settings-item.highlight-item {
+            background: rgba(85,170,255,0.12);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(85,170,255,0.3);
+            margin: 4px 0;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item .label { color: #ccc; }
+        .settings-item .action-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid #556688;
+            border-radius: 6px; padding: 4px 14px; color: #fff; font-size: 0.85rem;
+            cursor: pointer; transition: background 0.2s; white-space: nowrap;
+        }
+        .settings-item .action-btn:hover { background: rgba(255,255,255,0.18); }
+        .settings-item .toggle { display: flex; align-items: center; gap: 8px; }
+        .toggle-switch {
+            position: relative; width: 40px; height: 22px; background: #334;
+            border-radius: 12px; cursor: pointer; transition: background 0.25s;
+            border: 1px solid #556; flex-shrink: 0;
+        }
+        .toggle-switch.on { background: #4a8; border-color: #6ac; }
+        .toggle-switch .slider {
+            position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            background: #fff; border-radius: 50%; transition: transform 0.25s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .toggle-switch.on .slider { transform: translateX(18px); }
+        .toggle-label { font-size: 0.85rem; color: #aaa; min-width: 40px; }
+        .slider-container {
+            display: flex; align-items: center; gap: 12px; width: 100%;
+        }
+        .slider-container input[type="range"] {
+            flex: 1; accent-color: #ff5555; background: #223; height: 4px;
+            border-radius: 2px; -webkit-appearance: none;
+        }
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: #ff5555; cursor: pointer;
+        }
+        .slider-value { min-width: 32px; text-align: center; color: #ddd; font-size: 0.9rem; }
+
+        /* Info Display (bottom-right) */
+        #info-display {
+            position: absolute; bottom: 24px; right: 24px;
+            color: rgba(255,255,255,0.75);
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            padding: 10px 16px; border-radius: 8px; font-size: 0.85rem;
+            font-family: 'Courier New', monospace; z-index: 10;
+            border: 1px solid rgba(255,255,255,0.08); line-height: 1.7; min-width: 140px;
+            user-select: none; display: none;
+        }
+        #info-display.visible { display: block; }
+        #info-display-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        #info-display-header .title {
+            font-weight: bold;
+            color: #99b;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        #info-toggle-btn {
+            background: none;
+            border: none;
+            color: #99b;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        #info-toggle-btn:hover { color: #fff; }
+        #info-display-body { display: block; }
+        #info-display.collapsed #info-display-body { display: none; }
+        #info-display.collapsed #info-display-header {
+            margin-bottom: 0; padding-bottom: 0; border-bottom: none;
+        }
+        #info-display .label { color: #99b; margin-right: 8px; display: inline-block; min-width: 44px; }
+        #info-display .value { color: #dde; font-weight: bold; }
+
+        /* Centre overlap display (bottom-left telemetry HUD) */
+        #centre-overlap-display {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(8, 12, 24, 0.88);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: Arial, Helvetica, sans-serif;
+            pointer-events: auto;
+            z-index: 10;
+            border: 1px solid rgba(85, 170, 255, 0.25);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            min-width: 300px;
+            max-width: 360px;
+            user-select: none;
+        }
+        .hud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            font-weight: bold;
+            color: #55aaff;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .hud-row:last-child { margin-bottom: 0; }
+        .hud-label {
+            color: #8899aa;
+            font-weight: 600;
+            font-size: 0.78rem;
+            min-width: 42px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .hud-val {
+            color: #77ccff;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        .hud-status-container {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .hud-status-container::-webkit-scrollbar { width: 3px; }
+        .hud-status-container::-webkit-scrollbar-thumb { background: #55aaff; border-radius: 3px; }
+        .hud-status-dot {
+            width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #4a8;
+            box-shadow: 0 0 6px rgba(68, 170, 136, 0.6);
+        }
+        .hud-status-dot.active-constraint {
+            background-color: #ff5555;
+            box-shadow: 0 0 8px rgba(255, 85, 85, 0.8);
+        }
+        .hud-status-dot.active-warning {
+            background-color: #ffaa00;
+            box-shadow: 0 0 8px rgba(255, 170, 0, 0.8);
+        }
+        #centre-overlap-text {
+            color: #eeeeee;
+            font-weight: 500;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            flex: 1;
+        }
+        .hud-feature-title {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+        .hud-detail-line {
+            color: #cccccc;
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+
+        /* State Legend Panel */
+        #state-legend-panel {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(10, 14, 28, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #55aaff;
+            border-radius: 10px;
+            padding: 12px 14px;
+            min-width: 220px;
+            max-width: 280px;
+            z-index: 35;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            user-select: none;
+            transition: bottom 0.25s ease;
+        }
+        #state-legend-panel.visible { display: block; }
+        .state-legend-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #77ccff;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .state-legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .state-legend-list::-webkit-scrollbar { width: 3px; }
+        .state-legend-list::-webkit-scrollbar-thumb { background: #55aaff; border-radius: 3px; }
+        .state-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: #ddd;
+        }
+        .state-legend-color {
+            width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+        }
+
+        /* Planning Modal */
+        #planning-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px);
+            z-index: 50; display: none; align-items: center; justify-content: center;
+        }
+        #planning-modal-overlay.visible { display: flex; }
+        #planning-modal {
+            background: rgba(12, 15, 30, 0.96); border: 1px solid #55aaff;
+            border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+        }
+        .planning-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 20px; border-bottom: 1px solid #445566;
+            flex-shrink: 0;
+        }
+        .planning-header .title {
+            font-size: 1.1rem; font-weight: bold; color: #55ff88;
+            letter-spacing: 0.5px;
+        }
+        .planning-header .close-btn {
+            background: none; border: none; color: #889; font-size: 1.4rem;
+            cursor: pointer; transition: color 0.2s;
+        }
+        .planning-header .close-btn:hover { color: #fff; }
+        .planning-body {
+            padding: 20px 24px; overflow-y: auto; flex: 1;
+        }
+        .planning-body::-webkit-scrollbar { width: 4px; }
+        .planning-body::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .planning-body .form-group {
+            margin-bottom: 14px;
+        }
+        .planning-body .form-group label {
+            display: block; font-size: 0.85rem; color: #99b; margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .planning-body .form-group input,
+        .planning-body .form-group select,
+        .planning-body .form-group textarea {
+            width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.06);
+            border: 1px solid #445566; border-radius: 6px; color: #fff;
+            font-size: 0.9rem; transition: border-color 0.2s;
+        }
+        .planning-body .form-group input:focus,
+        .planning-body .form-group select:focus,
+        .planning-body .form-group textarea:focus {
+            outline: none; border-color: #55aaff;
+        }
+        .planning-body .form-group input:disabled {
+            opacity: 0.5; cursor: not-allowed;
+        }
+        .planning-body .form-group select option {
+            background: #1a1a2e;
+        }
+        .planning-body .form-group textarea {
+            resize: vertical; min-height: 60px; font-family: Arial, sans-serif;
+        }
+        .planning-body .form-group .hint {
+            font-size: 0.75rem; color: #667; margin-top: 3px;
+        }
+        .planning-body .form-group .current-loc {
+            background: rgba(85,170,255,0.08);
+            border: 1px solid rgba(85,170,255,0.2);
+            border-radius: 6px; padding: 6px 12px;
+            font-size: 0.85rem; color: #77ccff;
+            text-align: center;
+        }
+        .planning-body .form-row {
+            display: flex; gap: 12px;
+        }
+        .planning-body .form-row .form-group { flex: 1; }
+        .planning-footer {
+            padding: 12px 24px; border-top: 1px solid #445566;
+            display: flex; justify-content: flex-end; gap: 12px;
+            flex-shrink: 0;
+        }
+        .planning-footer .btn {
+            padding: 8px 20px; border-radius: 6px; border: none;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .planning-footer .btn-primary {
+            background: #55aaff; color: #fff;
+        }
+        .planning-footer .btn-primary:hover { background: #77ccff; }
+        .planning-footer .btn-secondary {
+            background: rgba(255,255,255,0.1); color: #aaa;
+        }
+        .planning-footer .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+        /* Conflict Report Modal */
+        #conflict-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+            z-index: 60; display: none; align-items: center; justify-content: center;
+        }
+        #conflict-modal-overlay.visible { display: flex; }
+        #conflict-modal {
+            background: rgba(12, 15, 30, 0.96); border: 1px solid #ffaa55;
+            border-radius: 12px; width: 90%; max-width: 600px; max-height: 85vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+        }
+        .conflict-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 20px; border-bottom: 1px solid #445566;
+            flex-shrink: 0;
+        }
+        .conflict-header .title {
+            font-size: 1.1rem; font-weight: bold; color: #ffaa55;
+            letter-spacing: 0.5px;
+        }
+        .conflict-header .close-btn {
+            background: none; border: none; color: #889; font-size: 1.4rem;
+            cursor: pointer; transition: color 0.2s;
+        }
+        .conflict-header .close-btn:hover { color: #fff; }
+        .conflict-body {
+            padding: 20px 24px; overflow-y: auto; flex: 1;
+        }
+        .conflict-body::-webkit-scrollbar { width: 4px; }
+        .conflict-body::-webkit-scrollbar-thumb { background: #445566; border-radius: 4px; }
+        .conflict-summary {
+            background: rgba(255,255,255,0.05); border-radius: 8px;
+            padding: 14px; margin-bottom: 16px;
+            border-left: 3px solid #55aaff;
+        }
+        .conflict-summary h4 {
+            margin: 0 0 8px 0; color: #55aaff;
+        }
+        .conflict-item {
+            background: rgba(255,255,255,0.03); border-radius: 6px;
+            padding: 10px 14px; margin-bottom: 8px;
+            border-left: 3px solid #667;
+        }
+        .conflict-item.severity-high { border-left-color: #ff5555; }
+        .conflict-item.severity-medium { border-left-color: #ffaa55; }
+        .conflict-item.severity-low { border-left-color: #55ff88; }
+        .conflict-item .item-title { font-weight: bold; color: #ddd; }
+        .conflict-item .item-detail { font-size: 0.85rem; color: #99b; margin-top: 2px; }
+        .conflict-item .item-article {
+            display: inline-block; background: rgba(85,170,255,0.15);
+            padding: 1px 10px; border-radius: 12px; font-size: 0.75rem;
+            color: #77ccff; margin-top: 4px;
+        }
+        .conflict-footer {
+            padding: 12px 24px; border-top: 1px solid #445566;
+            display: flex; justify-content: flex-end; gap: 12px;
+            flex-shrink: 0;
+        }
+        .conflict-footer .btn {
+            padding: 8px 20px; border-radius: 6px; border: none;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .conflict-footer .btn-primary {
+            background: #55ff88; color: #000;
+        }
+        .conflict-footer .btn-primary:hover { background: #77ffaa; }
+        .conflict-footer .btn-secondary {
+            background: rgba(255,255,255,0.1); color: #aaa;
+        }
+        .conflict-footer .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+        /* Crosshair */
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #crosshair.visible { opacity: 0.6; }
+        #crosshair .outer {
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(85, 255, 136, 0.6);
+            border-radius: 50%;
+            position: relative;
+        }
+        #crosshair .inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: rgba(85, 255, 136, 0.8);
+            border-radius: 50%;
+        }
+        #crosshair .line-h {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 1px;
+            background: rgba(85, 255, 136, 0.4);
+        }
+        #crosshair .line-v {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1px;
+            height: 18px;
+            background: rgba(85, 255, 136, 0.4);
+        }
+
+        @media (max-width: 500px) {
+            #message { top: 12px; font-size: 0.75rem; padding: 4px 12px; }
+            #layers-panel { top: 10px; left: 10px; padding: 10px 12px; min-width: 180px; max-width: 280px; font-size: 0.8rem; }
+            #layers-panel .title { font-size: 0.9rem; }
+            #gear { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 10px; }
+            #planning-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 105px; }
+            #help-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 185px; }
+            #settings-panel { right: 10px; top: 50px; min-width: 160px; padding: 12px 14px; }
+            #info-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 110px; }
+            #info-display .label { min-width: 32px; }
+            #centre-overlap-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; left: 16px; min-width: 100px; max-width: 200px; }
+            #centre-overlap-display .label { min-width: 32px; }
+            #layers-toggle { top: 10px; left: 10px; font-size: 0.85rem; padding: 6px 10px; }
+            .planning-body .form-row { flex-direction: column; gap: 0; }
+            #crosshair .outer { width: 20px; height: 20px; }
+            #crosshair .line-h { width: 12px; }
+            #crosshair .line-v { height: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="message" class="hidden">Ready</div>
+
+    <!-- Crosshair -->
+    <div id="crosshair">
+        <div class="outer">
+            <div class="inner"></div>
+            <div class="line-h"></div>
+            <div class="line-v"></div>
+        </div>
+    </div>
+
+    <!-- Layers panel -->
+    <div id="layers-panel">
+        <div class="layers-header">
+            <span class="title">
+                <input type="checkbox" id="global-toggle" title="Toggle all layers" />
+                Moon Layers
+            </span>
+            <button class="close-btn" id="layers-close" title="Close layers panel">X</button>
+        </div>
+        <!-- Master Governance Toggles -->
+        <div id="governance-toggles" style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #334455;">
+            <div style="font-size: 0.75rem; font-weight: bold; color: #88aacc; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Governance & Dynamic Overlays</div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ffaa44; cursor:pointer; margin-bottom:4px;">
+                <input type="checkbox" id="assessment-status-toggle" />
+                <span>⚖️ Assessment Status & Provisional Mode</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#00ffcc; cursor:pointer; margin-bottom:4px;">
+                <input type="checkbox" id="op-activity-toggle" checked />
+                <span>🚀 Operational Activity Layer</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ff44aa; cursor:pointer; margin-bottom:4px;">
+                <input type="checkbox" id="dynamic-harms-toggle" />
+                <span>⚠️ Dynamic Harms Layer (Computed)</span>
+            </label>
+            <div id="dynamic-harms-controls" style="margin-left: 20px; font-size: 0.75rem; color: #bbccdd; margin-bottom: 6px; display: none;">
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-psi" checked /> Plume Surface Interaction (PSI-v1.2)</label>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-contamination" checked /> Volatile Contamination (CONTAM-v1.0)</label>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-emi" checked /> Transient EMI (EMI-v1.1)</label>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ffdd44; cursor:pointer;">
+                <input type="checkbox" id="disputes-toggle" />
+                <span>⚔️ Disputes, Salience & Recency</span>
+            </label>
+        </div>
+        <div id="layer-list"></div>
+        <div id="user-sites-list" style="margin-top:12px;border-top:1px solid #445566;padding-top:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:0.85rem;font-weight:bold;color:#55ff88;">📋 Planning</span>
+                <button id="clear-user-sites" style="background:none;border:none;color:#667;font-size:0.75rem;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='#ff5555'" onmouseout="this.style.color='#667'">Clear All</button>
+            </div>
+            <div id="user-sites-container"></div>
+        </div>
+    </div>
+
+    <div id="layers-toggle" title="Show layers">Layers</div>
+
+    <!-- Centre overlap display -->
+    <div id="centre-overlap-display">
+        <div class="hud-header"><span>⊕ LUNAR TELEMETRY</span></div>
+        <div class="hud-row"><span class="hud-label">LAT:</span><span class="hud-val" id="centre-lat">0.00° N</span></div>
+        <div class="hud-row"><span class="hud-label">LON:</span><span class="hud-val" id="centre-lon">0.00° E</span></div>
+        <div class="hud-status-container">
+            <span class="hud-status-dot" id="hud-status-dot"></span>
+            <span id="centre-overlap-text">Open</span>
+        </div>
+    </div>
+
+    <!-- Info display -->
+    <div id="info-display">
+        <div id="info-display-header">
+            <span class="title">INFO</span>
+            <button id="info-toggle-btn" title="Collapse/Expand">[-]</button>
+        </div>
+        <div id="info-display-body">
+            <div><span class="label">Dist</span><span class="value" id="dist">0.00</span></div>
+            <div><span class="label">Lat</span><span class="value" id="lat-display">0.00 deg</span></div>
+            <div><span class="label">Lon</span><span class="value" id="lon-display">0.00 deg</span></div>
+            <div><span class="label">Sens</span><span class="value" id="sens-display">1.00</span></div>
+            <div><span class="label">Rot</span><span class="value" id="rot-state">OFF</span></div>
+        </div>
+    </div>
+
+    <!-- State Legend Panel -->
+    <div id="state-legend-panel">
+        <div class="state-legend-title"><span>Art. VI State Parties</span><span style="font-size:0.75rem;color:#aaa;">OST Map</span></div>
+        <div class="state-legend-list" id="state-legend-list"></div>
+    </div>
+
+    <!-- Planning Modal -->
+    <div id="planning-modal-overlay">
+        <div id="planning-modal">
+            <div class="planning-header">
+                <span class="title">📌 New Planned Site</span>
+                <button class="close-btn" id="planning-close-btn" title="Close">X</button>
+            </div>
+            <div class="planning-body">
+                <div class="form-group">
+                    <label>📍 Current Camera Location</label>
+                    <div class="current-loc" id="current-location-display">Loading...</div>
+                    <div class="hint">Site will be placed at the center of your view</div>
+                </div>
+                <div class="form-group">
+                    <label>Site Name *</label>
+                    <input type="text" id="planning-name" placeholder="e.g., Artemis Base Camp" />
+                </div>
+                <div class="form-group">
+                    <label>Actor / Operator *</label>
+                    <input type="text" id="planning-actor" placeholder="e.g., NASA, SpaceX, ESA" />
+                </div>
+                <div class="form-group">
+                    <label>State Party (Art. VI Responsibility)</label>
+                    <input type="text" id="planning-state" placeholder="e.g., USA, China, Russia, or leave blank" />
+                    <div class="hint">Required for OST Art. VI authorization and supervision.</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Latitude (°)</label>
+                        <input type="number" id="planning-lat" step="0.001" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude (°)</label>
+                        <input type="number" id="planning-lon" step="0.001" disabled />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Radius (km) *</label>
+                        <input type="number" id="planning-radius" step="0.1" min="0.1" value="5" />
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <input type="color" id="planning-color" value="#00ff88" style="height:42px;padding:2px;cursor:pointer;" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Constraint Tier *</label>
+                    <select id="planning-tier">
+                        <option value="3">Tier 3 - General Activity (e.g., temporary camp, research)</option>
+                        <option value="2" selected>Tier 2 - Significant Interest (e.g., base, extraction)</option>
+                        <option value="1">Tier 1 - Critical Constraint (e.g., exclusion zone, heritage)</option>
+                    </select>
+                    <div class="hint">Tier determines priority in conflict detection and OST obligations.</div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="planning-description" placeholder="Brief description of planned activity..."></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Notes (optional)</label>
+                    <textarea id="planning-notes" placeholder="Additional notes, mission details, etc."></textarea>
+                </div>
+            </div>
+            <div class="planning-footer">
+                <button class="btn btn-secondary" id="planning-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="planning-submit-btn">Check Conflicts & Place</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conflict Report Modal -->
+    <div id="conflict-modal-overlay">
+        <div id="conflict-modal">
+            <div class="conflict-header">
+                <span class="title">⚠️ Conflict Assessment Report</span>
+                <button class="close-btn" id="conflict-close-btn" title="Close">X</button>
+            </div>
+            <div class="conflict-body" id="conflict-body-content">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="conflict-footer">
+                <button class="btn btn-secondary" id="conflict-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="conflict-confirm-btn">✓ Confirm & Place Site</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div id="help-btn" title="Help / Documentation">?</div>
+    <div id="planning-btn" title="Plan a site at your current camera location">📐 Plan</div>
+    <div id="gear" title="Settings">Settings</div>
+
+    <!-- Help Modal -->
+    <div id="help-modal-overlay">
+        <div id="help-modal">
+            <div class="help-header">
+                <span class="title">Lunar Constraint Map Guide</span>
+                <button class="close-btn" id="help-close-btn" title="Close">X</button>
+            </div>
+            <div class="help-tabs">
+                <button class="help-tab-btn active" data-tab="about">About LCM & OST</button>
+                <button class="help-tab-btn" data-tab="settings">Settings</button>
+                <button class="help-tab-btn" data-tab="layers">Layers</button>
+                <button class="help-tab-btn" data-tab="planning">Planning</button>
+                <button class="help-tab-btn" data-tab="info">Info Panels</button>
+            </div>
+            <div class="help-content">
+                <div class="help-tab-pane active" id="tab-about">
+                    <h3>3D Globe Navigation</h3>
+                    <ul>
+                        <li><strong>Rotate:</strong> Click & drag with left mouse button</li>
+                        <li><strong>Zoom:</strong> Scroll wheel</li>
+                        <li><strong>Touch:</strong> Drag to rotate, pinch to zoom</li>
+                    </ul>
+                    <h4>What is the Lunar Constraint Map (LCM)?</h4>
+                    <p>Interactive 3D tool for visualizing spatial constraints, heritage sites, resource zones, and regulatory status across the Moon's surface.</p>
+                    <h4>Outer Space Treaty (OST) Framework</h4>
+                    <div class="article-box"><strong>Article 6:</strong> States bear international responsibility for national activities in space.</div>
+                    <div class="article-box"><strong>Article 9:</strong> Due regard for other states' interests; consultation required for harmful interference.</div>
+                    <div class="article-box"><strong>Article 11:</strong> Information sharing with UN Secretary-General and scientific community.</div>
+                </div>
+                <div class="help-tab-pane" id="tab-settings">
+                    <h3>Settings</h3>
+                    <ul>
+                        <li><strong>Load GLB:</strong> Load custom 3D lunar mesh</li>
+                        <li><strong>Reset View:</strong> Reset camera position</li>
+                        <li><strong>Art. VI State Mode:</strong> Color features by responsible State Party</li>
+                        <li><strong>Info Debug Panel:</strong> Show/hide telemetry HUD</li>
+                        <li><strong>Lock N/S Pole:</strong> Restrict camera to equatorial plane</li>
+                        <li><strong>Auto-rotate:</strong> Continuous globe rotation</li>
+                        <li><strong>Glow Opacity:</strong> Adjust feature disc transparency</li>
+                        <li><strong>Crosshair:</strong> Show/hide targeting crosshair at screen center</li>
+                    </ul>
+                </div>
+                <div class="help-tab-pane" id="tab-layers">
+                    <h3>Layers Panel</h3>
+                    <ul>
+                        <li><strong>Global Checkbox:</strong> Toggle all layers</li>
+                        <li><strong>Category Accordion:</strong> Click to expand/collapse</li>
+                        <li><strong>Discs Toggle:</strong> Show/hide 3D discs per category</li>
+                        <li><strong>Layer Items:</strong> Click arrow to expand individual features</li>
+                        <li><strong>Planning Section:</strong> Shows user-added sites with delete controls and tier badges</li>
+                    </ul>
+                </div>
+                <div class="help-tab-pane" id="tab-planning">
+                    <h3>Planning Mode</h3>
+                    <p>Click the <strong>📐 Plan</strong> button to plan a site at your current camera location.</p>
+                    <ul>
+                        <li><strong>Move the camera</strong> to your desired landing location using orbit and zoom controls.</li>
+                        <li><strong>Click "Plan"</strong> to open the planning form with the current coordinates pre-filled.</li>
+                        <li><strong>Fill in the details:</strong> Name, Actor, State Party, Radius, Color, Tier, Description.</li>
+                        <li><strong>State Party is a free-text field</strong> - type any country or entity responsible under Art. VI.</li>
+                        <li><strong>Tier selection</strong> determines priority (Tier 1 = highest, Tier 3 = lowest).</li>
+                        <li><strong>Click "Check Conflicts & Place"</strong> to generate a conflict report.</li>
+                        <li><strong>Review the OST analysis</strong> showing Articles 6, 9, and 11 implications.</li>
+                        <li><strong>Confirm</strong> to place the site at your camera's location.</li>
+                        <li><strong>Manage sites</strong> from the Planning section in the Layers panel.</li>
+                        <li><strong>Data persistence:</strong> Your planned sites are saved in local storage.</li>
+                    </ul>
+                    <div class="article-box">
+                        <strong>💡 Tier System:</strong>
+                        <p><strong>Tier 1</strong> - Critical constraints requiring mandatory Art. IX consultation.<br>
+                        <strong>Tier 2</strong> - Significant interests requiring due regard and coordination.<br>
+                        <strong>Tier 3</strong> - General activities with standard Art. XI notification.</p>
+                    </div>
+                </div>
+                <div class="help-tab-pane" id="tab-info">
+                    <h3>Information Panels</h3>
+                    <h4>Bottom-Left Telemetry</h4>
+                    <ul>
+                        <li><strong>LAT/LON:</strong> Coordinates at screen center</li>
+                        <li><strong>Status:</strong> Shows overlapping features at center point</li>
+                    </ul>
+                    <h4>Bottom-Right Info (Debug)</h4>
+                    <ul>
+                        <li><strong>Dist:</strong> Camera distance from Moon center</li>
+                        <li><strong>Lat/Lon:</strong> Camera viewpoint coordinates</li>
+                        <li><strong>Sens:</strong> Dynamic rotation sensitivity</li>
+                        <li><strong>Rot:</strong> Auto-rotation state</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel">
+        <div class="settings-header-title">Lunar Constraint Map</div>
+        <div class="settings-item">
+            <span class="label">Load GLB</span>
+            <button class="action-btn" id="load-btn">Choose file...</button>
+            <input type="file" id="file-input" accept=".glb,.gltf" style="display:none;" />
+        </div>
+        <div class="settings-item">
+            <span class="label">Reset View</span>
+            <button class="action-btn" id="reset-view-btn">Reset</button>
+        </div>
+        <div class="settings-item highlight-item">
+            <span class="label" style="font-weight:bold;color:#77ccff;">Art. VI State Mode</span>
+            <div class="toggle">
+                <span class="toggle-label" id="state-mode-label" style="color:#77ccff;">OFF</span>
+                <div class="toggle-switch" id="state-mode-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label">Info Debug Panel</span>
+            <div class="toggle">
+                <span class="toggle-label" id="info-debug-label">OFF</span>
+                <div class="toggle-switch" id="info-debug-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label">Lock N/S Pole</span>
+            <div class="toggle">
+                <span class="toggle-label" id="lock-label">OFF</span>
+                <div class="toggle-switch" id="lock-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label">Auto-rotate</span>
+            <div class="toggle">
+                <span class="toggle-label" id="rot-label">OFF</span>
+                <div class="toggle-switch" id="rot-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label">Crosshair</span>
+            <div class="toggle">
+                <span class="toggle-label" id="crosshair-label">OFF</span>
+                <div class="toggle-switch" id="crosshair-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item" style="flex-wrap:wrap;">
+            <span class="label">Glow Opacity</span>
+            <div class="slider-container">
+                <input type="range" id="opacity-slider" min="0" max="1" step="0.01" value="0.5" />
+                <span class="slider-value" id="opacity-value">0.50</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { FEATURES, LAYER_DEFS, CATEGORIES, TIER_DEFS, STATE_DEFS } from './moonLayers.js';
+
+        // --- DOM References ---
+        const msgEl = document.getElementById('message');
+        const fileInput = document.getElementById('file-input');
+        const loadBtn = document.getElementById('load-btn');
+        const resetViewBtn = document.getElementById('reset-view-btn');
+        const gearBtn = document.getElementById('gear');
+        const settingsPanel = document.getElementById('settings-panel');
+        const rotToggle = document.getElementById('rot-toggle');
+        const rotLabel = document.getElementById('rot-label');
+        const lockToggle = document.getElementById('lock-toggle');
+        const lockLabel = document.getElementById('lock-label');
+        const stateModeToggle = document.getElementById('state-mode-toggle');
+        const stateModeLabel = document.getElementById('state-mode-label');
+        const stateLegendPanel = document.getElementById('state-legend-panel');
+        const stateLegendList = document.getElementById('state-legend-list');
+        const infoDebugToggle = document.getElementById('info-debug-toggle');
+        const infoDebugLabel = document.getElementById('info-debug-label');
+        const crosshairToggle = document.getElementById('crosshair-toggle');
+        const crosshairLabel = document.getElementById('crosshair-label');
+        const crosshairEl = document.getElementById('crosshair');
+        const planningBtn = document.getElementById('planning-btn');
+        const planningModalOverlay = document.getElementById('planning-modal-overlay');
+        const planningCloseBtn = document.getElementById('planning-close-btn');
+        const planningCancelBtn = document.getElementById('planning-cancel-btn');
+        const planningSubmitBtn = document.getElementById('planning-submit-btn');
+        const planningName = document.getElementById('planning-name');
+        const planningActor = document.getElementById('planning-actor');
+        const planningState = document.getElementById('planning-state');
+        const planningLat = document.getElementById('planning-lat');
+        const planningLon = document.getElementById('planning-lon');
+        const planningRadius = document.getElementById('planning-radius');
+        const planningColor = document.getElementById('planning-color');
+        const planningTier = document.getElementById('planning-tier');
+        const planningDescription = document.getElementById('planning-description');
+        const planningNotes = document.getElementById('planning-notes');
+        const currentLocationDisplay = document.getElementById('current-location-display');
+        const conflictModalOverlay = document.getElementById('conflict-modal-overlay');
+        const conflictBodyContent = document.getElementById('conflict-body-content');
+        const conflictCloseBtn = document.getElementById('conflict-close-btn');
+        const conflictCancelBtn = document.getElementById('conflict-cancel-btn');
+        const conflictConfirmBtn = document.getElementById('conflict-confirm-btn');
+        const userSitesContainer = document.getElementById('user-sites-container');
+        const clearUserSitesBtn = document.getElementById('clear-user-sites');
+
+        let isStateModeActive = false;
+        let isInfoDebugActive = false;
+        let isCrosshairVisible = false;
+        let pendingSiteData = null;
+        let currentCameraLat = 0;
+        let currentCameraLon = 0;
+
+        const distSpan = document.getElementById('dist');
+        const latSpan = document.getElementById('lat-display');
+        const lonSpan = document.getElementById('lon-display');
+        const sensSpan = document.getElementById('sens-display');
+        const rotStateSpan = document.getElementById('rot-state');
+        const opacitySlider = document.getElementById('opacity-slider');
+        const opacityValue = document.getElementById('opacity-value');
+        const layerList = document.getElementById('layer-list');
+        const layersPanel = document.getElementById('layers-panel');
+        const layersToggle = document.getElementById('layers-toggle');
+        const layersClose = document.getElementById('layers-close');
+        const globalToggle = document.getElementById('global-toggle');
+        const infoDisplay = document.getElementById('info-display');
+        const infoToggleBtn = document.getElementById('info-toggle-btn');
+        const centreLatEl = document.getElementById('centre-lat');
+        const centreLonEl = document.getElementById('centre-lon');
+        const centreOverlapText = document.getElementById('centre-overlap-text');
+        const hudStatusDotEl = document.getElementById('hud-status-dot');
+        const assessmentStatusToggle = document.getElementById('assessment-status-toggle');
+        const opActivityToggle = document.getElementById('op-activity-toggle');
+        const dynamicHarmsToggle = document.getElementById('dynamic-harms-toggle');
+        const disputesToggle = document.getElementById('disputes-toggle');
+        let isAssessmentStatusMode = false;
+        let isOpActivityEnabled = true;
+        let isDynamicHarmsEnabled = false;
+        let isDisputesEnabled = false;
+        let harmPsiEnabled = true;
+        let harmContamEnabled = true;
+        let harmEmiEnabled = true;
+        const harmMeshes = [];
+
+        // --- User Sites Storage ---
+        let userSites = [];
+        const USER_SITES_KEY = 'lcm_user_sites';
+
+        function loadUserSites() {
+            try {
+                const data = localStorage.getItem(USER_SITES_KEY);
+                if (data) {
+                    userSites = JSON.parse(data);
+                    userSites = userSites.filter(s => s.id && s.name && s.lat !== undefined && s.lon !== undefined);
+                }
+            } catch (e) {
+                userSites = [];
+            }
+        }
+
+        function saveUserSites() {
+            try {
+                localStorage.setItem(USER_SITES_KEY, JSON.stringify(userSites));
+            } catch (e) {
+                console.warn('Could not save user sites to localStorage');
+            }
+            renderUserSites();
+            updateUserSiteVisibility();
+        }
+
+        function generateId() {
+            return 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+        }
+
+        // --- Three.js Setup ---
+        let isInfoCollapsed = false;
+        infoToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isInfoCollapsed = !isInfoCollapsed;
+            infoDisplay.classList.toggle('collapsed', isInfoCollapsed);
+            infoToggleBtn.textContent = isInfoCollapsed ? '[+]' : '[-]';
+        });
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        const INITIAL_CAM_POS = new THREE.Vector3(0, 0.6, 4.5);
+        const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.copy(INITIAL_CAM_POS);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.1;
+        controls.minDistance = 1.1;
+        controls.maxDistance = 15;
+        controls.target.set(0, 0, 0);
+        controls.enablePan = false;
+        controls.minPolarAngle = 0;
+        controls.maxPolarAngle = Math.PI;
+        controls.rotateSpeed = 1.0;
+        controls.update();
+
+        scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+
+        // Stars
+        (function addStars() {
+            const geo = new THREE.BufferGeometry();
+            const count = 2500;
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count * 3; i += 3) {
+                const r = 40 + Math.random() * 60;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                pos[i] = r * Math.sin(phi) * Math.cos(theta);
+                pos[i+1] = r * Math.sin(phi) * Math.sin(theta);
+                pos[i+2] = r * Math.cos(phi);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true });
+            scene.add(new THREE.Points(geo, mat));
+        })();
+
+        // Moon
+        let currentMoon = null;
+        let moonMeshes = [];
+        function createFallbackMoon() {
+            const tex = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/moon_1024.jpg');
+            const mat = new THREE.MeshBasicMaterial({ map: tex });
+            const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), mat);
+            mesh.rotation.x = 0.1;
+            return mesh;
+        }
+        const fallbackMoon = createFallbackMoon();
+        scene.add(fallbackMoon);
+        currentMoon = fallbackMoon;
+        moonMeshes = [fallbackMoon];
+
+        // --- Helper Functions ---
+        function showMessage(text, type = 'info') {
+            msgEl.textContent = text;
+            msgEl.className = type;
+            if (type === 'hidden') msgEl.classList.add('hidden');
+            else msgEl.classList.remove('hidden');
+        }
+
+        function makeMaterialFlat(oldMat) {
+            if (!oldMat) return new THREE.MeshBasicMaterial({ color: 0xffffff });
+            if (oldMat.isMeshBasicMaterial) return oldMat;
+            return new THREE.MeshBasicMaterial({
+                map: oldMat.map || null,
+                color: oldMat.color || new THREE.Color(0xffffff),
+                opacity: oldMat.opacity ?? 1.0,
+                transparent: oldMat.transparent || false,
+                side: oldMat.side || THREE.FrontSide,
+                depthWrite: oldMat.depthWrite ?? true,
+                depthTest: oldMat.depthTest ?? true,
+            });
+        }
+
+        function latLonToPosition(lat, lon, radius) {
+            const latRad = lat * Math.PI / 180;
+            const lonRad = lon * Math.PI / 180;
+            return new THREE.Vector3(
+                radius * Math.cos(latRad) * Math.cos(lonRad),
+                radius * Math.sin(latRad),
+                -radius * Math.cos(latRad) * Math.sin(lonRad)
+            );
+        }
+
+        function positionToLatLon(pos) {
+            const norm = pos.clone().normalize();
+            const latRad = Math.asin(Math.min(1, Math.max(-1, norm.y)));
+            const lonRad = Math.atan2(-norm.z, norm.x);
+            let lat = latRad * 180 / Math.PI;
+            let lon = lonRad * 180 / Math.PI;
+            return { lat, lon };
+        }
+
+        function distanceBetween(lat1, lon1, lat2, lon2) {
+            const R = 1737.4;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function lonToDisplay(lonDeg) {
+            let normalizedLon = ((lonDeg + 180) % 360 + 360) % 360 - 180;
+            const absLon = Math.abs(normalizedLon);
+            const dir = normalizedLon >= 0 ? 'E' : 'W';
+            return `${absLon.toFixed(2)}° ${dir}`;
+        }
+
+        const MOON_RADIUS_KM = 1737.4;
+        const MOON_3D_RADIUS = 1;
+        const DEFAULT_RADIUS_KM = 10;
+        const MIN_VISUAL_RADIUS_KM = 50;
+        const MIN_DETECTION_KM = 150;
+
+        // --- Planning System ---
+        function openPlanningModal() {
+            const lat = currentCameraLat;
+            const lon = currentCameraLon;
+            planningLat.value = lat.toFixed(4);
+            planningLon.value = lon.toFixed(4);
+
+            const latStr = lat >= 0 ? `${lat.toFixed(4)}° N` : `${(-lat).toFixed(4)}° S`;
+            const lonStr = lonToDisplay(lon);
+            currentLocationDisplay.textContent = `📍 ${latStr}, ${lonStr}`;
+
+            planningName.value = '';
+            planningActor.value = '';
+            planningState.value = '';
+            planningRadius.value = '5';
+            planningColor.value = '#00ff88';
+            planningTier.value = '2';
+            planningDescription.value = '';
+            planningNotes.value = '';
+
+            planningModalOverlay.classList.add('visible');
+        }
+
+        function closePlanningModal() {
+            planningModalOverlay.classList.remove('visible');
+        }
+
+        function checkConflicts(newSite) {
+            const overlaps = [];
+
+
+            // Filter out operational activities if opActivityToggle is unchecked
+            const activeFeaturesList = FEATURES.filter(f => {
+                if (f.tags && f.tags.includes('operational_activity')) {
+                    return isOpActivityEnabled;
+                }
+                return true;
+            });
+
+            // Store operational footprints for overlap detection
+            const opFootprints = [];
+
+            for (const feature of activeFeaturesList) {
+
+                if (!feature.tags) continue;
+                const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
+                const dist = distanceBetween(newSite.lat, newSite.lon, feature.lat, feature.lon);
+                const combinedRadius = newSite.radius_km + featureRadius;
+                if (dist < combinedRadius) {
+                    overlaps.push({
+                        type: 'feature',
+                        feature: feature,
+                        distance: dist,
+                        overlapAmount: combinedRadius - dist,
+                        tier: feature.tier || 3,
+                        state: feature.state || null,
+                        articles: feature.articles || [],
+                        name: feature.name,
+                        radius_km: featureRadius
+                    });
+                }
+            }
+
+            for (const site of userSites) {
+                if (site.id === newSite.id) continue;
+                const dist = distanceBetween(newSite.lat, newSite.lon, site.lat, site.lon);
+                const combinedRadius = newSite.radius_km + site.radius_km;
+                if (dist < combinedRadius) {
+                    overlaps.push({
+                        type: 'user_site',
+                        feature: site,
+                        distance: dist,
+                        overlapAmount: combinedRadius - dist,
+                        tier: site.tier || 2,
+                        state: site.state || null,
+                        articles: [],
+                        name: site.name + ' (Planned)',
+                        radius_km: site.radius_km
+                    });
+                }
+            }
+
+            return overlaps;
+        }
+
+        function generateOSTAnalysis(overlaps, newSite) {
+            const analysis = [];
+            const highTierOverlaps = overlaps.filter(o => o.tier === 1);
+            const mediumTierOverlaps = overlaps.filter(o => o.tier === 2);
+            const states = new Set(overlaps.map(o => o.state).filter(s => s));
+
+            // Art. IX - Harmful Interference / Due Regard
+            if (highTierOverlaps.length > 0) {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'HIGH',
+                    message: `⚠️ Site overlaps with ${highTierOverlaps.length} Tier 1 zone(s). Mandatory consultation with affected States required before proceeding.`,
+                    details: highTierOverlaps.map(o => `• ${o.name} (${o.distance.toFixed(1)} km overlap)`).join('\n')
+                });
+            } else if (mediumTierOverlaps.length > 0) {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'MEDIUM',
+                    message: `Site overlaps with ${mediumTierOverlaps.length} Tier 2 zone(s). Due regard and coordination recommended.`,
+                    details: mediumTierOverlaps.map(o => `• ${o.name} (${o.distance.toFixed(1)} km overlap)`).join('\n')
+                });
+            } else if (overlaps.length > 0) {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'LOW',
+                    message: `Site overlaps with ${overlaps.length} feature(s). General due regard applies.`,
+                    details: overlaps.map(o => `• ${o.name} (${o.distance.toFixed(1)} km overlap)`).join('\n')
+                });
+            } else {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'CLEAR',
+                    message: '✅ No overlaps detected. No Art. IX consultation required.'
+                });
+            }
+
+            // Art. VI - State Responsibility
+            if (newSite.state && newSite.state.trim()) {
+                analysis.push({
+                    article: 'Art. VI',
+                    severity: 'INFO',
+                    message: `Site falls under ${newSite.state} responsibility. Ensure authorization and continuing supervision as per Art. VI.`
+                });
+            } else {
+                analysis.push({
+                    article: 'Art. VI',
+                    severity: 'WARNING',
+                    message: '⚠️ No State Party entered. Art. VI requires a State to authorize and supervise national activities. Please specify a State Party.'
+                });
+            }
+
+            // Multiple States overlap
+            if (states.size > 1) {
+                const stateNames = Array.from(states).map(s => s || 'Unknown');
+                analysis.push({
+                    article: 'Art. IX / Art. VI',
+                    severity: 'MEDIUM',
+                    message: `Site overlaps with features from multiple States (${stateNames.join(', ')}). International consultation may be required.`
+                });
+            }
+
+            // Tier-based recommendation
+            if (newSite.tier === 1) {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'INFO',
+                    message: `🔴 Tier 1 site: Ensure all Art. IX consultation requirements are met before proceeding.`
+                });
+            } else if (newSite.tier === 2) {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'INFO',
+                    message: `🟡 Tier 2 site: Coordinate with affected parties and exercise due regard.`
+                });
+            } else {
+                analysis.push({
+                    article: 'Art. IX',
+                    severity: 'INFO',
+                    message: `🟢 Tier 3 site: Standard notification and due regard apply.`
+                });
+            }
+
+            // Art. XI - Information Sharing
+            if (overlaps.length === 0) {
+                analysis.push({
+                    article: 'Art. XI',
+                    severity: 'INFO',
+                    message: '✅ No conflicts detected. Proceed with Art. XI notification to UN Secretary-General.'
+                });
+            } else {
+                analysis.push({
+                    article: 'Art. XI',
+                    severity: 'INFO',
+                    message: '📋 Report site details and any coordination activities to UN Secretary-General as per Art. XI.'
+                });
+            }
+
+            return analysis;
+        }
+
+        function showConflictReport(newSite) {
+            const overlaps = checkConflicts(newSite);
+            const analysis = generateOSTAnalysis(overlaps, newSite);
+
+            const hasHighSeverity = analysis.some(a => a.severity === 'HIGH');
+            const hasMediumSeverity = analysis.some(a => a.severity === 'MEDIUM' || a.severity === 'WARNING');
+
+            const tierLabel = newSite.tier === 1 ? 'Tier 1 - Critical' :
+                             newSite.tier === 2 ? 'Tier 2 - Significant' :
+                             'Tier 3 - General';
+
+            let html = `
+                <div class="conflict-summary">
+                    <h4>📋 Site: ${newSite.name}</h4>
+                    <div style="font-size:0.85rem;color:#99b;">
+                        <div>📍 ${newSite.lat.toFixed(4)}°, ${newSite.lon.toFixed(4)}°</div>
+                        <div>📏 Radius: ${newSite.radius_km} km</div>
+                        <div>🏛️ Actor: ${newSite.actor || 'Unspecified'}</div>
+                        ${newSite.state && newSite.state.trim() ? `<div>🏴 State: ${newSite.state}</div>` : ''}
+                        <div>🏷️ Tier: ${tierLabel}</div>
+                        <div style="margin-top:6px;font-size:0.8rem;color:#667;">${newSite.description || ''}</div>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.85rem;">
+                        <span>⚠️ Overlaps: <strong style="color:${overlaps.length > 0 ? '#ffaa55' : '#55ff88'}">${overlaps.length}</strong></span>
+                        <span>🏷️ Tier 1: <strong style="color:${overlaps.filter(o => o.tier === 1).length > 0 ? '#ff5555' : '#55ff88'}">${overlaps.filter(o => o.tier === 1).length}</strong></span>
+                        <span>🏷️ Tier 2: <strong>${overlaps.filter(o => o.tier === 2).length}</strong></span>
+                        <span>🏷️ Tier 3: <strong>${overlaps.filter(o => o.tier === 3).length}</strong></span>
+                    </div>
+                </div>
+            `;
+
+            html += `<h4 style="color:#55aaff;margin-bottom:8px;">⚖️ OST Analysis</h4>`;
+            for (const item of analysis) {
+                const severityClass = item.severity === 'HIGH' ? 'severity-high' :
+                                    item.severity === 'MEDIUM' || item.severity === 'WARNING' ? 'severity-medium' :
+                                    item.severity === 'CLEAR' ? '' : 'severity-low';
+                html += `
+                    <div class="conflict-item ${severityClass}">
+                        <div class="item-title">${item.article} ${item.severity !== 'CLEAR' ? `[${item.severity}]` : '✅'}</div>
+                        <div class="item-detail">${item.message}</div>
+                        ${item.details ? `<div style="font-size:0.8rem;color:#889;margin-top:4px;white-space:pre-line;">${item.details}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            if (overlaps.length > 0) {
+                html += `<h4 style="color:#55aaff;margin:12px 0 8px 0;">📌 Overlapping Features</h4>`;
+                for (const overlap of overlaps) {
+                    const tierColor = overlap.tier === 1 ? '#ff5555' : overlap.tier === 2 ? '#ffaa55' : '#6688aa';
+                    html += `
+                        <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 12px;margin-bottom:4px;border-left:3px solid ${tierColor};">
+                            <div style="font-weight:bold;color:#ddd;">${overlap.name}</div>
+                            <div style="font-size:0.8rem;color:#99b;">
+                                Distance: ${overlap.distance.toFixed(1)} km |
+                                Overlap: ${overlap.overlapAmount.toFixed(1)} km |
+                                Tier: ${overlap.tier}
+                                ${overlap.state ? ` | State: ${overlap.state}` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            conflictBodyContent.innerHTML = html;
+
+            pendingSiteData = newSite;
+
+            if (hasHighSeverity) {
+                conflictConfirmBtn.textContent = '⚠️ Proceed with Caution';
+                conflictConfirmBtn.style.background = '#ff5555';
+                conflictConfirmBtn.style.color = '#fff';
+            } else if (hasMediumSeverity) {
+                conflictConfirmBtn.textContent = '⚠️ Confirm & Place';
+                conflictConfirmBtn.style.background = '#ffaa55';
+                conflictConfirmBtn.style.color = '#000';
+            } else {
+                conflictConfirmBtn.textContent = '✅ Confirm & Place Site';
+                conflictConfirmBtn.style.background = '#55ff88';
+                conflictConfirmBtn.style.color = '#000';
+            }
+
+            conflictModalOverlay.classList.add('visible');
+        }
+
+        function closeConflictModal() {
+            conflictModalOverlay.classList.remove('visible');
+            pendingSiteData = null;
+        }
+
+        function confirmPlaceSite() {
+            if (!pendingSiteData) return;
+            const site = pendingSiteData;
+            site.id = generateId();
+            site.createdAt = new Date().toISOString();
+            site.active = true;
+
+            userSites.push(site);
+            saveUserSites();
+            renderUserSites();
+            updateUserSiteVisibility();
+
+            showMessage(`✅ Site "${site.name}" placed successfully!`, 'success');
+            setTimeout(() => showMessage('', 'hidden'), 3000);
+
+            closeConflictModal();
+            closePlanningModal();
+            pendingSiteData = null;
+        }
+
+        function deleteUserSite(id) {
+            userSites = userSites.filter(s => s.id !== id);
+            saveUserSites();
+            renderUserSites();
+            updateUserSiteVisibility();
+            showMessage('🗑️ Site deleted', 'info');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        }
+
+        function clearAllUserSites() {
+            if (userSites.length === 0) return;
+            if (confirm('Delete all planned sites?')) {
+                userSites = [];
+                saveUserSites();
+                renderUserSites();
+                updateUserSiteVisibility();
+                showMessage('🗑️ All planned sites cleared', 'info');
+                setTimeout(() => showMessage('', 'hidden'), 1500);
+            }
+        }
+
+        // --- User Site 3D Objects - Curved disc with no meridian line ---
+        const userSiteObjects = new Map();
+
+        function createUserSiteDisc(site) {
+            const color = site.color || '#00ff88';
+            const radiusKm = site.radius_km || 5;
+            const pos = latLonToPosition(site.lat, site.lon, MOON_3D_RADIUS);
+            const targetNormal = pos.clone().normalize();
+
+            // Create a curved disc that follows the surface - using SphereGeometry with a thin slice
+            const theta = radiusKm / MOON_RADIUS_KM;
+            const segments = Math.max(16, Math.min(48, Math.floor(theta * 50)));
+
+            const discGeo = new THREE.SphereGeometry(
+                1.001,
+                segments,
+                Math.max(8, Math.min(20, Math.floor(segments / 2))),
+                0,
+                Math.PI * 2,
+                0,
+                theta
+            );
+
+            const discMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(color),
+                transparent: true,
+                opacity: 0.35,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                depthTest: true,
+                flatShading: true
+            });
+            const disc = new THREE.Mesh(discGeo, discMat);
+            disc.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+
+            // Border ring - dashed, thin, subtle
+            const ringPoints = [];
+            const ringSegments = 48;
+            const ringRadius = radiusKm / MOON_RADIUS_KM;
+            for (let i = 0; i <= ringSegments; i++) {
+                const thetaAngle = (i / ringSegments) * Math.PI * 2;
+                const x = ringRadius * Math.sin(thetaAngle);
+                const y = ringRadius * Math.cos(thetaAngle);
+                const p = new THREE.Vector3(0, y, x);
+                p.applyQuaternion(disc.quaternion);
+                p.add(pos);
+                ringPoints.push(p);
+            }
+            const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
+            const ringMat = new THREE.LineDashedMaterial({
+                color: new THREE.Color(color),
+                transparent: true,
+                opacity: 0.35,
+                dashSize: 0.015,
+                gapSize: 0.01,
+                depthWrite: false
+            });
+            const ring = new THREE.Line(ringGeo, ringMat);
+            ring.computeLineDistances();
+
+            // Label
+            const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24);
+            const labelMat = new THREE.SpriteMaterial({
+                map: labelTex,
+                transparent: true,
+                depthTest: false,
+                depthWrite: false,
+                opacity: 1.0,
+                sizeAttenuation: true
+            });
+            const label = new THREE.Sprite(labelMat);
+            const labelHeight = 1.005 + (Math.max(radiusKm, MIN_VISUAL_RADIUS_KM) / MOON_RADIUS_KM) * 0.15;
+            const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
+            label.position.copy(labelPos);
+            label.scale.set(0.35, 0.08, 1);
+
+            const group = new THREE.Group();
+            group.add(disc);
+            group.add(ring);
+            group.add(label);
+
+            return { group, disc, ring, label };
+        }
+
+        function createLabelTexture(text, fontSize = 32) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 96;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            ctx.font = `${fontSize * 0.4}px Arial, sans-serif`;
+            ctx.fillStyle = 'rgba(85,255,136,0.6)';
+            ctx.fillText('(PLANNED)', canvas.width/2, canvas.height - 14);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        function updateUserSiteVisibility() {
+            for (const [id, obj] of userSiteObjects) {
+                if (currentMoon) {
+                    currentMoon.remove(obj.group);
+                }
+            }
+            userSiteObjects.clear();
+
+            for (const site of userSites) {
+                if (site.active === false) continue;
+                const obj = createUserSiteDisc(site);
+                if (currentMoon) {
+                    currentMoon.add(obj.group);
+                }
+                userSiteObjects.set(site.id, obj);
+            }
+        }
+
+        // --- Render User Sites in Layers Panel ---
+        function renderUserSites() {
+            if (userSites.length === 0) {
+                userSitesContainer.innerHTML = '<div style="font-size:0.8rem;color:#667;padding:4px 0;">No planned sites</div>';
+                return;
+            }
+
+            let html = '';
+            for (const site of userSites) {
+                const color = site.color || '#00ff88';
+                const tierLabel = site.tier || 2;
+                html += `
+                    <div class="user-site-item" data-id="${site.id}">
+                        <span class="color-dot" style="background-color:${color};"></span>
+                        <span style="flex:1;font-size:0.8rem;">${site.name}</span>
+                        <span class="tier-badge">T${tierLabel}</span>
+                        <span style="font-size:0.7rem;color:#667;">${site.radius_km}km</span>
+                        <button class="delete-btn" data-id="${site.id}" title="Delete site">✕</button>
+                    </div>
+                `;
+            }
+            userSitesContainer.innerHTML = html;
+
+            userSitesContainer.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteUserSite(btn.dataset.id);
+                });
+            });
+        }
+
+        // --- Layer System ---
+        const layerPriority = [];
+        for (const catName of Object.keys(CATEGORIES)) {
+            const keys = CATEGORIES[catName];
+            for (const key of keys) {
+                if (LAYER_DEFS[key]) {
+                    layerPriority.push(key);
+                }
+            }
+        }
+
+        const activeLayers = new Set();
+        const categoryDiscState = new Map();
+        const featureActiveState = new Map();
+        const featureEnabledState = new Map();
+
+        function getActiveTags() {
+            const activeTags = new Set();
+            for (const key of activeLayers) {
+                const def = LAYER_DEFS[key];
+                if (def) def.tags.forEach(t => activeTags.add(t));
+            }
+            return activeTags;
+        }
+
+        // --- FIXED: getFeatureStatus now checks user sites even when no layers are active ---
+        function getFeatureStatus(lat, lon) {
+            const overlappingFeatures = [];
+
+            // ALWAYS check user sites first - they should show regardless of layer state
+            for (const site of userSites) {
+                if (!site.active) continue;
+                const distKm = distanceBetween(lat, lon, site.lat, site.lon);
+                if (distKm < site.radius_km) {
+                    overlappingFeatures.push({
+                        feature: {
+                            id: site.id,
+                            name: site.name + ' (Planned)',
+                            tier: site.tier || 2,
+                            state: site.state || null,
+                            articles: [],
+                            source: 'User-planned site',
+                            note: site.description || 'No description'
+                        },
+                        distKm: distKm,
+                        isUserSite: true
+                    });
+                }
+            }
+
+            // If no layers active, return user sites only (or null if none)
+            if (activeLayers.size === 0) {
+                if (overlappingFeatures.length === 0) return null;
+                overlappingFeatures.sort((a, b) => a.distKm - b.distKm);
+                const { feature, distKm, isUserSite } = overlappingFeatures[0];
+                let html = `<div class="hud-feature-title">${feature.name}${isUserSite ? ' 📋' : ''}</div>`;
+                html += `<div class="hud-detail-line"><strong>Category:</strong> Planning</div>`;
+                const tierObj = TIER_DEFS[feature.tier] || TIER_DEFS[3];
+                html += `<div class="hud-detail-line"><strong>Tier:</strong> Tier ${feature.tier || 3} (${tierObj.label})</div>`;
+                if (feature.state && feature.state.trim()) {
+                    html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> ${feature.state}</div>`;
+                } else {
+                    html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> Not specified</div>`;
+                }
+                html += `<div class="hud-detail-line"><strong>Source:</strong> User-planned</div>`;
+                html += `<div class="hud-detail-line"><strong>Notes:</strong> ${feature.note || 'No description'}</div>`;
+                return {
+                    html,
+                    tier: feature.tier || 3,
+                    articles: feature.articles || []
+                };
+            }
+
+            // Layers are active - check features
+            const activeTags = getActiveTags();
+
+
+            // Filter out operational activities if opActivityToggle is unchecked
+            const activeFeaturesList = FEATURES.filter(f => {
+                if (f.tags && f.tags.includes('operational_activity')) {
+                    return isOpActivityEnabled;
+                }
+                return true;
+            });
+
+            // Store operational footprints for overlap detection
+            const opFootprints = [];
+
+            for (const feature of activeFeaturesList) {
+
+                if (!feature.tags || !feature.tags.some(t => activeTags.has(t))) continue;
+                if (featureEnabledState.has(feature.id) && !featureEnabledState.get(feature.id)) continue;
+
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                let distKm = 0;
+                let overlaps = false;
+                if (type === 'hemisphere') {
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const hPos = latLonToPosition(hLat, hLon, 1);
+                    const curPos = latLonToPosition(lat, lon, 1);
+                    if (hPos.dot(curPos) > 0) {
+                        overlaps = true;
+                        distKm = distanceBetween(lat, lon, hLat, hLon);
+                    }
+                } else if (type === 'orbit') {
+                    const entry = featureObjects[feature.id];
+                    if (entry && entry.satellite && entry.satellite.group) {
+                        const satLatLon = positionToLatLon(entry.satellite.group.position);
+                        distKm = distanceBetween(lat, lon, satLatLon.lat, satLatLon.lon);
+                        if (distKm < 800) overlaps = true;
+                    } else {
+                        distKm = 500;
+                        overlaps = true;
+                    }
+                } else {
+                    const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const detectionRadius = Math.max(featureRadius, 150);
+                    distKm = distanceBetween(lat, lon, feature.lat, feature.lon);
+                    if (distKm < detectionRadius) overlaps = true;
+                }
+                if (overlaps) {
+                    overlappingFeatures.push({ feature, distKm, isUserSite: false });
+                }
+            }
+
+            if (overlappingFeatures.length === 0) return null;
+
+            overlappingFeatures.sort((a, b) => a.distKm - b.distKm);
+            const { feature, distKm, isUserSite } = overlappingFeatures[0];
+
+            let html = `<div class="hud-feature-title">${feature.name}${isUserSite ? ' 📋' : ''}</div>`;
+
+            let primaryLayerKey = null;
+            for (const key of layerPriority) {
+                if (activeLayers.has(key)) {
+                    const def = LAYER_DEFS[key];
+                    if (def && feature.tags && feature.tags.some(t => def.tags.includes(t))) {
+                        primaryLayerKey = key;
+                        break;
+                    }
+                }
+            }
+            const categoryLabel = primaryLayerKey && LAYER_DEFS[primaryLayerKey] ? LAYER_DEFS[primaryLayerKey].label : (isUserSite ? 'Planning' : 'General');
+            html += `<div class="hud-detail-line"><strong>Category:</strong> ${categoryLabel}</div>`;
+
+            const tierObj = TIER_DEFS[feature.tier] || TIER_DEFS[3];
+            html += `<div class="hud-detail-line"><strong>Tier:</strong> Tier ${feature.tier || 3} (${tierObj.label})</div>`;
+
+            if (feature.state && feature.state.trim()) {
+                html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> ${feature.state}</div>`;
+            } else {
+                html += `<div class="hud-detail-line"><strong>Art. VI Resp:</strong> ${isUserSite ? 'Not specified' : 'None. Article II. Natural feature not subject to appropriation.'}</div>`;
+            }
+
+            const sourceText = feature.source || (isUserSite ? 'User-planned' : 'Unspecified Source (Provenance Pending)');
+            html += `<div class="hud-detail-line"><strong>Source:</strong> ${sourceText}</div>`;
+            if (feature.evidence_grade) {
+                const gradeLabel = feature.evidence_grade === 'A' ? 'A (Direct Measurement/Data)' : (feature.evidence_grade === 'B' ? 'B (Regulatory Designation)' : 'C (Assertion/Unverified)');
+                html += `<div class="hud-detail-line"><strong>Evidence Grade:</strong> ${gradeLabel}</div>`;
+            }
+            if (feature.review_status) {
+                const statusMap = {
+                    'unassessed': '<span style="color:#888899;font-weight:bold;">UNASSESSED</span>',
+                    'under_assessment': '<span style="color:#ffaa00;font-weight:bold;">UNDER ASSESSMENT (Provisional)</span>',
+                    'assessed_open': '<span style="color:#44ff88;font-weight:bold;">ASSESSED OPEN</span>',
+                    'assessed_protected': '<span style="color:#ff4444;font-weight:bold;">ASSESSED PROTECTED</span>'
+                };
+                html += `<div class="hud-detail-line"><strong>Review Status:</strong> ${statusMap[feature.review_status] || feature.review_status}</div>`;
+            }
+            if (feature.date) {
+                html += `<div class="hud-detail-line"><strong>Assessment/Record Date:</strong> ${feature.date}</div>`;
+            }
+            if (feature.designation_authority) {
+                html += `<div class="hud-detail-line"><strong>Authority:</strong> ${feature.designation_authority}</div>`;
+            }
+            if (feature.mission_status) {
+                html += `<div class="hud-detail-line"><strong>Mission Status:</strong> <span style="color:#00ffcc;">${feature.mission_status.toUpperCase()}</span></div>`;
+            }
+
+            // Provisional Protection Notice Banner
+            if (feature.review_status === 'under_assessment') {
+                html += `<div style="margin-top:6px;padding:6px 8px;background:rgba(255,170,0,0.18);border:1px solid #ffaa00;border-radius:4px;color:#ffdd66;font-size:0.72rem;line-height:1.35;">` +
+                        `<strong>⚠️ PROVISIONAL PROTECTION NOTICE:</strong> Proceeding during the assessment window requires public justification. Nothing is prohibited. The choice is made visible.` +
+                        `</div>`;
+            }
+
+            const noteText = feature.note || (isUserSite ? (feature.description || 'No description') : 'No additional note.');
+
+            // Recency Badge
+            if (feature.date && parseInt(feature.date.substring(0, 4)) >= 2024) {
+                html += `<div style="display:inline-block;margin-top:4px;padding:2px 6px;background:#0055ff;color:#ffffff;font-size:0.68rem;font-weight:bold;border-radius:3px;letter-spacing:0.5px;">⚡ NEW / RECENTLY UPDATED (Last 2 Years)</div>`;
+            }
+
+            // Dispute Overlay Details Block
+            if (isDisputesEnabled && feature.disputed) {
+                const d = feature.dispute_details || {};
+                html += `<div style="margin-top:6px;padding:6px 8px;background:rgba(255,221,68,0.2);border:1px solid #ffdd44;border-radius:4px;color:#fffaaa;font-size:0.72rem;line-height:1.35;">` +
+                        `<strong>⚔️ ACTIVE DESIGNATION DISPUTE:</strong><br/>` +
+                        `• <strong>Challenger:</strong> ${d.challenger || 'Under Challenge'}<br/>` +
+                        `• <strong>Justification:</strong> ${d.justification || 'Overlapping jurisdictional/environmental claim'}<br/>` +
+                        `• <strong>Register Link:</strong> <a href="${d.register_link || '#'}" target="_blank" style="color:#77ccff;text-decoration:underline;">${d.register_link || 'Official Register Entry'}</a><br/>` +
+                        `• <strong>Response Deadline:</strong> <span style="color:#ffaa44;font-weight:bold;">${d.response_deadline || '2026-12-31'}</span>` +
+                        `</div>`;
+            }
+            html += `<div class="hud-detail-line"><strong>Notes:</strong> ${noteText}</div>`;
+
+            // Dynamic Harms Computed Models HUD Block
+            if (isDynamicHarmsEnabled && (feature.tags && (feature.tags.includes('operational_activity') || feature.tags.includes('landing')))) {
+                html += `<div style="margin-top:6px;padding:6px 8px;background:rgba(255,68,170,0.15);border:1px solid #ff44aa;border-radius:4px;color:#ffbbee;font-size:0.72rem;line-height:1.35;">` +
+                        `<strong>⚠️ COMPUTED DYNAMIC HARMS MODEL FOOTPRINTS:</strong><br/>` +
+                        (harmPsiEnabled ? `• Plume Surface Interaction (PSI-v1.2, 2026-08-30): Est. radius ${(feature.radius_km * 1.8).toFixed(0)} km<br/>` : '') +
+                        (harmContamEnabled ? `• Volatile Contamination (CONTAM-v1.0, 2026-08-30): Est. radius ${(feature.radius_km * 3.2).toFixed(0)} km<br/>` : '') +
+                        (harmEmiEnabled ? `• Transient EMI (EMI-v1.1, 2026-08-30): Est. radius ${(feature.radius_km * 2.4).toFixed(0)} km` : '') +
+                        `</div>`;
+            }
+
+            // Article IX Operational Activity Overlap Check
+            if (isOpActivityEnabled && feature.tags && feature.tags.includes('operational_activity') && (feature.mission_status === 'planned' || feature.mission_status === 'active')) {
+                const featureOpRad = feature.operational_radius_km || (feature.radius_km * 1.5);
+                const overlappingOps = FEATURES.filter(other => {
+                    if (other.id === feature.id) return false;
+                    if (!other.tags || !other.tags.includes('operational_activity')) return false;
+                    if (other.mission_status !== 'planned' && other.mission_status !== 'active') return false;
+                    const otherOpRad = other.operational_radius_km || (other.radius_km * 1.5);
+                    const dKm = distanceBetween(feature.lat, feature.lon, other.lat, other.lon);
+                    return dKm <= (featureOpRad + otherOpRad);
+                });
+
+                if (overlappingOps.length > 0) {
+                    html += `<div style="margin-top:6px;padding:6px 8px;background:rgba(255,85,85,0.2);border:1px solid #ff5555;border-radius:4px;color:#ff8888;font-size:0.72rem;line-height:1.35;">` +
+                            `<strong>🚨 ARTICLE IX OVERLAP DETECTED:</strong> Operational footprint overlaps with <strong>${overlappingOps.map(o => o.name).join(', ')}</strong>. International consultation and due regard coordination required.` +
+                            `</div>`;
+                }
+            }
+
+            return {
+                html,
+                tier: feature.tier || 3,
+                articles: feature.articles || []
+            };
+        }
+
+        // --- Feature Objects ---
+        const featureObjects = {};
+        const allGlowMeshes = [];
+        const allLabels = [];
+        const satelliteList = [];
+
+        function createCurvedDiscGeometry(radiusKm, sphereRadius = 1.002) {
+            const theta = radiusKm / MOON_RADIUS_KM;
+            const segments = Math.max(16, Math.min(64, Math.floor(theta * 60)));
+            const geo = new THREE.SphereGeometry(sphereRadius, segments, segments, 0, Math.PI * 2, 0, theta);
+            return geo;
+        }
+
+        function createSatelliteMesh() {
+            const group = new THREE.Group();
+            const busMat = new THREE.MeshBasicMaterial({ color: 0x888888 });
+            const busMesh = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.025), busMat);
+            group.add(busMesh);
+            const panelMat = new THREE.MeshBasicMaterial({ color: 0x555555 });
+            const panelMesh = new THREE.Mesh(new THREE.BoxGeometry(0.0875, 0.00375, 0.02), panelMat);
+            group.add(panelMesh);
+            const coreMat = new THREE.MeshBasicMaterial({ color: 0x999999 });
+            const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.015, 6, 6), coreMat);
+            group.add(coreMesh);
+            return group;
+        }
+
+
+        function createHatchedTexture(baseColorHex, lineAngle = 45) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = baseColorHex;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            for (let i = -128; i < 256; i += 16) {
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + 128, 128);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = baseColorHex;
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        function createPulsatingRingTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = colorHex + '33'; // 20% opacity fill
+            ctx.beginPath();
+            ctx.arc(64, 64, 58, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = colorHex;
+            ctx.lineWidth = 6;
+            ctx.setLineDash([12, 8]);
+            ctx.beginPath();
+            ctx.arc(64, 64, 58, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+
+        function getFeatureVisualProps(feature) {
+            let color = '#ff5555';
+            let opacity = 0.5;
+            let isDashed = false;
+            let useTexture = null;
+
+            if (isAssessmentStatusMode) {
+                switch (feature.review_status) {
+                    case 'unassessed':
+                        color = '#888899';
+                        opacity = 0.35;
+                        isDashed = true;
+                        break;
+                    case 'under_assessment':
+                        color = '#ffaa00'; // Amber provisional protection
+                        opacity = 0.75;
+                        useTexture = 'provisional';
+                        break;
+                    case 'assessed_open':
+                        color = '#44ff88'; // Green
+                        opacity = 0.5;
+                        break;
+                    case 'assessed_protected':
+                        color = '#ff4444'; // Red
+                        opacity = 0.65;
+                        break;
+                    default:
+                        color = '#888899';
+                        opacity = 0.4;
+                }
+            } else {
+                // Tier color default
+                const tierObj = TIER_DEFS[feature.tier] || TIER_DEFS[3];
+                color = tierObj.color || '#ff5555';
+                if (feature.tags && feature.tags.includes('operational_activity')) {
+                    color = '#00ffcc';
+                }
+            }
+
+            // If disputes enabled & feature is disputed, apply hatched pattern / visual weight
+            if (isDisputesEnabled && feature.disputed) {
+                useTexture = 'disputed';
+            }
+
+            let isRecent = false;
+            if (feature.date) {
+                const fYear = parseInt(feature.date.substring(0, 4));
+                if (!isNaN(fYear) && fYear >= 2024) {
+                    isRecent = true;
+                }
+            }
+
+            // Salience adjustments if disputes/salience mode active
+            if (isDisputesEnabled) {
+                if (feature.evidence_grade === 'A') opacity = Math.min(1.0, opacity * 1.4);
+                else if (feature.evidence_grade === 'C') opacity = opacity * 0.5;
+            }
+
+            return { color, opacity, isDashed, useTexture, isRecent };
+        }
+
+        function buildLayers() {
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                if (entry.discObject) currentMoon.remove(entry.discObject);
+                if (entry.label) currentMoon.remove(entry.label);
+                if (entry.satellite) {
+                    currentMoon.remove(entry.satellite.group);
+                    if (entry.satellite.label) currentMoon.remove(entry.satellite.label);
+                }
+            }
+            for (const key in featureObjects) delete featureObjects[key];
+            allGlowMeshes.length = 0;
+            allLabels.length = 0;
+            satelliteList.length = 0;
+
+
+            // Filter out operational activities if opActivityToggle is unchecked
+            const activeFeaturesList = FEATURES.filter(f => {
+                if (f.tags && f.tags.includes('operational_activity')) {
+                    return isOpActivityEnabled;
+                }
+                return true;
+            });
+
+            // Store operational footprints for overlap detection
+            const opFootprints = [];
+
+            for (const feature of activeFeaturesList) {
+
+                let discObject = null;
+                let labelSprite = null;
+                let satelliteObj = null;
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                const color = '#ff5555';
+
+                if (type === 'point') {
+                    const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
+                    const targetNormal = pos.clone().normalize();
+
+                    const discGeo = createCurvedDiscGeometry(featureRadiusKm, 1.002);
+                    const visualProps = getFeatureVisualProps(feature);
+                    const discMatProps = {
+                        color: new THREE.Color(visualProps.color),
+                        transparent: true,
+                        opacity: visualProps.opacity,
+                        side: THREE.DoubleSide,
+                        depthWrite: false,
+                        depthTest: true,
+                    };
+                    if (visualProps.useTexture === 'provisional') {
+                        discMatProps.map = createPulsatingRingTexture(visualProps.color);
+                    } else if (visualProps.useTexture === 'disputed') {
+                        discMatProps.map = createHatchedTexture(visualProps.color);
+                    }
+                    const discMat = new THREE.MeshBasicMaterial(discMatProps);
+                    discObject = new THREE.Mesh(discGeo, discMat);
+                    discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    allGlowMeshes.push(discObject);
+                    // Create dynamic harms meshes if operational activity
+                    if (feature.tags && (feature.tags.includes('operational_activity') || feature.tags.includes('landing'))) {
+                        const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
+                        const targetNormal = pos.clone().normalize();
+
+                        // 1. PSI (Plume Surface Interaction)
+                        const psiGeo = createCurvedDiscGeometry((feature.radius_km || 10) * 1.8, 1.004);
+                        const psiMat = new THREE.MeshBasicMaterial({ color: 0xff3300, transparent: true, opacity: 0.25, side: THREE.DoubleSide, depthWrite: false });
+                        const psiMesh = new THREE.Mesh(psiGeo, psiMat);
+                        psiMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                        psiMesh.userData = { harmType: 'psi', featureId: feature.id };
+                        if (currentMoon) currentMoon.add(psiMesh);
+                        psiMesh.visible = false;
+                        harmMeshes.push(psiMesh);
+
+                        // 2. Contamination Deposition
+                        const contamGeo = createCurvedDiscGeometry((feature.radius_km || 10) * 3.2, 1.0035);
+                        const contamMat = new THREE.MeshBasicMaterial({ color: 0xaa00ff, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false });
+                        const contamMesh = new THREE.Mesh(contamGeo, contamMat);
+                        contamMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                        contamMesh.userData = { harmType: 'contam', featureId: feature.id };
+                        if (currentMoon) currentMoon.add(contamMesh);
+                        contamMesh.visible = false;
+                        harmMeshes.push(contamMesh);
+
+                        // 3. Transient EMI
+                        const emiGeo = createCurvedDiscGeometry((feature.radius_km || 10) * 2.4, 1.0045);
+                        const emiMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false });
+                        const emiMesh = new THREE.Mesh(emiGeo, emiMat);
+                        emiMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                        emiMesh.userData = { harmType: 'emi', featureId: feature.id };
+                        if (currentMoon) currentMoon.add(emiMesh);
+                        emiMesh.visible = false;
+                        harmMeshes.push(emiMesh);
+                    }
+
+
+                    const labelTex = createLabelTexture(feature.name, 30);
+                    const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 0, sizeAttenuation: true });
+                    labelSprite = new THREE.Sprite(labelMat);
+                    const labelHeight = 1.005 + (Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM) / MOON_RADIUS_KM) * 0.2;
+                    const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
+                    labelSprite.position.copy(labelPos);
+                    labelSprite.scale.set(0.4, 0.1, 1);
+                    labelSprite.userData.featureId = feature.id;
+                    allLabels.push(labelSprite);
+                }
+                else if (type === 'hemisphere') {
+                    const radius3D = MOON_3D_RADIUS * 1.01;
+                    const segs = 48;
+                    const geo = new THREE.SphereGeometry(radius3D, segs, segs/2, 0, Math.PI*2, 0, Math.PI/2);
+                    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const targetNormal = latLonToPosition(hLat, hLon, 1).normalize();
+                    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    discObject = mesh;
+                }
+                else if (type === 'orbit') {
+                    const radiusKm = geom.radius_km || (MOON_RADIUS_KM + 100);
+                    const radius3D = radiusKm / MOON_RADIUS_KM * MOON_3D_RADIUS;
+                    const inclination = (geom.inclination || 0) * Math.PI / 180;
+                    const segments = 64;
+                    const points = [];
+                    for (let i = 0; i <= segments; i++) {
+                        const theta = (i / segments) * Math.PI * 2;
+                        let x = radius3D * Math.cos(theta);
+                        let y = radius3D * Math.sin(theta);
+                        let z = 0;
+                        const cosI = Math.cos(inclination);
+                        const sinI = Math.sin(inclination);
+                        const newY = y * cosI - z * sinI;
+                        const newZ = y * sinI + z * cosI;
+                        points.push(new THREE.Vector3(x, newY, newZ));
+                    }
+                    const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const isDashed = geom.dash || false;
+                    let mat;
+                    if (isDashed) {
+                        mat = new THREE.LineDashedMaterial({ color, dashSize: 0.02, gapSize: 0.015, transparent: true, opacity: 0.7, depthWrite: false });
+                    } else {
+                        mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false });
+                    }
+                    const line = new THREE.Line(orbitGeo, mat);
+                    if (isDashed) line.computeLineDistances();
+                    discObject = line;
+
+                    if (geom.has_satellite) {
+                        const satGroup = createSatelliteMesh();
+                        const satName = geom.satellite_name || feature.name;
+                        const labelTex = createLabelTexture(satName, 26);
+                        const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 1.0, sizeAttenuation: true });
+                        const satLabel = new THREE.Sprite(labelMat);
+                        satelliteObj = { group: satGroup, label: satLabel, radius3D, inclinationRad: inclination, angle: Math.random() * Math.PI * 2, speed: geom.speed || 0.2, parentObject: line };
+                        satelliteList.push(satelliteObj);
+                    }
+                }
+
+                let opFootprintMesh = null;
+                if (feature.tags && feature.tags.includes('operational_activity') && (feature.mission_status === 'planned' || feature.mission_status === 'active')) {
+                    const opRadKm = feature.operational_radius_km || (feature.radius_km * 1.5);
+                    const opGeo = createCurvedDiscGeometry(opRadKm, 1.003);
+                    const opMat = new THREE.MeshBasicMaterial({
+                        color: new THREE.Color('#00ffcc'),
+                        transparent: true,
+                        opacity: 0.2,
+                        side: THREE.DoubleSide,
+                        depthWrite: false,
+                        depthTest: true
+                    });
+                    opFootprintMesh = new THREE.Mesh(opGeo, opMat);
+                    const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
+                    const targetNormal = pos.clone().normalize();
+                    opFootprintMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    if (currentMoon) currentMoon.add(opFootprintMesh);
+                    opFootprintMesh.visible = false;
+                    allGlowMeshes.push(opFootprintMesh);
+
+                    opFootprints.push({
+                        feature,
+                        lat: feature.lat,
+                        lon: feature.lon,
+                        radiusKm: opRadKm
+                    });
+                }
+
+                featureObjects[feature.id] = {
+                    discObject,
+                    opFootprintMesh,
+                    label: labelSprite || null,
+                    satellite: satelliteObj || null,
+                    type,
+                    tags: feature.tags || [],
+                    feature
+                };
+                featureActiveState.set(feature.id, false);
+                featureEnabledState.set(feature.id, false);
+
+                if (currentMoon) {
+                    if (discObject) currentMoon.add(discObject);
+                    if (labelSprite) currentMoon.add(labelSprite);
+                    if (satelliteObj) {
+                        currentMoon.add(satelliteObj.group);
+                        currentMoon.add(satelliteObj.label);
+                    }
+                }
+
+                if (discObject) discObject.visible = false;
+                if (opFootprintMesh) opFootprintMesh.visible = false;
+                if (labelSprite) labelSprite.visible = false;
+                if (satelliteObj) {
+                    satelliteObj.group.visible = false;
+                    satelliteObj.label.visible = false;
+                }
+            }
+
+            buildLayerUI();
+            updateVisibility(new Set());
+            updateGlobalToggle();
+            renderUserSites();
+            updateUserSiteVisibility();
+        }
+
+        function buildStateLegendUI() {
+            stateLegendList.innerHTML = '';
+            for (const [key, st] of Object.entries(STATE_DEFS)) {
+                const item = document.createElement('div');
+                item.className = 'state-legend-item';
+                item.title = st.note || '';
+                const colorBox = document.createElement('span');
+                colorBox.className = 'state-legend-color';
+                colorBox.style.backgroundColor = st.color;
+                const nameLabel = document.createElement('span');
+                nameLabel.textContent = st.name;
+                item.appendChild(colorBox);
+                item.appendChild(nameLabel);
+                stateLegendList.appendChild(item);
+            }
+        }
+        buildStateLegendUI();
+
+        function buildLayerUI() {
+            layerList.innerHTML = '';
+            activeLayers.clear();
+
+            for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
+                categoryDiscState.set(catName, true);
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category';
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                const arrow = document.createElement('span');
+                arrow.className = 'arrow';
+                arrow.textContent = '>';
+                const catCheck = document.createElement('input');
+                catCheck.type = 'checkbox';
+                catCheck.checked = false;
+                catCheck.dataset.category = catName;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'cat-name';
+                nameSpan.textContent = catName;
+
+                let total = 0;
+                for (const k of layerKeys) {
+                    if (LAYER_DEFS[k]) {
+                        total += FEATURES.filter(f => f.tags && f.tags.some(t => LAYER_DEFS[k].tags.includes(t))).length;
+                    }
+                }
+                const countSpan = document.createElement('span');
+                countSpan.className = 'cat-count';
+                countSpan.textContent = total;
+
+                const discToggle = document.createElement('div');
+                discToggle.className = 'disc-toggle';
+                discToggle.title = 'Show/hide discs for this category';
+                const discCheck = document.createElement('input');
+                discCheck.type = 'checkbox';
+                discCheck.checked = true;
+                discCheck.dataset.categoryDisc = catName;
+                const discLabel = document.createElement('span');
+                discLabel.textContent = 'Discs';
+                discToggle.appendChild(discCheck);
+                discToggle.appendChild(discLabel);
+
+                header.appendChild(arrow);
+                header.appendChild(catCheck);
+                header.appendChild(nameSpan);
+                header.appendChild(countSpan);
+                header.appendChild(discToggle);
+
+                const body = document.createElement('div');
+                body.className = 'category-body';
+
+                for (const layerKey of layerKeys) {
+                    const def = LAYER_DEFS[layerKey];
+                    if (!def) continue;
+                    const layerFeatures = FEATURES.filter(f => f.tags && f.tags.some(t => def.tags.includes(t)));
+
+                    const layerDiv = document.createElement('div');
+                    layerDiv.className = 'layer-item';
+                    layerDiv.dataset.layerKey = layerKey;
+
+                    const layerArrow = document.createElement('span');
+                    layerArrow.className = 'layer-arrow';
+                    layerArrow.textContent = '>';
+
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = false;
+                    cb.dataset.layerKey = layerKey;
+                    cb.dataset.category = catName;
+
+                    const dot = document.createElement('span');
+                    dot.className = 'color-dot';
+                    dot.style.backgroundColor = def.color || '#ff5555';
+
+                    const label = document.createElement('span');
+                    label.textContent = def.label;
+
+                    const subCount = document.createElement('span');
+                    subCount.className = 'sub-count';
+                    subCount.textContent = layerFeatures.length;
+
+                    if (def.desc) layerDiv.title = def.desc;
+
+                    layerDiv.appendChild(layerArrow);
+                    layerDiv.appendChild(cb);
+                    layerDiv.appendChild(dot);
+                    layerDiv.appendChild(label);
+                    layerDiv.appendChild(subCount);
+                    body.appendChild(layerDiv);
+
+                    const featureList = document.createElement('div');
+                    featureList.className = 'feature-list';
+                    for (const feature of layerFeatures) {
+                        const featureItem = document.createElement('div');
+                        featureItem.className = 'feature-item';
+                        const featureCheck = document.createElement('input');
+                        featureCheck.type = 'checkbox';
+                        featureCheck.checked = false;
+                        featureCheck.dataset.featureId = feature.id;
+                        featureCheck.dataset.layerKey = layerKey;
+                        featureCheck.addEventListener('change', (e) => {
+                            const isChecked = e.target.checked;
+                            featureEnabledState.set(feature.id, isChecked);
+
+                            const allLayerFeatChecks = featureList.querySelectorAll('input[type="checkbox"]');
+                            const anyChecked = Array.from(allLayerFeatChecks).some(fcb => fcb.checked);
+
+                            if (anyChecked) {
+                                activeLayers.add(layerKey);
+                                cb.checked = true;
+                            } else {
+                                activeLayers.delete(layerKey);
+                                cb.checked = false;
+                            }
+
+                            updateVisibility(activeLayers);
+                            updateCategoryCheckbox(catName);
+                            updateGlobalToggle();
+                            highlightActiveLayerItems();
+                        });
+                        const featureDot = document.createElement('span');
+                        featureDot.className = 'feature-dot';
+                        featureDot.style.backgroundColor = def.color || '#ff5555';
+                        featureDot.title = `Resource Category: ${def.label}`;
+
+                        featureItem.appendChild(featureCheck);
+                        featureItem.appendChild(featureDot);
+
+                        if (feature.state && STATE_DEFS[feature.state]) {
+                            const stDot = document.createElement('span');
+                            stDot.className = 'state-dot';
+                            stDot.style.backgroundColor = STATE_DEFS[feature.state].color;
+                            stDot.title = `Art. VI Responsible State: ${STATE_DEFS[feature.state].name}`;
+                            featureItem.appendChild(stDot);
+                        }
+
+                        const featureLabel = document.createElement('span');
+                        featureLabel.textContent = feature.name;
+                        featureItem.appendChild(featureLabel);
+                        featureList.appendChild(featureItem);
+                    }
+                    body.appendChild(featureList);
+
+                    cb.addEventListener('change', (e) => {
+                        const isChecked = e.target.checked;
+                        if (isChecked) activeLayers.add(layerKey);
+                        else activeLayers.delete(layerKey);
+
+                        const featChecks = featureList.querySelectorAll('input[type="checkbox"]');
+                        featChecks.forEach(fcb => {
+                            fcb.checked = isChecked;
+                            const fid = fcb.dataset.featureId;
+                            if (fid) featureEnabledState.set(fid, isChecked);
+                        });
+
+                        updateVisibility(activeLayers);
+                        updateCategoryCheckbox(catName);
+                        updateGlobalToggle();
+                        highlightActiveLayerItems();
+                    });
+
+                    layerDiv.addEventListener('click', (e) => {
+                        if (e.target.type === 'checkbox') return;
+                        const isOpen = featureList.classList.toggle('open');
+                        layerArrow.classList.toggle('open', isOpen);
+                    });
+                }
+
+                catCheck.addEventListener('change', (e) => {
+                    const checked = e.target.checked;
+                    const subCheckboxes = body.querySelectorAll('.layer-item > input[type="checkbox"]');
+                    subCheckboxes.forEach(cb => {
+                        cb.checked = checked;
+                        const layerKey = cb.dataset.layerKey;
+                        if (checked) activeLayers.add(layerKey);
+                        else activeLayers.delete(layerKey);
+                    });
+                    const featCheckboxes = body.querySelectorAll('.feature-item > input[type="checkbox"]');
+                    featCheckboxes.forEach(fcb => {
+                        fcb.checked = checked;
+                        const fid = fcb.dataset.featureId;
+                        if (fid) featureEnabledState.set(fid, checked);
+                    });
+                    updateVisibility(activeLayers);
+                    updateGlobalToggle();
+                    highlightActiveLayerItems();
+                });
+
+                discCheck.addEventListener('change', (e) => {
+                    categoryDiscState.set(catName, e.target.checked);
+                    harmMeshes.forEach(mesh => {
+                const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
+                if (!isDynamicHarmsEnabled || !parentActive) {
+                    mesh.visible = false;
+                    return;
+                }
+                if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
+                else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
+                else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
+            });
+            applyDiscVisibility();
+                });
+
+                header.addEventListener('click', (e) => {
+                    if (e.target.type === 'checkbox') return;
+                    const isOpen = body.classList.toggle('open');
+                    arrow.classList.toggle('open', isOpen);
+                });
+
+                catDiv.appendChild(header);
+                catDiv.appendChild(body);
+                layerList.appendChild(catDiv);
+            }
+
+            globalToggle.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                const allSubChecks = layerList.querySelectorAll('.layer-item > input[type="checkbox"]');
+                const allCatChecks = layerList.querySelectorAll('.category-header > input[type="checkbox"]');
+                const allFeatChecks = layerList.querySelectorAll('.feature-item > input[type="checkbox"]');
+                allSubChecks.forEach(cb => {
+                    cb.checked = checked;
+                    const layerKey = cb.dataset.layerKey;
+                    if (checked) activeLayers.add(layerKey);
+                    else activeLayers.delete(layerKey);
+                });
+                allCatChecks.forEach(cb => { cb.checked = checked; });
+                allFeatChecks.forEach(fcb => {
+                    fcb.checked = checked;
+                    const fid = fcb.dataset.featureId;
+                    if (fid) featureEnabledState.set(fid, checked);
+                });
+                updateVisibility(activeLayers);
+                highlightActiveLayerItems();
+            });
+
+            highlightActiveLayerItems();
+        }
+
+        function getFeatureColor(feature, primaryLayerKey) {
+            if (isStateModeActive && feature.state && STATE_DEFS[feature.state]) {
+                return STATE_DEFS[feature.state].color;
+            }
+            if (primaryLayerKey && LAYER_DEFS[primaryLayerKey]) {
+                return LAYER_DEFS[primaryLayerKey].color;
+            }
+            return '#ff5555';
+        }
+
+        function applyDiscVisibility() {
+            for (const [fid, entry] of Object.entries(featureObjects)) {
+                if (!entry.discObject) continue;
+                const isActive = featureActiveState.get(fid) === true;
+                if (!isActive) {
+                    entry.discObject.visible = false;
+                    continue;
+                }
+
+                const feature = FEATURES.find(f => f.id === fid);
+                if (!feature) continue;
+                let belongsToCategory = null;
+                for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
+                    for (const key of layerKeys) {
+                        const def = LAYER_DEFS[key];
+                        if (def && feature.tags && feature.tags.some(t => def.tags.includes(t))) {
+                            belongsToCategory = catName;
+                            break;
+                        }
+                    }
+                    if (belongsToCategory) break;
+                }
+
+                const categoryDiscsOn = !categoryDiscState.has(belongsToCategory) || categoryDiscState.get(belongsToCategory);
+                entry.discObject.visible = isActive && categoryDiscsOn;
+            }
+        }
+
+        function highlightActiveLayerItems() {
+            const items = layerList.querySelectorAll('.layer-item');
+            items.forEach(item => {
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb && cb.checked) item.classList.add('active-layer');
+                else item.classList.remove('active-layer');
+            });
+        }
+
+        function updateCategoryCheckbox(catName) {
+            const catHeader = layerList.querySelector(`.category-header input[data-category="${catName}"]`);
+            if (!catHeader) return;
+            const body = catHeader.closest('.category').querySelector('.category-body');
+            const subChecks = body.querySelectorAll('.layer-item > input[type="checkbox"]');
+            const allChecked = Array.from(subChecks).every(cb => cb.checked);
+            catHeader.checked = allChecked;
+        }
+
+        function updateGlobalToggle() {
+            const allSubChecks = layerList.querySelectorAll('.layer-item > input[type="checkbox"]');
+            if (allSubChecks.length === 0) {
+                globalToggle.checked = false;
+                return;
+            }
+            const allChecked = Array.from(allSubChecks).every(cb => cb.checked);
+            globalToggle.checked = allChecked;
+        }
+
+        function updateVisibility(activeLayerKeys = new Set()) {
+            if (activeLayerKeys.size === 0) {
+                for (const key in featureObjects) {
+                    const entry = featureObjects[key];
+                    featureActiveState.set(key, false);
+                    if (entry.discObject) entry.discObject.visible = false;
+                    if (entry.label) entry.label.visible = false;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = false;
+                        entry.satellite.label.visible = false;
+                    }
+                }
+                harmMeshes.forEach(mesh => {
+                const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
+                if (!isDynamicHarmsEnabled || !parentActive) {
+                    mesh.visible = false;
+                    return;
+                }
+                if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
+                else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
+                else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
+            });
+            applyDiscVisibility();
+                updateGlobalToggle();
+                return;
+            }
+
+            const activeTags = new Set();
+            for (const key of activeLayerKeys) {
+                const def = LAYER_DEFS[key];
+                if (def) def.tags.forEach(t => activeTags.add(t));
+            }
+
+            for (const [fid, entry] of Object.entries(featureObjects)) {
+                const feature = FEATURES.find(f => f.id === fid);
+                if (!feature) continue;
+
+                let primaryKey = null;
+                for (const key of layerPriority) {
+                    if (activeLayerKeys.has(key)) {
+                        const def = LAYER_DEFS[key];
+                        if (def && feature.tags && feature.tags.some(t => def.tags.includes(t))) {
+                            primaryKey = key;
+                            break;
+                        }
+                    }
+                }
+
+                const isFeatureEnabled = featureEnabledState.get(fid) !== false;
+                if (primaryKey && isFeatureEnabled) {
+                    featureActiveState.set(fid, true);
+                    if (entry.discObject) entry.discObject.visible = true;
+                    if (entry.label) entry.label.visible = true;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = true;
+                        entry.satellite.label.visible = true;
+                    }
+
+                    const color = getFeatureColor(feature, primaryKey);
+                    if (entry.discObject && entry.discObject.material) entry.discObject.material.color.set(color);
+                } else {
+                    featureActiveState.set(fid, false);
+                    if (entry.discObject) entry.discObject.visible = false;
+                    if (entry.label) entry.label.visible = false;
+                    if (entry.satellite) {
+                        entry.satellite.group.visible = false;
+                        entry.satellite.label.visible = false;
+                    }
+                }
+            }
+            harmMeshes.forEach(mesh => {
+                const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
+                if (!isDynamicHarmsEnabled || !parentActive) {
+                    mesh.visible = false;
+                    return;
+                }
+                if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
+                else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
+                else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
+            });
+            applyDiscVisibility();
+            updateGlobalToggle();
+        }
+
+        // --- Event Listeners ---
+        opacitySlider.addEventListener('input', () => {
+            const val = parseFloat(opacitySlider.value);
+            opacityValue.textContent = val.toFixed(2);
+            allGlowMeshes.forEach(mesh => {
+                if (mesh.material) mesh.material.opacity = val;
+            });
+        });
+
+        function closeLayersPanel() {
+            layersPanel.classList.add('closed');
+            layersToggle.classList.add('visible');
+        }
+        function openLayersPanel() {
+            layersPanel.classList.remove('closed');
+            layersToggle.classList.remove('visible');
+        }
+        layersClose.addEventListener('click', closeLayersPanel);
+        layersToggle.addEventListener('click', openLayersPanel);
+
+        function resetView() {
+            camera.position.copy(INITIAL_CAM_POS);
+            controls.target.set(0, 0, 0);
+            controls.update();
+            showMessage('View reset', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        }
+
+        let isPoleLocked = false;
+        function applyPoleLock(locked) {
+            if (locked) {
+                controls.minPolarAngle = Math.PI / 2;
+                controls.maxPolarAngle = Math.PI / 2;
+                const offset = camera.position.clone().sub(controls.target);
+                const radius = offset.length();
+                if (radius > 0.001) {
+                    const theta = Math.atan2(offset.x, offset.z);
+                    camera.position.set(radius * Math.sin(theta), 0, radius * Math.cos(theta));
+                }
+                controls.update();
+            } else {
+                controls.minPolarAngle = 0;
+                controls.maxPolarAngle = Math.PI;
+                controls.update();
+            }
+        }
+
+        function loadGLB(url) {
+            showMessage('Loading GLB...', 'info');
+            const loader = new GLTFLoader();
+            loader.load(
+                url,
+                (gltf) => {
+                    if (currentMoon) scene.remove(currentMoon);
+                    const newMoon = gltf.scene;
+                    newMoon.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material = makeMaterialFlat(child.material);
+                            child.material.needsUpdate = true;
+                            moonMeshes.push(child);
+                        }
+                    });
+                    newMoon.rotation.y = 0;
+                    scene.add(newMoon);
+                    currentMoon = newMoon;
+                    for (const key in featureObjects) {
+                        const entry = featureObjects[key];
+                        if (entry.discObject) currentMoon.add(entry.discObject);
+                        if (entry.label) currentMoon.add(entry.label);
+                        if (entry.satellite) {
+                            currentMoon.add(entry.satellite.group);
+                            currentMoon.add(entry.satellite.label);
+                        }
+                    }
+                    updateUserSiteVisibility();
+                    showMessage('Moon loaded', 'success');
+                    setTimeout(() => showMessage('', 'hidden'), 2500);
+                },
+                (xhr) => {
+                    const pct = Math.round((xhr.loaded / xhr.total) * 100);
+                    if (pct < 100) showMessage(`Loading... ${pct}%`, 'info');
+                },
+                (error) => {
+                    console.error(error);
+                    showMessage(`Failed: ${error.message || 'unknown'}`, 'error');
+                }
+            );
+        }
+
+        let panelVisible = false;
+        gearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            panelVisible = !panelVisible;
+            settingsPanel.classList.toggle('visible', panelVisible);
+        });
+        document.addEventListener('click', (e) => {
+            if (panelVisible && !settingsPanel.contains(e.target) && e.target !== gearBtn) {
+                settingsPanel.classList.remove('visible');
+                panelVisible = false;
+            }
+        });
+
+        // --- Help Modal ---
+        const helpBtn = document.getElementById('help-btn');
+        const helpModalOverlay = document.getElementById('help-modal-overlay');
+        const helpCloseBtn = document.getElementById('help-close-btn');
+        const helpTabBtns = document.querySelectorAll('.help-tab-btn');
+        const helpTabPanes = document.querySelectorAll('.help-tab-pane');
+
+        function openHelpModal() { helpModalOverlay.classList.add('visible'); }
+        function closeHelpModal() { helpModalOverlay.classList.remove('visible'); }
+
+        helpBtn.addEventListener('click', (e) => { e.stopPropagation(); openHelpModal(); });
+        helpCloseBtn.addEventListener('click', closeHelpModal);
+        helpModalOverlay.addEventListener('click', (e) => {
+            if (e.target === helpModalOverlay) closeHelpModal();
+        });
+
+        helpTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+                helpTabBtns.forEach(b => b.classList.remove('active'));
+                helpTabPanes.forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                const activePane = document.getElementById(`tab-${targetTab}`);
+                if (activePane) activePane.classList.add('active');
+            });
+        });
+
+        // --- Planning Button ---
+        planningBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openPlanningModal();
+        });
+
+        // --- Planning Modal Events ---
+        planningCloseBtn.addEventListener('click', closePlanningModal);
+        planningCancelBtn.addEventListener('click', closePlanningModal);
+        planningModalOverlay.addEventListener('click', (e) => {
+            if (e.target === planningModalOverlay) closePlanningModal();
+        });
+
+        planningSubmitBtn.addEventListener('click', () => {
+            const name = planningName.value.trim();
+            const actor = planningActor.value.trim();
+            const state = planningState.value.trim();
+            const lat = parseFloat(planningLat.value);
+            const lon = parseFloat(planningLon.value);
+            const radius = parseFloat(planningRadius.value);
+            const color = planningColor.value;
+            const tier = parseInt(planningTier.value);
+            const description = planningDescription.value.trim();
+            const notes = planningNotes.value.trim();
+
+            if (!name) { showMessage('Please enter a site name', 'error'); return; }
+            if (!actor) { showMessage('Please enter an actor/operator', 'error'); return; }
+            if (isNaN(lat) || lat < -90 || lat > 90) { showMessage('Invalid latitude', 'error'); return; }
+            if (isNaN(lon) || lon < -180 || lon > 180) { showMessage('Invalid longitude', 'error'); return; }
+            if (isNaN(radius) || radius <= 0) { showMessage('Please enter a valid radius (> 0 km)', 'error'); return; }
+            if (isNaN(tier) || tier < 1 || tier > 3) { showMessage('Please select a valid tier', 'error'); return; }
+
+            const newSite = {
+                id: 'pending',
+                name: name,
+                actor: actor,
+                state: state || null,
+                lat: lat,
+                lon: lon,
+                radius_km: radius,
+                color: color,
+                tier: tier,
+                description: description,
+                notes: notes || '',
+                active: true
+            };
+
+            showConflictReport(newSite);
+        });
+
+        // --- Conflict Modal Events ---
+        conflictCloseBtn.addEventListener('click', closeConflictModal);
+        conflictCancelBtn.addEventListener('click', closeConflictModal);
+        conflictModalOverlay.addEventListener('click', (e) => {
+            if (e.target === conflictModalOverlay) closeConflictModal();
+        });
+        conflictConfirmBtn.addEventListener('click', confirmPlaceSite);
+
+        // --- Clear User Sites ---
+        clearUserSitesBtn.addEventListener('click', clearAllUserSites);
+
+        // --- Settings Events ---
+        loadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['glb', 'gltf'].includes(ext)) {
+                showMessage('Please select .glb or .gltf', 'error');
+                fileInput.value = '';
+                return;
+            }
+            if (currentMoon === fallbackMoon) scene.remove(fallbackMoon);
+            moonMeshes = [];
+            loadGLB(URL.createObjectURL(file));
+            fileInput.value = '';
+            settingsPanel.classList.remove('visible');
+            panelVisible = false;
+        });
+
+        resetViewBtn.addEventListener('click', (e) => { e.stopPropagation(); resetView(); });
+
+        function updateStateModeUI() {
+            stateModeToggle.classList.toggle('on', isStateModeActive);
+            stateModeLabel.textContent = isStateModeActive ? 'ON' : 'OFF';
+            stateLegendPanel.classList.toggle('visible', isStateModeActive);
+            adjustBottomRightPanels();
+            updateVisibility(activeLayers);
+            updateUserSiteVisibility();
+        }
+        stateModeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isStateModeActive = !isStateModeActive;
+            updateStateModeUI();
+            showMessage(isStateModeActive ? 'Art. VI State Responsibility Mode ON' : 'Resource Category Mode ON', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1800);
+        });
+
+        function updateInfoDebugUI() {
+            infoDebugToggle.classList.toggle('on', isInfoDebugActive);
+            infoDebugLabel.textContent = isInfoDebugActive ? 'ON' : 'OFF';
+            infoDisplay.classList.toggle('visible', isInfoDebugActive);
+            adjustBottomRightPanels();
+        }
+        infoDebugToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isInfoDebugActive = !isInfoDebugActive;
+            updateInfoDebugUI();
+            showMessage(isInfoDebugActive ? 'Info Debug Panel Enabled' : 'Info Debug Panel Disabled', 'info');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        });
+
+        function updateCrosshairUI() {
+            crosshairToggle.classList.toggle('on', isCrosshairVisible);
+            crosshairLabel.textContent = isCrosshairVisible ? 'ON' : 'OFF';
+            crosshairEl.classList.toggle('visible', isCrosshairVisible);
+        }
+
+        crosshairToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isCrosshairVisible = !isCrosshairVisible;
+            updateCrosshairUI();
+            showMessage(isCrosshairVisible ? 'Crosshair enabled' : 'Crosshair disabled', 'info');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        });
+        updateCrosshairUI();
+
+        function adjustBottomRightPanels() {
+            if (isInfoDebugActive && isStateModeActive) {
+                const infoHeight = infoDisplay.offsetHeight || 160;
+                stateLegendPanel.style.bottom = `${infoHeight + 36}px`;
+            } else {
+                stateLegendPanel.style.bottom = '24px';
+            }
+        }
+
+        function updateLockUI() {
+            const on = isPoleLocked;
+            lockToggle.classList.toggle('on', on);
+            lockLabel.textContent = on ? 'ON' : 'OFF';
+        }
+        lockToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isPoleLocked = !isPoleLocked;
+            applyPoleLock(isPoleLocked);
+            updateLockUI();
+            showMessage(isPoleLocked ? 'Pole lock ON' : 'Pole lock OFF', 'success');
+            setTimeout(() => showMessage('', 'hidden'), 1500);
+        });
+        updateLockUI();
+
+        function updateRotateUI() {
+            const on = controls.autoRotate;
+            rotToggle.classList.toggle('on', on);
+            rotLabel.textContent = on ? 'ON' : 'OFF';
+            rotStateSpan.textContent = on ? 'ON' : 'OFF';
+        }
+        rotToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            controls.autoRotate = !controls.autoRotate;
+            updateRotateUI();
+        });
+        updateRotateUI();
+
+        // --- Drag and Drop ---
+        window.addEventListener('dragover', (e) => { e.preventDefault(); gearBtn.style.borderColor = '#aaccff'; });
+        window.addEventListener('dragleave', (e) => { e.preventDefault(); gearBtn.style.borderColor = '#6688aa'; });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            gearBtn.style.borderColor = '#6688aa';
+            const files = e.dataTransfer.files;
+            if (files.length === 0) return;
+            const file = files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['glb', 'gltf'].includes(ext)) {
+                showMessage('Drop a .glb/.gltf file', 'error');
+                return;
+            }
+            if (currentMoon === fallbackMoon) scene.remove(fallbackMoon);
+            moonMeshes = [];
+            loadGLB(URL.createObjectURL(file));
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Initialize ---
+
+        // Governance Toggle Event Listeners
+        if (assessmentStatusToggle) {
+            assessmentStatusToggle.addEventListener('change', (e) => {
+                isAssessmentStatusMode = e.target.checked;
+                buildLayers();
+                updateVisibility(activeLayers);
+            });
+        }
+        if (opActivityToggle) {
+            opActivityToggle.addEventListener('change', (e) => {
+                isOpActivityEnabled = e.target.checked;
+                buildLayers();
+                updateVisibility(activeLayers);
+            });
+        }
+        if (dynamicHarmsToggle) {
+            dynamicHarmsToggle.addEventListener('change', (e) => {
+                isDynamicHarmsEnabled = e.target.checked;
+                buildLayers();
+                updateVisibility(activeLayers);
+            });
+        }
+        if (disputesToggle) {
+            disputesToggle.addEventListener('change', (e) => {
+                isDisputesEnabled = e.target.checked;
+                buildLayers();
+                updateVisibility(activeLayers);
+            });
+        }
+
+        loadUserSites();
+        buildLayers();
+
+        let clock = new THREE.Clock();
+        let highlightedFeatureIds = new Set();
+        let lastTelemetryTime = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            controls.update();
+
+            const cameraWorldPos = camera.position;
+            const dist = cameraWorldPos.distanceTo(controls.target);
+            const maxDist = controls.maxDistance;
+            const t = Math.max(0, Math.min(1, (dist - controls.minDistance) / (maxDist - controls.minDistance)));
+            controls.rotateSpeed = 0.1 + t * 0.9;
+            sensSpan.textContent = controls.rotateSpeed.toFixed(2);
+
+            const showLabels = dist < 3.0;
+            const cameraDir = camera.position.clone().normalize();
+
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                if (entry.discObject && entry.discObject.material) {
+                    entry.discObject.material.opacity = 0.5;
+                }
+            }
+
+            const { lat, lon } = positionToLatLon(camera.position);
+            currentCameraLat = lat;
+            currentCameraLon = lon;
+
+            const activeTags = getActiveTags();
+            const overlappingFeatures = [];
+
+            // Filter out operational activities if opActivityToggle is unchecked
+            const activeFeaturesList = FEATURES.filter(f => {
+                if (f.tags && f.tags.includes('operational_activity')) {
+                    return isOpActivityEnabled;
+                }
+                return true;
+            });
+
+            // Store operational footprints for overlap detection
+            const opFootprints = [];
+
+            for (const feature of activeFeaturesList) {
+
+                if (feature.tags && feature.tags.includes('natural')) continue;
+                if (feature.geometry && feature.geometry.type === 'orbit') continue;
+                if (!feature.tags || !feature.tags.some(t => activeTags.has(t))) continue;
+                if (featureEnabledState.has(feature.id) && !featureEnabledState.get(feature.id)) continue;
+
+                const geom = feature.geometry;
+                const type = geom ? geom.type : 'point';
+                let overlaps = false;
+                if (type === 'hemisphere') {
+                    const hLat = geom.lat ?? 0;
+                    const hLon = geom.lon ?? 180;
+                    const hPos = latLonToPosition(hLat, hLon, 1);
+                    const curPos = latLonToPosition(lat, lon, 1);
+                    if (hPos.dot(curPos) > 0) overlaps = true;
+                } else {
+                    const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);
+                    const d = distanceBetween(lat, lon, feature.lat, feature.lon);
+                    if (d < detectionRadius) overlaps = true;
+                }
+                if (overlaps) overlappingFeatures.push(feature);
+            }
+
+            highlightedFeatureIds.clear();
+            if (overlappingFeatures.length > 0) {
+                const highestTier = Math.min(...overlappingFeatures.map(f => f.tier || 3));
+                overlappingFeatures.forEach(f => {
+                    if ((f.tier || 3) === highestTier) {
+                        highlightedFeatureIds.add(f.id);
+                    }
+                });
+
+                for (const id of highlightedFeatureIds) {
+                    const entry = featureObjects[id];
+                    if (entry && entry.discObject && entry.discObject.material) {
+                        entry.discObject.material.opacity = 0.9;
+                    }
+                }
+            }
+
+            const now = performance.now();
+            if (now - lastTelemetryTime >= 33) {
+                lastTelemetryTime = now;
+                const latStr = lat >= 0 ? `${lat.toFixed(2)}° N` : `${(-lat).toFixed(2)}° S`;
+                const lonStr = lonToDisplay(lon);
+
+                centreLatEl.textContent = latStr;
+                centreLonEl.textContent = lonStr;
+
+                const statusInfo = getFeatureStatus(lat, lon);
+                if (statusInfo) {
+                    centreOverlapText.innerHTML = statusInfo.html;
+                    if (statusInfo.tier === 1 || statusInfo.articles.includes(9)) {
+                        hudStatusDotEl.className = 'hud-status-dot active-constraint';
+                    } else {
+                        hudStatusDotEl.className = 'hud-status-dot active-warning';
+                    }
+                } else {
+                    centreOverlapText.textContent = 'Open (No active constraints)';
+                    hudStatusDotEl.className = 'hud-status-dot';
+                }
+            }
+
+            const zoomProgress = Math.max(0, Math.min(1, (dist - 1.1) / (3.0 - 1.1)));
+
+            for (const key in featureObjects) {
+                const entry = featureObjects[key];
+                const feature = FEATURES.find(f => f.id === key);
+
+                if (feature && entry.type === 'point') {
+                    const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
+                    const currentR = actualR + zoomProgress * (maxR - actualR);
+                    const scaleS = currentR / actualR;
+
+                    if (entry.discObject) {
+                        entry.discObject.scale.set(scaleS, 1.0, scaleS);
+                    }
+
+                    if (entry.label) {
+                        const targetNormal = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS).normalize();
+                        const labelHeight = 1.005 + (currentR / MOON_RADIUS_KM) * 0.2;
+                        entry.label.position.copy(targetNormal.multiplyScalar(labelHeight));
+                    }
+                }
+
+                if (entry.label) {
+                    const isLabelVisible = featureActiveState.get(key) && showLabels;
+                    let labelVisible = isLabelVisible;
+                    if (labelVisible) {
+                        const labelWorldPos = new THREE.Vector3();
+                        entry.label.getWorldPosition(labelWorldPos);
+                        const labelDir = labelWorldPos.clone().normalize();
+                        const dot = Math.min(1, Math.max(-1, cameraDir.dot(labelDir)));
+                        const angle = Math.acos(dot);
+                        if (angle > Math.PI / 4) labelVisible = false;
+                    }
+                    entry.label.visible = labelVisible;
+                    if (labelVisible) {
+                        const labelWorldPos = new THREE.Vector3();
+                        entry.label.getWorldPosition(labelWorldPos);
+                        const labelDist = camera.position.distanceTo(labelWorldPos);
+                        const baseScaleY = 0.056 * labelDist;
+                        const baseScaleX = baseScaleY * 4.0;
+                        entry.label.scale.set(baseScaleX, baseScaleY, 1);
+                        entry.label.material.opacity = 1.0;
+                    } else {
+                        entry.label.material.opacity = 0;
+                    }
+                }
+            }
+
+            // Update user site labels
+            for (const [id, obj] of userSiteObjects) {
+                const site = userSites.find(s => s.id === id);
+                if (!site || !site.active) continue;
+
+                const label = obj.label;
+                if (label) {
+                    const isVisible = showLabels;
+                    if (isVisible) {
+                        const pos = latLonToPosition(site.lat, site.lon, MOON_3D_RADIUS);
+                        const targetNormal = pos.clone().normalize();
+                        const dot = Math.min(1, Math.max(-1, cameraDir.dot(targetNormal)));
+                        const angle = Math.acos(dot);
+                        const labelVisible = angle <= Math.PI / 4;
+                        label.visible = labelVisible;
+                        if (labelVisible) {
+                            const labelWorldPos = new THREE.Vector3();
+                            label.getWorldPosition(labelWorldPos);
+                            const labelDist = camera.position.distanceTo(labelWorldPos);
+                            const baseScaleY = 0.045 * labelDist;
+                            const baseScaleX = baseScaleY * 4.5;
+                            label.scale.set(baseScaleX, baseScaleY, 1);
+                            label.material.opacity = 1.0;
+                        } else {
+                            label.material.opacity = 0;
+                        }
+                    } else {
+                        label.visible = false;
+                        label.material.opacity = 0;
+                    }
+                }
+            }
+
+            // Update satellites
+            for (const sat of satelliteList) {
+                if (sat.parentObject.visible) {
+                    sat.group.visible = true;
+                    sat.angle += delta * sat.speed;
+                    const r = sat.radius3D;
+                    const inc = sat.inclinationRad;
+                    const cosI = Math.cos(inc);
+                    const sinI = Math.sin(inc);
+                    const x = r * Math.cos(sat.angle);
+                    const y = r * Math.sin(sat.angle) * cosI;
+                    const z = r * Math.sin(sat.angle) * sinI;
+                    sat.group.position.set(x, y, z);
+                    const satZoomScale = Math.max(0.6, Math.min(1.2, (dist - 1.1) / 2.5));
+                    sat.group.scale.setScalar(satZoomScale);
+
+                    const satWorldPos = new THREE.Vector3();
+                    sat.group.getWorldPosition(satWorldPos);
+                    const labelOffset = satWorldPos.clone().normalize().multiplyScalar(0.12 * satZoomScale);
+                    sat.label.position.copy(satWorldPos).add(labelOffset);
+                    const satLabelDist = cameraWorldPos.distanceTo(sat.label.position);
+                    const satDot = Math.min(1, Math.max(-1, cameraDir.dot(satWorldPos.clone().normalize())));
+                    const satAngle = Math.acos(satDot);
+                    const satLabelVisible = showLabels && (satAngle <= Math.PI / 4);
+                    sat.label.visible = satLabelVisible;
+                    if (satLabelVisible) {
+                        const satLabelScaleY = Math.max(0.015, 0.042 * satLabelDist * satZoomScale);
+                        const satLabelScaleX = satLabelScaleY * 3.5;
+                        sat.label.scale.set(satLabelScaleX, satLabelScaleY, 1);
+                    }
+                } else {
+                    sat.group.visible = false;
+                    sat.label.visible = false;
+                }
+            }
+
+            latSpan.textContent = lat >= 0 ? `${lat.toFixed(2)} deg N` : `${(-lat).toFixed(2)} deg S`;
+            lonSpan.textContent = lonToDisplay(lon);
+            distSpan.textContent = dist.toFixed(3);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        layersPanel.classList.remove('closed');
+        layersToggle.classList.remove('visible');
+        showMessage('📐 Click "Plan" to plan a site at your current camera location', 'info');
+        setTimeout(() => showMessage('', 'hidden'), 5000);
+        console.log('Lunar Constraint Map with Camera-Based Planning and Curved Discs initialized.');
+    </script>
+</body>
+</html>
