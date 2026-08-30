@@ -630,7 +630,7 @@
       const MAX_TOKENS = 40000; const HARDCODED_API_KEY = '';
       let documents=[], chatLog=[], savedScenes=[], aiDocs=[], aiDocsArchive=[];
       let apiKey=HARDCODED_API_KEY; let xaiApiKey=''; let anthropicApiKey=''; let waiting=false, sessionCount=0, lastCategory='';
-      let currentModel='deepseek-chat'; let secondBrainModel='claude-3-5-sonnet-20241022'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
+      let currentModel='deepseek-v4-flash'; let secondBrainModel='claude-3-5-sonnet-20241022'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
 
       // ── Second Brain / Debate State ────────────
       let debateModeActive = false;
@@ -1225,7 +1225,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       function load(key,def){try{const raw=localStorage.getItem(INSTANCE+'_'+key);return raw?JSON.parse(raw):def;}catch(e){return def;}}
       function save(key,val){try{localStorage.setItem(INSTANCE+'_'+key,JSON.stringify(val));}catch(e){if(e.name==='QuotaExceededError')showToast('Storage full.');}}
       function migrateOldData(){const oldChapters=load('wc_chapters',null);if(oldChapters&&Array.isArray(oldChapters)&&oldChapters.length){const migrated=oldChapters.map(ch=>({id:ch.id||'doc_'+Date.now()+Math.random().toString(36),title:ch.name||'Untitled chapter',type:'published',content:ch.content||'',summary:'',locked:ch.locked||false,timestamp:new Date().toISOString()}));documents=[...migrated,...documents];save('wc_documents',documents);localStorage.removeItem(INSTANCE+'_wc_chapters');showToast('Migrated old chapters into documents.');}}
-      function restoreFromBackupData(d){apiKey=d.apiKey||HARDCODED_API_KEY;documents=(d.documents||[]).map(doc=>({id:doc.id,title:doc.title,type:doc.type||'draft',content:doc.content,summary:doc.summary||'',locked:doc.locked||false,timestamp:doc.timestamp||new Date().toISOString()}));chatLog=d.chatLog||[];savedScenes=(d.savedScenes||[]).map(s=>({...s,tag:s.tag||'draft'}));aiDocs=(d.aiDocs||[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));aiDocsArchive=d.aiDocsArchive||[];sessionCount=(d.sessionCount||0)+1;lastCategory=d.lastCategory||'';currentModel=d.currentModel||'deepseek-chat';thinkingEnabled=d.thinkingEnabled||false;currentTemp=d.currentTemp||0.8;save('wc_apiKey',apiKey);save('wc_documents',documents);save('wc_chatLog',chatLog);save('wc_savedScenes',savedScenes);save('wc_aiDocs',aiDocs);save('wc_aiDocsArchive',aiDocsArchive);save('wc_sessionCount',sessionCount);save('wc_lastCategory',lastCategory);save('wc_model',currentModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();apiKey?enableChat():disableChat();renderDocuments();renderSavedScenes();renderAiWorkspace();chatC.innerHTML='';restoreChatHistory();renderWelcome();updateContextBar();updatePeakIndicator();updateTempPill();showUndoButtonIfArchive();autoSave();}
+      function restoreFromBackupData(d){apiKey=d.apiKey||HARDCODED_API_KEY;anthropicApiKey=d.anthropicApiKey||'';xaiApiKey=d.xaiApiKey||'';documents=(d.documents||[]).map(doc=>({id:doc.id,title:doc.title,type:doc.type||'draft',content:doc.content,summary:doc.summary||'',locked:doc.locked||false,timestamp:doc.timestamp||new Date().toISOString()}));chatLog=d.chatLog||[];savedScenes=(d.savedScenes||[]).map(s=>({...s,tag:s.tag||'draft'}));aiDocs=(d.aiDocs||[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));aiDocsArchive=d.aiDocsArchive||[];sessionCount=(d.sessionCount||0)+1;lastCategory=d.lastCategory||'';currentModel=d.currentModel||'deepseek-v4-flash';secondBrainModel=d.secondBrainModel||'claude-3-5-sonnet-20241022';thinkingEnabled=d.thinkingEnabled||false;currentTemp=d.currentTemp||0.8;save('wc_apiKey',apiKey);save('wc_anthropic_apiKey',anthropicApiKey);save('wc_xai_apiKey',xaiApiKey);save('wc_documents',documents);save('wc_chatLog',chatLog);save('wc_savedScenes',savedScenes);save('wc_aiDocs',aiDocs);save('wc_aiDocsArchive',aiDocsArchive);save('wc_sessionCount',sessionCount);save('wc_lastCategory',lastCategory);save('wc_model',currentModel);save('wc_secondBrainModel',secondBrainModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();hasActiveApiKey()?enableChat():disableChat();renderDocuments();renderSavedScenes();renderAiWorkspace();chatC.innerHTML='';restoreChatHistory();renderWelcome();updateContextBar();updatePeakIndicator();updateTempPill();showUndoButtonIfArchive();autoSave();}
 
       async function generateSummary(content){const activeKey=(currentModel.startsWith('grok')?xaiApiKey:apiKey)||apiKey;if(!activeKey)throw new Error('API key not set.');const prompt=`Summarize the following document concisely. Include key terms, numbers, dates, and main topics. Keep under 150 words.\n\nDocument:\n${content}`;const messages=[{role:'system',content:'You are a precise summarizer.'},{role:'user',content:prompt}];const endpoint=currentModel.startsWith('grok')?API_XAI:API_DEEPSEEK;const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${activeKey}`},body:JSON.stringify({model:currentModel,messages,temperature:0.3,max_tokens:200})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`API error ${res.status}`);}const data=await res.json();return data.choices?.[0]?.message?.content?.trim()||'';}
 
@@ -1309,16 +1309,19 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       // ── Single API Request Helper ───────────────
       async function callApi(messages, modelOverride) {
         const model = modelOverride || currentModel;
-        const targetModel = (model === 'deepseek-v4-flash' || model === 'deepseek-v4-pro') ? 'deepseek-chat' : model;
 
-        if (targetModel.startsWith('claude')) {
+        // --- Claude/Anthropic ---
+        if (model.startsWith('claude')) {
           const key = anthropicApiKey || apiKey;
           if (!key) throw new Error('Anthropic API key not set in Settings.');
           const sysMsg = messages.filter(m => m.role === 'system').map(m => m.content).join('\n\n');
-          const nonSysMsgs = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+          const nonSysMsgs = messages.filter(m => m.role !== 'system').map(m => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: m.content
+          }));
 
           const body = {
-            model: targetModel,
+            model: model,
             max_tokens: 4096,
             system: sysMsg,
             messages: nonSysMsgs,
@@ -1344,11 +1347,17 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           return reply.replace(/^\s*\[\d{12}\]\s*/, '');
         }
 
-        if (targetModel.startsWith('grok')) {
+        // --- xAI/Grok ---
+        if (model.startsWith('grok')) {
           const key = xaiApiKey || apiKey;
           if (!key) throw new Error('xAI/Grok API key not set in Settings.');
 
-          const body = { model: targetModel, messages, temperature: currentTemp, max_tokens: MAX_TOKENS };
+          const body = {
+            model: model,
+            messages,
+            temperature: currentTemp,
+            max_tokens: MAX_TOKENS
+          };
           if (webSearchEnabled) {
             body.tools = [{ type: "web_search" }];
           }
@@ -1373,15 +1382,16 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           return reply.replace(/^\s*\[\d{12}\]\s*/, '');
         }
 
-        // --- DeepSeek (Default) ---
+        // --- DeepSeek (FIXED) ---
         const key = apiKey;
         if (!key) throw new Error('DeepSeek API key not set in Settings.');
 
-        const validDeepSeekModels = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'deepseek-v4-pro'];
-        let effectiveModel = validDeepSeekModels.includes(targetModel) ? targetModel : 'deepseek-chat';
-        if (effectiveModel === 'deepseek-v4-flash' || effectiveModel === 'deepseek-v4-pro') {
-          effectiveModel = 'deepseek-chat';
-        }
+        // ✅ Only use valid V4 models
+        const validDeepSeekModels = ['deepseek-v4-flash', 'deepseek-v4-pro'];
+        const effectiveModel = validDeepSeekModels.includes(model) ? model : 'deepseek-v4-flash';
+
+        console.log('[DeepSeek] Using model:', effectiveModel);
+        console.log('[DeepSeek] API Key present:', !!key);
 
         const body = {
           model: effectiveModel,
@@ -1390,21 +1400,30 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           top_p: 1.0
         };
 
+        // ✅ Correct thinking mode handling for V4
         if (thinkingEnabled && effectiveModel === 'deepseek-v4-pro') {
           body.thinking = { type: "enabled" };
-          body.temperature = 0.6;
+          body.temperature = 0.6; // Thinking mode forces temperature to 0.6
         } else {
           body.temperature = currentTemp;
         }
 
+        console.log('[DeepSeek Request]', JSON.stringify(body, null, 2));
+
         const res = await fetch(API_DEEPSEEK, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
           body: JSON.stringify(body)
         });
 
+        console.log('[DeepSeek Response Status]', res.status);
+
         if (!res.ok) {
           const errorText = await res.text();
+          console.error('[DeepSeek Error Response]', errorText);
           let errorMessage = `DeepSeek API error ${res.status}`;
           try {
             const errData = JSON.parse(errorText);
@@ -1416,11 +1435,15 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
         }
 
         const data = await res.json();
+        console.log('[DeepSeek Response]', data);
+
         if (!data.choices || !data.choices[0] || !data.choices[0].message) {
           throw new Error('Invalid response structure from DeepSeek API');
         }
 
         let reply = data.choices[0].message.content || '(no response from DeepSeek)';
+
+        // If thinking mode was used, include the thinking content
         if (thinkingEnabled && data.choices[0].message.thinking) {
           reply = data.choices[0].message.thinking + '\n\n' + reply;
         }
@@ -1828,7 +1851,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           sessionCount=load('wc_sessionCount',0)+1;save('wc_sessionCount',sessionCount);
           if(!load('wc_hasVisited',false))save('wc_hasVisited',true);
           lastCategory=load('wc_lastCategory','');
-          currentModel=load('wc_model','deepseek-chat');
+          currentModel=load('wc_model','deepseek-v4-flash');
           secondBrainModel=load('wc_secondBrainModel','claude-3-5-sonnet-20241022');
           thinkingEnabled=load('wc_thinking',false);
           webSearchEnabled=load('wc_webSearch',true);
