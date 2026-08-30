@@ -693,33 +693,9 @@
 
       async function callMemoryAPI(prompt, options = {}) {
         const {
-          model = currentModel,
-          temperature = 0.2,
-          maxTokens = 40000
+          model = secondBrainModel
         } = options;
-        const targetModel = (model === 'deepseek-v4-flash' || model === 'deepseek-v4-pro') ? 'deepseek-chat' : model;
-        const body = {
-          model: targetModel,
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: maxTokens,
-          temperature: temperature,
-          top_p: 1.0
-        };
-        const isGrok = targetModel.startsWith('grok');
-        const endpoint = isGrok ? API_XAI : API_DEEPSEEK;
-        const key = isGrok ? (xaiApiKey || apiKey) : apiKey;
-
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-          body: JSON.stringify(body)
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(()=>({}));
-          throw new Error(err.error?.message || `API error ${res.status}`);
-        }
-        const data = await res.json();
-        return data.choices?.[0]?.message?.content?.trim() || '';
+        return await callApiWithRetry([{ role: 'user', content: prompt }], 1, model);
       }
 
       function buildMemoryPass0Prompt(workspace) {
