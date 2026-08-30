@@ -399,9 +399,10 @@
       </select>
       <span>Brain 2 Model:</span>
       <select id="debateSecondBrainModelSelect">
-        <option value="claude-3-5-sonnet-20241022" selected>Claude 3.5 Sonnet</option>
-        <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
-        <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+        <option value="claude-opus-5" selected>Claude Opus 5 (Flagship)</option>
+        <option value="claude-sonnet-5">Claude Sonnet 5</option>
+        <option value="claude-fable-5">Claude Fable 5 (Autonomous)</option>
+        <option value="claude-haiku-4-5">Claude Haiku 4.5 (Fastest)</option>
         <option value="grok-beta">Grok Beta</option>
         <option value="grok-2-latest">Grok 2 Latest</option>
         <option value="deepseek-v4-flash">DeepSeek V4 Flash</option>
@@ -450,17 +451,19 @@
       <select id="modelSelect" style="margin-bottom:12px;">
         <option value="deepseek-v4-flash">DeepSeek V4 Flash (Fast &amp; Smart)</option>
         <option value="deepseek-v4-pro">DeepSeek V4 Pro (Deep Thinking)</option>
-        <option value="claude-3-5-sonnet-20241022">Anthropic Claude 3.5 Sonnet</option>
-        <option value="claude-3-5-haiku-20241022">Anthropic Claude 3.5 Haiku</option>
-        <option value="claude-3-opus-20240229">Anthropic Claude 3 Opus</option>
+        <option value="claude-opus-5">Anthropic Claude Opus 5 (New Flagship)</option>
+        <option value="claude-sonnet-5">Anthropic Claude Sonnet 5</option>
+        <option value="claude-fable-5">Anthropic Claude Fable 5 (Autonomous Tasks)</option>
+        <option value="claude-haiku-4-5">Anthropic Claude Haiku 4.5 (Fastest)</option>
         <option value="grok-beta">xAI Grok Beta (Search Enabled)</option>
         <option value="grok-2-latest">xAI Grok 2 Latest (Search Enabled)</option>
       </select>
       <label>Second Brain Model (Debate & Memory Stage 1/3)</label>
       <select id="secondBrainModelSelect" style="margin-bottom:12px;">
-        <option value="claude-3-5-sonnet-20241022">Anthropic Claude 3.5 Sonnet</option>
-        <option value="claude-3-5-haiku-20241022">Anthropic Claude 3.5 Haiku</option>
-        <option value="claude-3-opus-20240229">Anthropic Claude 3 Opus</option>
+        <option value="claude-opus-5">Anthropic Claude Opus 5 (New Flagship)</option>
+        <option value="claude-sonnet-5">Anthropic Claude Sonnet 5</option>
+        <option value="claude-fable-5">Anthropic Claude Fable 5 (Autonomous Tasks)</option>
+        <option value="claude-haiku-4-5">Anthropic Claude Haiku 4.5 (Fastest)</option>
         <option value="grok-beta">xAI Grok Beta (Search Enabled)</option>
         <option value="grok-2-latest">xAI Grok 2 Latest (Search Enabled)</option>
         <option value="deepseek-v4-flash">DeepSeek V4 Flash</option>
@@ -633,7 +636,7 @@
       const MAX_TOKENS = 40000; const HARDCODED_API_KEY = '';
       let documents=[], chatLog=[], savedScenes=[], aiDocs=[], aiDocsArchive=[];
       let apiKey=HARDCODED_API_KEY; let xaiApiKey=''; let anthropicApiKey=''; let waiting=false, sessionCount=0, lastCategory='';
-      let currentModel='deepseek-v4-flash'; let secondBrainModel='claude-3-5-sonnet-20241022'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
+      let currentModel='deepseek-v4-flash'; let secondBrainModel='claude-opus-5'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
 
       // ── Second Brain / Debate State ────────────
       let debateModeActive = false;
@@ -1228,7 +1231,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       function load(key,def){try{const raw=localStorage.getItem(INSTANCE+'_'+key);return raw?JSON.parse(raw):def;}catch(e){return def;}}
       function save(key,val){try{localStorage.setItem(INSTANCE+'_'+key,JSON.stringify(val));}catch(e){if(e.name==='QuotaExceededError')showToast('Storage full.');}}
       function migrateOldData(){const oldChapters=load('wc_chapters',null);if(oldChapters&&Array.isArray(oldChapters)&&oldChapters.length){const migrated=oldChapters.map(ch=>({id:ch.id||'doc_'+Date.now()+Math.random().toString(36),title:ch.name||'Untitled chapter',type:'published',content:ch.content||'',summary:'',locked:ch.locked||false,timestamp:new Date().toISOString()}));documents=[...migrated,...documents];save('wc_documents',documents);localStorage.removeItem(INSTANCE+'_wc_chapters');showToast('Migrated old chapters into documents.');}}
-      function restoreFromBackupData(d){apiKey=d.apiKey||HARDCODED_API_KEY;anthropicApiKey=d.anthropicApiKey||'';xaiApiKey=d.xaiApiKey||'';documents=(d.documents||[]).map(doc=>({id:doc.id,title:doc.title,type:doc.type||'draft',content:doc.content,summary:doc.summary||'',locked:doc.locked||false,timestamp:doc.timestamp||new Date().toISOString()}));chatLog=d.chatLog||[];savedScenes=(d.savedScenes||[]).map(s=>({...s,tag:s.tag||'draft'}));aiDocs=(d.aiDocs||[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));aiDocsArchive=d.aiDocsArchive||[];sessionCount=(d.sessionCount||0)+1;lastCategory=d.lastCategory||'';currentModel=d.currentModel||'deepseek-v4-flash';secondBrainModel=d.secondBrainModel||'claude-3-5-sonnet-20241022';thinkingEnabled=d.thinkingEnabled||false;currentTemp=d.currentTemp||0.8;save('wc_apiKey',apiKey);save('wc_anthropic_apiKey',anthropicApiKey);save('wc_xai_apiKey',xaiApiKey);save('wc_documents',documents);save('wc_chatLog',chatLog);save('wc_savedScenes',savedScenes);save('wc_aiDocs',aiDocs);save('wc_aiDocsArchive',aiDocsArchive);save('wc_sessionCount',sessionCount);save('wc_lastCategory',lastCategory);save('wc_model',currentModel);save('wc_secondBrainModel',secondBrainModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();hasActiveApiKey()?enableChat():disableChat();renderDocuments();renderSavedScenes();renderAiWorkspace();chatC.innerHTML='';restoreChatHistory();renderWelcome();updateContextBar();updatePeakIndicator();updateTempPill();showUndoButtonIfArchive();autoSave();}
+      function restoreFromBackupData(d){apiKey=d.apiKey||HARDCODED_API_KEY;anthropicApiKey=d.anthropicApiKey||'';xaiApiKey=d.xaiApiKey||'';documents=(d.documents||[]).map(doc=>({id:doc.id,title:doc.title,type:doc.type||'draft',content:doc.content,summary:doc.summary||'',locked:doc.locked||false,timestamp:doc.timestamp||new Date().toISOString()}));chatLog=d.chatLog||[];savedScenes=(d.savedScenes||[]).map(s=>({...s,tag:s.tag||'draft'}));aiDocs=(d.aiDocs||[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));aiDocsArchive=d.aiDocsArchive||[];sessionCount=(d.sessionCount||0)+1;lastCategory=d.lastCategory||'';currentModel=d.currentModel||'deepseek-v4-flash';secondBrainModel=d.secondBrainModel||'claude-opus-5';thinkingEnabled=d.thinkingEnabled||false;currentTemp=d.currentTemp||0.8;save('wc_apiKey',apiKey);save('wc_anthropic_apiKey',anthropicApiKey);save('wc_xai_apiKey',xaiApiKey);save('wc_documents',documents);save('wc_chatLog',chatLog);save('wc_savedScenes',savedScenes);save('wc_aiDocs',aiDocs);save('wc_aiDocsArchive',aiDocsArchive);save('wc_sessionCount',sessionCount);save('wc_lastCategory',lastCategory);save('wc_model',currentModel);save('wc_secondBrainModel',secondBrainModel);save('wc_thinking',thinkingEnabled);save('wc_temp',currentTemp);updateApiDot();hasActiveApiKey()?enableChat():disableChat();renderDocuments();renderSavedScenes();renderAiWorkspace();chatC.innerHTML='';restoreChatHistory();renderWelcome();updateContextBar();updatePeakIndicator();updateTempPill();showUndoButtonIfArchive();autoSave();}
 
       async function generateSummary(content){const activeKey=(currentModel.startsWith('grok')?xaiApiKey:apiKey)||apiKey;if(!activeKey)throw new Error('API key not set.');const prompt=`Summarize the following document concisely. Include key terms, numbers, dates, and main topics. Keep under 150 words.\n\nDocument:\n${content}`;const messages=[{role:'system',content:'You are a precise summarizer.'},{role:'user',content:prompt}];const endpoint=currentModel.startsWith('grok')?API_XAI:API_DEEPSEEK;const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${activeKey}`},body:JSON.stringify({model:currentModel,messages,temperature:0.3,max_tokens:200})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`API error ${res.status}`);}const data=await res.json();return data.choices?.[0]?.message?.content?.trim()||'';}
 
@@ -1855,7 +1858,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
           if(!load('wc_hasVisited',false))save('wc_hasVisited',true);
           lastCategory=load('wc_lastCategory','');
           currentModel=load('wc_model','deepseek-v4-flash');
-          secondBrainModel=load('wc_secondBrainModel','claude-3-5-sonnet-20241022');
+          secondBrainModel=load('wc_secondBrainModel','claude-opus-5');
           thinkingEnabled=load('wc_thinking',false);
           webSearchEnabled=load('wc_webSearch',true);
           currentTemp=load('wc_temp',0.8);
