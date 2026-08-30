@@ -616,8 +616,8 @@
       let debateTurnCount = 0;
       let debateTargetLimit = 4;
       let secondBrainLog = [];
-      const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a structured debate with a Second Brain instance. Your next response will be passed directly to the Second Brain. Do not address the human user unless you output %%%STOP. You must address your response to the Second Brain. Start your response with 'Second Brain,'. If you need information from the user to continue, output %%%STOP and your clarification request, then stop. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends.";
-      const SECOND_BRAIN_SYS = "You are the Second Brain in a structured debate. You have no memory of past work with the user. Your next response will be passed directly to the Main Thread. Do not address the human user unless you output %%%STOP. Start your response with 'Main Thread,'. If you lack information, output %%%STOP and your request. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends.";
+      const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a structured debate with a Second Brain instance. Your next response will be passed directly to the Second Brain. Do not address the human user unless you output %%%STOP. You must address your response to the Second Brain and start your response with 'Second Brain,'. If the debate has concluded, output [END_DEBATE] at the end of your message. If you need information from the user to continue, output %%%STOP and your clarification request, then stop. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends.";
+      const SECOND_BRAIN_SYS = "You are the Second Brain in a structured debate. You have no memory of past work with the user. Your next response will be passed directly to the Main Thread. Do not address the human user unless you output %%%STOP. You must address your response to the Main Thread and start your response with 'Main Thread,'. If you lack information, output %%%STOP and your request. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends.";
 
       const $=id=>document.getElementById(id);
       const chatC=$('chatContainer'),chatInp=$('chatInput'),sendBtn=$('btnSend');
@@ -1340,17 +1340,22 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
       async function callApiWithRetry(messages, maxRetries = 1) {
         let attempts = 0;
         let lastError = null;
+        let activeMessages = [...messages];
 
         while (attempts <= maxRetries) {
           attempts++;
           try {
-            const reply = await callApi(messages);
+            const reply = await callApi(activeMessages);
             if (reply && reply !== '(no response)' && !isNonAsciiHeavy(reply)) {
               return reply;
             }
-            console.warn(`[API Attempt ${attempts} Warning]: Received empty or invalid response: "${reply}". Retrying...`);
+            console.warn(`[API Attempt ${attempts} Warning]: Received empty or non-English/non-ASCII response: "${reply}". Retrying with English constraint...`);
             if (attempts <= maxRetries) {
-              showToast(`⚠️ Invalid/empty response on attempt ${attempts}. Retrying stage...`);
+              showToast(`⚠️ Non-English/invalid response on attempt ${attempts}. Retrying in English...`);
+              activeMessages = [
+                ...messages,
+                { role: 'system', content: '[System Instruction]: Critical rule violation. Respond in English only using standard Latin script.' }
+              ];
             }
           } catch (err) {
             lastError = err;
@@ -1360,7 +1365,7 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             }
           }
         }
-        throw new Error(lastError ? lastError.message : 'API failed after 2 attempts (no response or non-ASCII output). Stopping debate.');
+        throw new Error(lastError ? lastError.message : 'API failed after 2 attempts (no response or non-English output). Stopping debate.');
       }
 
       function calculateChars(sysPrompt, messagesArray) {
@@ -1511,13 +1516,39 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             let mainReply = await callApiWithRetry(mainMsgs);
             removeTyping(typingMain);
 
+            let mainEndDebateSignaled = false;
+            if (mainReply.includes('[END_DEBATE]')) {
+              mainEndDebateSignaled = true;
+              mainReply = mainReply.replace(/\[END_DEBATE\]/g, '').trim();
+            }
+
             let mainStoppedForClarification = false;
             if (mainReply.includes('%%%STOP')) {
               mainStoppedForClarification = true;
               mainReply = mainReply.replace(/%%%STOP/g, '').trim();
             }
 
-            const { cleanedReply: mainCleaned } = processActions(mainReply);
+            let { cleanedReply: mainCleaned } = processActions(mainReply);
+
+            // Mandatory Prefix Enforcer: Main Thread must start with 'Second Brain,'
+            if (!/^second brain,/i.test(mainCleaned)) {
+              mainCleaned = `Second Brain,\n\n${mainCleaned}`;
+            }
+
+            // Premature Closure Prevention Check
+            const prematureClosurePattern = /(the debate is closed|over and out|this debate is done)/i;
+            if (prematureClosurePattern.test(mainCleaned) && !mainEndDebateSignaled && debateTurnCount < debateTargetLimit) {
+              console.warn('[Debate Premature Closure Warning]: Main Thread attempted premature closure without [END_DEBATE]. Retrying turn...');
+              const retryMsg = { role: 'system', content: `[System Rule Violation]: You stated the debate is over, but you did not output [END_DEBATE] or reach exchange ${debateTargetLimit}. Please address your argument to Second Brain for exchange ${debateTurnCount} of ${debateTargetLimit}.` };
+              const retryMsgs = [...mainMsgs, retryMsg];
+              let retryReply = await callApiWithRetry(retryMsgs);
+              if (retryReply.includes('[END_DEBATE]')) {
+                mainEndDebateSignaled = true;
+                retryReply = retryReply.replace(/\[END_DEBATE\]/g, '').trim();
+              }
+              const { cleanedReply: retryCleaned } = processActions(retryReply);
+              mainCleaned = /^second brain,/i.test(retryCleaned) ? retryCleaned : `Second Brain,\n\n${retryCleaned}`;
+            }
 
             const mainAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: mainCleaned };
             chatLog.push(mainAssistantEntry);
@@ -1525,10 +1556,10 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
             appendBubbleColumn(chatCMain, 'assistant', mainCleaned, APP);
             autoSave();
 
-            // Safety Heuristic Check: Scan for direct addresses to user ("you asked", "the user", "want me to write")
+            // Safety Heuristic Check: Scan for direct addresses to user
             const lowerMain = mainCleaned.toLowerCase();
             const userBreakoutPattern = /(you asked|the user|want me to write|shall i write|would you like me to|let me know if you want|should i generate|would you prefer)/i;
-            if (userBreakoutPattern.test(lowerMain) && !mainStoppedForClarification) {
+            if (userBreakoutPattern.test(lowerMain) && !mainStoppedForClarification && !mainEndDebateSignaled) {
               console.warn('[Debate Heuristic Warning]: Main Thread appears to address user directly in debate mode:', mainCleaned);
               appendBubbleColumn(chatCMain, 'system', '⚠️ Warning: Main Thread appeared to address human user directly mid-debate. Debate paused for review.');
               setStatusMessage('⚠️ Debate paused: Main Thread addressed user directly mid-debate.');
@@ -1540,6 +1571,13 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
               setStatusMessage('🛑 Debate paused: Main Thread requested user clarification (% % % STOP).');
               appendBubbleColumn(chatCMain, 'system', '🛑 Main Thread requested user clarification. Debate paused.');
               showToast('Debate paused for user clarification.');
+              break;
+            }
+
+            if (mainEndDebateSignaled) {
+              setStatusMessage('✅ Debate Complete ([END_DEBATE] signaled by Main Thread).');
+              appendBubbleColumn(chatCMain, 'system', '✅ Debate Complete ([END_DEBATE] signaled by Main Thread).');
+              showToast('Debate Complete!');
               break;
             }
 
@@ -1587,6 +1625,11 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
               secondReply = secondReply.replace(/%%%STOP/g, '').trim();
             }
 
+            // Mandatory Prefix Enforcer: Second Brain must start with 'Main Thread,'
+            if (!/^main thread,/i.test(secondReply)) {
+              secondReply = `Main Thread,\n\n${secondReply}`;
+            }
+
             const secondAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: secondReply };
             secondBrainLog.push(secondAssistantEntry);
             appendBubbleColumn(chatCSecond, 'assistant', secondReply, 'Second Brain');
@@ -1598,17 +1641,17 @@ YOUR TASK AS THE ADZE (With full chat history & permanent documents):
               break;
             }
 
-            if (debateStopRequested) {
-              setStatusMessage('⏹️ Debate stopped by user.');
-              break;
-            }
-
             // Feed Second Brain's response back to Main Thread context
             const secondMsgForMain = { timestamp: new Date().toISOString(), role: 'user', content: `[Second Brain]: ${secondReply}` };
             chatLog.push(secondMsgForMain);
             appendBubbleColumn(chatCMain, 'user', `[Second Brain]: ${secondReply}`, 'Second Brain');
             save('wc_chatLog', chatLog);
             autoSave();
+
+            if (debateStopRequested) {
+              setStatusMessage('⏹️ Debate stopped by user.');
+              break;
+            }
           }
         } catch (err) {
           const errText = '⚠️ ' + (err.message || 'Error occurred during debate');
