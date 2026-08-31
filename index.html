@@ -524,6 +524,65 @@
             margin-top: 2px;
         }
 
+        /* Feature Popup */
+        #feature-popup {
+            position: absolute;
+            top: 20px;
+            left: 360px;
+            background: rgba(10, 14, 28, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid #445566;
+            border-radius: 10px;
+            padding: 16px 20px;
+            min-width: 280px;
+            max-width: 340px;
+            z-index: 35;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+        #feature-popup.visible { display: flex; }
+        .popup-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #8899aa;
+            font-size: 1.2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .popup-close-btn:hover { color: #ffffff; }
+        .popup-field { display: flex; flex-direction: column; gap: 2px; }
+        .popup-field-label {
+            font-size: 0.72rem;
+            color: #8899aa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+        .popup-field-val {
+            font-size: 0.88rem;
+            color: #ffffff;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+        .popup-report-btn {
+            margin-top: 4px;
+            padding: 8px 16px;
+            background: #2b82c9;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .popup-report-btn:hover { background: #3b92d9; }
+
         /* State Legend Panel */
         #state-legend-panel {
             position: absolute;
@@ -833,28 +892,33 @@
         </div>
         <!-- Master Governance Toggles -->
         <div id="governance-toggles" style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #334455;">
-            <div style="font-size: 0.75rem; font-weight: bold; color: #88aacc; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Governance & Dynamic Overlays</div>
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ffaa44; cursor:pointer; margin-bottom:4px;">
-                <input type="checkbox" id="assessment-status-toggle" />
-                <span>⚖️ Assessment Status & Provisional Mode</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#00ffcc; cursor:pointer; margin-bottom:4px;">
-                <input type="checkbox" id="op-activity-toggle" checked />
-                <span>🚀 Operational Activity Layer</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ff44aa; cursor:pointer; margin-bottom:4px;">
-                <input type="checkbox" id="dynamic-harms-toggle" />
-                <span>⚠️ Dynamic Harms Layer (Computed)</span>
-            </label>
-            <div id="dynamic-harms-controls" style="margin-left: 20px; font-size: 0.75rem; color: #bbccdd; margin-bottom: 6px; display: none;">
-                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-psi" checked /> Plume Surface Interaction (PSI-v1.2)</label>
-                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-contamination" checked /> Volatile Contamination (CONTAM-v1.0)</label>
-                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-emi" checked /> Transient EMI (EMI-v1.1)</label>
+            <div id="governance-header" style="display:flex; align-items:center; justify-space-between; cursor:pointer; font-size: 0.75rem; font-weight: bold; color: #88aacc; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                <span>GOVERNANCE OVERLAYS</span>
+                <span id="governance-arrow" style="transition: transform 0.2s;">&gt;</span>
             </div>
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#ffdd44; cursor:pointer;">
-                <input type="checkbox" id="disputes-toggle" />
-                <span>⚔️ Disputes, Salience & Recency</span>
-            </label>
+            <div id="governance-body" style="display:none;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#8899aa; cursor:pointer; margin-bottom:4px;">
+                    <input type="checkbox" id="assessment-status-toggle" checked />
+                    <span>Assessment Status &amp; Provisional Mode</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#8899aa; cursor:pointer; margin-bottom:4px;">
+                    <input type="checkbox" id="op-activity-toggle" checked />
+                    <span>Operational Activity Layer</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#8899aa; cursor:pointer; margin-bottom:4px;">
+                    <input type="checkbox" id="dynamic-harms-toggle" />
+                    <span>Dynamic Harms Layer (Computed)</span>
+                </label>
+                <div id="dynamic-harms-controls" style="margin-left: 20px; font-size: 0.75rem; color: #bbccdd; margin-bottom: 6px; display: none;">
+                    <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-psi" checked /> Plume Surface Interaction (PSI-v1.2)</label>
+                    <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-contamination" checked /> Volatile Contamination (CONTAM-v1.0)</label>
+                    <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="harm-emi" checked /> Transient EMI (EMI-v1.1)</label>
+                </div>
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#8899aa; cursor:pointer;">
+                    <input type="checkbox" id="disputes-toggle" checked />
+                    <span>Disputes and Salience Overlay</span>
+                </label>
+            </div>
         </div>
         <div id="layer-list"></div>
         <div id="user-sites-list" style="margin-top:12px;border-top:1px solid #445566;padding-top:10px;">
@@ -867,6 +931,28 @@
     </div>
 
     <div id="layers-toggle" title="Show layers">Layers</div>
+
+    <!-- Feature Popup -->
+    <div id="feature-popup" class="hidden">
+        <button class="popup-close-btn" id="popup-close-btn">&times;</button>
+        <div class="popup-field">
+            <span class="popup-field-label">Name</span>
+            <span class="popup-field-val" id="popup-name"></span>
+        </div>
+        <div class="popup-field">
+            <span class="popup-field-label">Category</span>
+            <span class="popup-field-val" id="popup-category"></span>
+        </div>
+        <div class="popup-field">
+            <span class="popup-field-label">Tier</span>
+            <span class="popup-field-val" id="popup-tier"></span>
+        </div>
+        <div class="popup-field">
+            <span class="popup-field-label">What that means</span>
+            <span class="popup-field-val" id="popup-meaning"></span>
+        </div>
+        <button id="popup-report-btn" class="popup-report-btn">Report</button>
+    </div>
 
     <!-- Centre overlap display -->
     <div id="centre-overlap-display">
@@ -1238,10 +1324,10 @@
         const opActivityToggle = document.getElementById('op-activity-toggle');
         const dynamicHarmsToggle = document.getElementById('dynamic-harms-toggle');
         const disputesToggle = document.getElementById('disputes-toggle');
-        let isAssessmentStatusMode = false;
+        let isAssessmentStatusMode = true;
         let isOpActivityEnabled = true;
         let isDynamicHarmsEnabled = false;
-        let isDisputesEnabled = false;
+        let isDisputesEnabled = true;
         let harmPsiEnabled = true;
         let harmContamEnabled = true;
         let harmEmiEnabled = true;
@@ -1291,7 +1377,7 @@
         const INITIAL_CAM_POS = new THREE.Vector3(0, 0.6, 4.5);
         const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.copy(INITIAL_CAM_POS);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
@@ -2330,6 +2416,7 @@
                     }
                     const discMat = new THREE.MeshBasicMaterial(discMatProps);
                     discObject = new THREE.Mesh(discGeo, discMat);
+                    discObject.userData = { featureId: feature.id };
                     discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
                     allGlowMeshes.push(discObject);
                     // Create dynamic harms meshes if operational activity
@@ -2389,6 +2476,7 @@
                     const hLon = geom.lon ?? 180;
                     const targetNormal = latLonToPosition(hLat, hLon, 1).normalize();
                     mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+                    mesh.userData = { featureId: feature.id };
                     discObject = mesh;
                 }
                 else if (type === 'orbit') {
@@ -2417,6 +2505,7 @@
                         mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false });
                     }
                     const line = new THREE.Line(orbitGeo, mat);
+                    line.userData = { featureId: feature.id };
                     if (isDashed) line.computeLineDistances();
                     discObject = line;
 
@@ -2469,7 +2558,7 @@
                     feature
                 };
                 if (!featureActiveState.has(feature.id)) featureActiveState.set(feature.id, false);
-                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, false);
+                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, true);
 
                 if (currentMoon) {
                     if (discObject) currentMoon.add(discObject);
@@ -3220,34 +3309,349 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
+        // --- Feature Popup & Raycast Selection System ---
+        let selectedFeature = null;
+        let isMapFrozen = false;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        const popupEl = document.getElementById('feature-popup');
+        const popupCloseBtn = document.getElementById('popup-close-btn');
+        const popupNameEl = document.getElementById('popup-name');
+        const popupCategoryEl = document.getElementById('popup-category');
+        const popupTierEl = document.getElementById('popup-tier');
+        const popupMeaningEl = document.getElementById('popup-meaning');
+        const popupReportBtn = document.getElementById('popup-report-btn');
+
+        function getCategoryLabel(feature) {
+            if (!feature || !feature.tags) return 'General';
+            for (const [key, def] of Object.entries(LAYER_DEFS)) {
+                if (feature.tags.some(t => def.tags.includes(t))) {
+                    return def.label;
+                }
+            }
+            return 'General';
+        }
+
+        function showFeaturePopup(feature) {
+            if (!feature) return;
+            selectedFeature = feature;
+
+            popupNameEl.textContent = feature.name;
+            popupCategoryEl.textContent = getCategoryLabel(feature);
+
+            const tierNum = feature.tier || 3;
+            popupTierEl.textContent = `Tier ${tierNum}`;
+
+            let meaningText = '';
+            if (tierNum === 1) {
+                meaningText = 'Tier 1: high protection, activity requires coordination and can be challenged.';
+            } else if (tierNum === 2) {
+                meaningText = 'Tier 2: coordination required before proceeding.';
+            } else {
+                meaningText = 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
+            }
+            popupMeaningEl.textContent = meaningText;
+
+            popupEl.classList.add('visible');
+        }
+
+        function hideFeaturePopup() {
+            popupEl.classList.remove('visible');
+            if (!isMapFrozen) {
+                selectedFeature = null;
+            }
+        }
+
+        if (popupCloseBtn) {
+            popupCloseBtn.addEventListener('click', hideFeaturePopup);
+        }
+
+        function handleCanvasClick(event) {
+            if (isMapFrozen) return;
+            if (event.target !== renderer.domElement) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+
+            let foundFeature = null;
+            for (const intersect of intersects) {
+                let obj = intersect.object;
+                while (obj) {
+                    if (obj.userData && obj.userData.featureId) {
+                        foundFeature = FEATURES.find(f => f.id === obj.userData.featureId);
+                        if (foundFeature) break;
+                    }
+                    obj = obj.parent;
+                }
+                if (foundFeature) break;
+            }
+
+            if (!foundFeature && intersects.length > 0) {
+                const hitPoint = intersects[0].point;
+                const { lat, lon } = positionToLatLon(hitPoint);
+
+                let minDistance = Infinity;
+                for (const f of FEATURES) {
+                    if (f.geometry && f.geometry.type === 'orbit') continue;
+                    const radius = f.radius_km || DEFAULT_RADIUS_KM;
+                    const dist = distanceBetween(lat, lon, f.lat, f.lon);
+                    if (dist < Math.max(radius, 150) && dist < minDistance) {
+                        minDistance = dist;
+                        foundFeature = f;
+                    }
+                }
+            }
+
+            if (foundFeature) {
+                showFeaturePopup(foundFeature);
+            } else {
+                hideFeaturePopup();
+            }
+        }
+
+        renderer.domElement.addEventListener('click', handleCanvasClick);
+
+        function unfreezeMap() {
+            isMapFrozen = false;
+            controls.enabled = true;
+        }
+
+        function openReportWindow() {
+            if (!selectedFeature) return;
+
+            isMapFrozen = true;
+            controls.enabled = false;
+
+            if (selectedFeature && featureObjects[selectedFeature.id]) {
+                const entry = featureObjects[selectedFeature.id];
+                if (entry.label) entry.label.visible = true;
+                if (entry.discObject) entry.discObject.visible = true;
+            }
+
+            renderer.render(scene, camera);
+            const canvasImg = renderer.domElement.toDataURL('image/png');
+
+            const tierNum = selectedFeature.tier || 3;
+            const tierText = tierNum === 1
+                ? 'Tier 1: high protection, activity requires coordination and can be challenged.'
+                : tierNum === 2
+                ? 'Tier 2: coordination required before proceeding.'
+                : 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
+
+            const categoryName = getCategoryLabel(selectedFeature);
+
+            const stateResp = selectedFeature.state
+                ? (STATE_DEFS[selectedFeature.state]?.name || selectedFeature.state)
+                : (selectedFeature.owner || 'None specified');
+
+            const evidenceText = selectedFeature.evidence_grade === 'A'
+                ? 'Grade A - Direct measurement and observational data'
+                : selectedFeature.evidence_grade === 'B'
+                ? 'Grade B - Regulatory designation and technical specification'
+                : selectedFeature.evidence_grade === 'C'
+                ? 'Grade C - Unverified assertion or preliminary estimate'
+                : 'Not graded';
+
+            const statusText = selectedFeature.review_status === 'assessed_protected'
+                ? 'Assessed Protected'
+                : selectedFeature.review_status === 'assessed_open'
+                ? 'Assessed Open'
+                : selectedFeature.review_status === 'under_assessment'
+                ? 'Under Assessment'
+                : 'Unassessed';
+
+            const legalInstrumentText = selectedFeature.id === 'far_side_radio'
+                ? 'ITU Radio Regulations Article 22.22 and Outer Space Treaty Article IX'
+                : (selectedFeature.articles && selectedFeature.articles.length > 0
+                    ? `Outer Space Treaty Articles ${selectedFeature.articles.join(' and ')}`
+                    : 'Outer Space Treaty Article IX general due regard principles');
+
+            const disputeText = selectedFeature.disputed && selectedFeature.dispute_details
+                ? `Active challenge by ${selectedFeature.dispute_details.challenger || 'Challenger'}. Justification: ${selectedFeature.dispute_details.justification || 'Pending'}. Deadline: ${selectedFeature.dispute_details.response_deadline || 'None'}.`
+                : 'No active disputes recorded';
+
+            const summaryText = `This designation identifies ${selectedFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Operators planning activities within or adjacent to this zone must evaluate potential interference and observe international coordination guidelines. Authorization and continuing supervision remain the responsibility of the designated state party pursuant to Article VI of the Outer Space Treaty.`;
+
+            const textBlockToCopy = `LUNAR CONSTRAINT MAP REPORT\nTitle: ${selectedFeature.name} - ${categoryName}\n\nHEADLINE FIELDS\nName: ${selectedFeature.name}\nCategory: ${categoryName}\nTier: Tier ${tierNum}\nWhat that means: ${tierText}\n\nRECORD SECTIONS\nSource: ${selectedFeature.source || 'IAU Gazetteer / Scientific Literature'}\nEvidence: ${evidenceText}\nStatus: ${statusText}\nAssessed on: ${selectedFeature.date || '2024-01-01'}\nDesignated by: ${selectedFeature.designation_authority || 'IAU / Regulatory Framework'}\nState responsible: ${stateResp}\nDispute status: ${disputeText}\nRelevant legal instrument: ${legalInstrumentText}\n\nPLAIN LANGUAGE SUMMARY\n${summaryText}\n\nFOOTER\nAbsence from this report does not mean an area is free of constraint. This report is a rendering of the current record, not a legal determination.`;
+
+            const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report - ${selectedFeature.name}</title>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 24px; background: #080c18; color: #e2e8f0; line-height: 1.5; }
+.report-container { max-width: 800px; margin: 0 auto; background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+.report-actions { display: flex; gap: 12px; margin-bottom: 20px; }
+.report-btn { padding: 8px 16px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
+.report-btn:hover { background: #1d4ed8; }
+h1 { font-size: 1.5rem; margin-top: 0; color: #93c5fd; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+.map-capture { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; border: 1px solid #334155; margin-bottom: 20px; }
+.headline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #1e293b; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+.field-full { grid-column: 1 / -1; }
+.field-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+.field-value { font-size: 0.95rem; color: #f8fafc; }
+.section-title { font-size: 1.1rem; color: #93c5fd; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+.audit-list { display: flex; flex-direction: column; gap: 10px; }
+.audit-item { display: flex; flex-direction: column; padding: 8px 12px; background: #1e293b; border-radius: 6px; }
+.summary-box { background: #1e293b; border-left: 4px solid #2563eb; padding: 14px; border-radius: 0 6px 6px 0; margin-top: 12px; font-size: 0.95rem; }
+.honesty-footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #334155; font-size: 0.8rem; color: #64748b; text-align: center; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="report-container">
+    <div class="report-actions">
+        <button class="report-btn" onclick="window.print()">Print</button>
+        <button class="report-btn" onclick="copyText()">Copy</button>
+    </div>
+    <h1>${selectedFeature.name} - ${categoryName}</h1>
+    <img class="map-capture" src="${canvasImg}" alt="Map Capture">
+
+    <div class="headline-grid">
+        <div>
+            <div class="field-label">Name</div>
+            <div class="field-value">${selectedFeature.name}</div>
+        </div>
+        <div>
+            <div class="field-label">Category</div>
+            <div class="field-value">${categoryName}</div>
+        </div>
+        <div>
+            <div class="field-label">Tier</div>
+            <div class="field-value">Tier ${tierNum}</div>
+        </div>
+        <div class="field-full">
+            <div class="field-label">What that means</div>
+            <div class="field-value">${tierText}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Record Audit Trail</div>
+    <div class="audit-list">
+        <div class="audit-item">
+            <div class="field-label">Source</div>
+            <div class="field-value">${selectedFeature.source || 'IAU Gazetteer / Scientific Literature'}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Evidence</div>
+            <div class="field-value">${evidenceText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Status</div>
+            <div class="field-value">${statusText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Assessed on</div>
+            <div class="field-value">${selectedFeature.date || '2024-01-01'}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Designated by</div>
+            <div class="field-value">${selectedFeature.designation_authority || 'IAU / Regulatory Framework'}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">State responsible</div>
+            <div class="field-value">${stateResp}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Dispute status</div>
+            <div class="field-value">${disputeText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Relevant legal instrument</div>
+            <div class="field-value">${legalInstrumentText}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Plain Language Summary</div>
+    <div class="summary-box">
+        ${summaryText}
+    </div>
+
+    <div class="honesty-footer">
+        Absence from this report does not mean an area is free of constraint. This report is a rendering of the current record, not a legal determination.
+    </div>
+</div>
+<script>
+function copyText() {
+    const text = ${JSON.stringify(textBlockToCopy)};
+    navigator.clipboard.writeText(text).then(() => {
+        console.log('Report copied');
+    }).catch(err => {
+        console.error('Failed to copy', err);
+    });
+}
+<\/script>
+</body>
+</html>`;
+
+            const reportWin = window.open('', '_blank', 'width=900,height=900');
+            if (reportWin) {
+                reportWin.document.write(reportHtml);
+                reportWin.document.close();
+
+                const checkClosed = setInterval(() => {
+                    if (reportWin.closed) {
+                        clearInterval(checkClosed);
+                        unfreezeMap();
+                    }
+                }, 500);
+            }
+        }
+
+        if (popupReportBtn) {
+            popupReportBtn.addEventListener('click', openReportWindow);
+        }
+
         // --- Initialize ---
+
+        // Collapsible Governance Header
+        const govHeader = document.getElementById('governance-header');
+        const govBody = document.getElementById('governance-body');
+        const govArrow = document.getElementById('governance-arrow');
+        if (govHeader && govBody && govArrow) {
+            govHeader.addEventListener('click', () => {
+                const isHidden = govBody.style.display === 'none' || govBody.style.display === '';
+                govBody.style.display = isHidden ? 'block' : 'none';
+                govArrow.style.transform = isHidden ? 'rotate(90deg)' : 'none';
+            });
+        }
 
         // Governance Toggle Event Listeners
         if (assessmentStatusToggle) {
             assessmentStatusToggle.addEventListener('change', (e) => {
                 isAssessmentStatusMode = e.target.checked;
-                buildLayers();
                 updateVisibility(activeLayers);
             });
         }
         if (opActivityToggle) {
             opActivityToggle.addEventListener('change', (e) => {
                 isOpActivityEnabled = e.target.checked;
-                buildLayers();
                 updateVisibility(activeLayers);
             });
         }
         if (dynamicHarmsToggle) {
             dynamicHarmsToggle.addEventListener('change', (e) => {
                 isDynamicHarmsEnabled = e.target.checked;
-                buildLayers();
+                const ctrls = document.getElementById('dynamic-harms-controls');
+                if (ctrls) ctrls.style.display = isDynamicHarmsEnabled ? 'block' : 'none';
                 updateVisibility(activeLayers);
             });
         }
+        const harmPsiCb = document.getElementById('harm-psi');
+        const harmContamCb = document.getElementById('harm-contamination');
+        const harmEmiCb = document.getElementById('harm-emi');
+        if (harmPsiCb) harmPsiCb.addEventListener('change', (e) => { harmPsiEnabled = e.target.checked; updateVisibility(activeLayers); });
+        if (harmContamCb) harmContamCb.addEventListener('change', (e) => { harmContamEnabled = e.target.checked; updateVisibility(activeLayers); });
+        if (harmEmiCb) harmEmiCb.addEventListener('change', (e) => { harmEmiEnabled = e.target.checked; updateVisibility(activeLayers); });
+
         if (disputesToggle) {
             disputesToggle.addEventListener('change', (e) => {
                 isDisputesEnabled = e.target.checked;
-                buildLayers();
                 updateVisibility(activeLayers);
             });
         }
@@ -3494,6 +3898,13 @@
         layersToggle.classList.remove('visible');
         showMessage('📐 Click "Plan" to plan a site at your current camera location', 'info');
         setTimeout(() => showMessage('', 'hidden'), 5000);
+        window.FEATURES = FEATURES;
+        window.showFeaturePopup = showFeaturePopup;
+        window.hideFeaturePopup = hideFeaturePopup;
+        window.openReportWindow = openReportWindow;
+        window.unfreezeMap = unfreezeMap;
+        Object.defineProperty(window, 'isMapFrozen', { get: () => isMapFrozen });
+
         console.log('Lunar Constraint Map with Camera-Based Planning and Curved Discs initialized.');
     </script>
 </body>
