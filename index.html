@@ -1036,13 +1036,21 @@
                     </ul>
                 </div>
                 <div class="help-tab-pane" id="tab-layers">
-                    <h3>Layers Panel</h3>
+                    <h3>Layers & Governance Overlay Panel</h3>
+                    <p>The layers panel provides resource filtering and master governance overlays for regulatory & technical evaluation:</p>
                     <ul>
-                        <li><strong>Global Checkbox:</strong> Toggle all layers</li>
-                        <li><strong>Category Accordion:</strong> Click to expand/collapse</li>
-                        <li><strong>Discs Toggle:</strong> Show/hide 3D discs per category</li>
-                        <li><strong>Layer Items:</strong> Click arrow to expand individual features</li>
-                        <li><strong>Planning Section:</strong> Shows user-added sites with delete controls and tier badges</li>
+                        <li><strong>Master Governance Overlays:</strong>
+                            <ul>
+                                <li><strong>⚖️ Assessment Status Mode:</strong> Recolors features by confidence status (Unassessed: gray/dashed, Under Assessment: amber/provisional, Assessed Open: green, Assessed Protected: red). Displays provisional protection notices for active review windows.</li>
+                                <li><strong>🚀 Operational Activity Layer:</strong> Displays planned and active lunar missions, surface operating radii, and triggers dynamic Article IX spatial overlap alerts when footprints cross.</li>
+                                <li><strong>⚠️ Dynamic Harms Layer (Computed):</strong> Computes procedural footprints for Plume Surface Interaction (PSI-v1.2), Volatile Contamination (CONTAM-v1.0), and Transient EMI (EMI-v1.1) attached to operating assets.</li>
+                                <li><strong>⚔️ Disputes, Salience & Recency:</strong> Highlights challenged designations with hatched textures, shows dispute register entries, adjusts visual weight by evidence grade (A vs C), and flags status updates within 2 years.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Global Checkbox:</strong> Toggle all resource layers on or off simultaneously without resetting governance modes.</li>
+                        <li><strong>Category Accordion:</strong> Expand or collapse resource categories (Physical, Extractable, Spatial, Environmental, Intangible).</li>
+                        <li><strong>Discs Toggle:</strong> Toggle visual 3D surface discs for each category independently.</li>
+                        <li><strong>Planning Section:</strong> Manage custom user-planned sites with real-time OST conflict analysis.</li>
                     </ul>
                 </div>
                 <div class="help-tab-pane" id="tab-planning">
