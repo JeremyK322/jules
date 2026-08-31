@@ -2468,8 +2468,8 @@
                     tags: feature.tags || [],
                     feature
                 };
-                featureActiveState.set(feature.id, false);
-                featureEnabledState.set(feature.id, false);
+                if (!featureActiveState.has(feature.id)) featureActiveState.set(feature.id, false);
+                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, false);
 
                 if (currentMoon) {
                     if (discObject) currentMoon.add(discObject);
@@ -2490,7 +2490,7 @@
             }
 
             buildLayerUI();
-            updateVisibility(new Set());
+            updateVisibility(activeLayers);
             updateGlobalToggle();
             renderUserSites();
             updateUserSiteVisibility();
@@ -2516,10 +2516,9 @@
 
         function buildLayerUI() {
             layerList.innerHTML = '';
-            activeLayers.clear();
 
             for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
-                categoryDiscState.set(catName, true);
+                if (!categoryDiscState.has(catName)) categoryDiscState.set(catName, true);
                 const catDiv = document.createElement('div');
                 catDiv.className = 'category';
                 const header = document.createElement('div');
@@ -2529,7 +2528,7 @@
                 arrow.textContent = '>';
                 const catCheck = document.createElement('input');
                 catCheck.type = 'checkbox';
-                catCheck.checked = false;
+                catCheck.checked = layerKeys.every(k => activeLayers.has(k));
                 catCheck.dataset.category = catName;
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'cat-name';
@@ -2550,7 +2549,7 @@
                 discToggle.title = 'Show/hide discs for this category';
                 const discCheck = document.createElement('input');
                 discCheck.type = 'checkbox';
-                discCheck.checked = true;
+                discCheck.checked = categoryDiscState.get(catName) ?? true;
                 discCheck.dataset.categoryDisc = catName;
                 const discLabel = document.createElement('span');
                 discLabel.textContent = 'Discs';
@@ -2581,7 +2580,7 @@
 
                     const cb = document.createElement('input');
                     cb.type = 'checkbox';
-                    cb.checked = false;
+                    cb.checked = activeLayers.has(layerKey);
                     cb.dataset.layerKey = layerKey;
                     cb.dataset.category = catName;
 
@@ -2612,7 +2611,7 @@
                         featureItem.className = 'feature-item';
                         const featureCheck = document.createElement('input');
                         featureCheck.type = 'checkbox';
-                        featureCheck.checked = false;
+                        featureCheck.checked = featureEnabledState.get(feature.id) ?? activeLayers.has(layerKey);
                         featureCheck.dataset.featureId = feature.id;
                         featureCheck.dataset.layerKey = layerKey;
                         featureCheck.addEventListener('change', (e) => {
