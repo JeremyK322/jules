@@ -668,6 +668,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "political",
       "crewed"
@@ -696,6 +697,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "crewed"
     ],
@@ -723,6 +725,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "crewed"
     ],
@@ -750,6 +753,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "crewed"
     ],
@@ -777,6 +781,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "crewed"
     ],
@@ -804,6 +809,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "crewed"
     ],
@@ -831,6 +837,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Space Program Documentation",
@@ -857,6 +864,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Space Program Documentation",
@@ -883,6 +891,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
@@ -909,6 +918,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
@@ -935,6 +945,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
@@ -961,6 +972,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
@@ -987,6 +999,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
@@ -1013,6 +1026,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
@@ -1039,6 +1053,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
@@ -1065,6 +1080,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
@@ -1091,6 +1107,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
@@ -1117,6 +1134,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
@@ -1143,6 +1161,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "CNSA Official Mission Briefing",
@@ -1169,6 +1188,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "political"
     ],
@@ -1196,6 +1216,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "CNSA Official Mission Briefing",
@@ -1223,6 +1244,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Program Office",
@@ -1249,6 +1271,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "political"
     ],
@@ -1276,6 +1299,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "JAXA Press Release",
@@ -1303,6 +1327,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
@@ -1330,6 +1355,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
@@ -1356,6 +1382,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "heritage",
       "political"
     ],
@@ -1383,6 +1410,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage",
       "political"
     ],
@@ -1410,6 +1438,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "NASA Mission History",
@@ -1436,6 +1465,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage",
       "water_ice",
       "science_interest"
@@ -1464,6 +1494,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "ISRO Public Report",
@@ -1490,6 +1521,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "Roscosmos Press Release",
@@ -1517,6 +1549,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "ispace Flight Evaluation Report",
@@ -1544,6 +1577,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "ispace Flight Evaluation Report",
@@ -1571,6 +1605,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "Astrobotic Flight Operations",
@@ -1598,6 +1633,7 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "SpaceIL Mission Analysis",
@@ -1624,6 +1660,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "ESA Science Operations",
@@ -1650,6 +1687,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "NASA GRAIL Operations",
@@ -1676,6 +1714,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "impact",
       "heritage"
     ],
     "source": "ISRO Mission Report",
@@ -2244,6 +2283,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "operational_activity"
     ],
     "source": "NASA Artemis III Candidate Landing Regions Announcement (2022/2024)",
@@ -2270,6 +2310,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "operational_activity"
     ],
     "source": "CNSA / CLEP Lunar Exploration Mission Reports (2023/2024)",
@@ -2296,6 +2337,7 @@ export const FEATURES = [
       9
     ],
     "tags": [
+      "landing",
       "operational_activity"
     ],
     "source": "NASA Commercial Lunar Payload Services (CLPS) Manifest",
