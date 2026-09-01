@@ -1117,7 +1117,8 @@
                         <li><strong>Load GLB:</strong> Load custom 3D lunar mesh</li>
                         <li><strong>Reset View:</strong> Reset camera position</li>
                         <li><strong>Art. VI State Mode:</strong> Color features by responsible State Party</li>
-                        <li><strong>Info Debug Panel:</strong> Show/hide telemetry HUD</li>
+                        <li><strong>Surface Click Selection:</strong> Enable/disable clicking directly on the Moon surface to select features and open report dialogs (Default: OFF)</li>
+                        <li><strong>Info Debug Panel:</strong> Show/hide camera distance & debug info</li>
                         <li><strong>Lock N/S Pole:</strong> Restrict camera to equatorial plane</li>
                         <li><strong>Auto-rotate:</strong> Continuous globe rotation</li>
                         <li><strong>Glow Opacity:</strong> Adjust feature disc transparency</li>
@@ -1126,18 +1127,19 @@
                 </div>
                 <div class="help-tab-pane" id="tab-layers">
                     <h3>Layers & Governance Overlay Panel</h3>
-                    <p>The layers panel provides resource filtering and master governance overlays for regulatory & technical evaluation:</p>
+                    <p>The layers panel provides resource category filtering, orbit navigation, and master governance overlays for regulatory & technical evaluation:</p>
                     <ul>
                         <li><strong>Master Governance Overlays:</strong>
                             <ul>
-                                <li><strong>️ Assessment Status Mode:</strong> Recolors features by confidence status (Unassessed: gray/dashed, Under Assessment: amber/provisional, Assessed Open: green, Assessed Protected: red). Displays provisional protection notices for active review windows.</li>
-                                <li><strong> Operational Activity Layer:</strong> Displays planned and active lunar missions, surface operating radii, and triggers dynamic Article IX spatial overlap alerts when footprints cross.</li>
-                                <li><strong>️ Dynamic Harms Layer (Computed):</strong> Computes procedural footprints for Plume Surface Interaction (PSI-v1.2), Volatile Contamination (CONTAM-v1.0), and Transient EMI (EMI-v1.1) attached to operating assets.</li>
-                                <li><strong>️ Disputes, Salience & Recency:</strong> Highlights challenged designations with hatched textures, shows dispute register entries, adjusts visual weight by evidence grade (A vs C), and flags status updates within 2 years.</li>
+                                <li><strong>️ Assessment Status & Provisional Mode:</strong> Renders map confidence into 4 states (Unassessed, Under Assessment, Assessed Open, Assessed Protected) with dates. Sites under active review carry provisional protection notices requiring public justification before proceeding.</li>
+                                <li><strong> Operational Activity Layer:</strong> Displays planned and active lunar surface missions, footprints, and triggers dynamic Article IX spatial overlap alerts when operational radii cross.</li>
+                                <li><strong>️ Dynamic Harms Layer (Computed):</strong> Computes procedural environmental footprints for Plume Surface Interaction (PSI-v1.2), Volatile Contamination (CONTAM-v1.0), and Transient EMI (EMI-v1.1) attached to operating assets.</li>
+                                <li><strong>️ Disputes, Salience & Recency:</strong> Highlights challenged designations with hatched textures, shows dispute register entries with deadlines, adjusts visual weight by evidence grade (A vs C), and flags status updates within 2 years.</li>
                             </ul>
                         </li>
+                        <li><strong>Orbit Feature Navigation:</strong> Click any orbit feature (e.g. Gateway / NRHO Orbit) in the layer menu to frame the full orbital trajectory at distance 6.500, highlight orbital satellites, and generate reports without requiring surface Lat/Lon.</li>
                         <li><strong>Global Checkbox:</strong> Toggle all resource layers on or off simultaneously without resetting governance modes.</li>
-                        <li><strong>Category Accordion:</strong> Expand or collapse resource categories (Physical, Extractable, Spatial, Environmental, Intangible).</li>
+                        <li><strong>Category Accordion:</strong> Expand or collapse resource categories (Physical, Extractable, Spatial, Environmental, Heritage, Intangible).</li>
                         <li><strong>Discs Toggle:</strong> Toggle visual 3D surface discs for each category independently.</li>
                         <li><strong>Planning Section:</strong> Manage custom user-planned sites with real-time OST conflict analysis.</li>
                     </ul>
@@ -1200,6 +1202,13 @@
             <div class="toggle">
                 <span class="toggle-label" id="state-mode-label" style="color:#77ccff;">OFF</span>
                 <div class="toggle-switch" id="state-mode-toggle"><div class="slider"></div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="label">Surface Click Selection</span>
+            <div class="toggle">
+                <span class="toggle-label" id="surface-click-label">OFF</span>
+                <div class="toggle-switch" id="surface-click-toggle"><div class="slider"></div></div>
             </div>
         </div>
         <div class="settings-item">
@@ -1267,6 +1276,8 @@
         const lockLabel = document.getElementById('lock-label');
         const stateModeToggle = document.getElementById('state-mode-toggle');
         const stateModeLabel = document.getElementById('state-mode-label');
+        const surfaceClickToggle = document.getElementById('surface-click-toggle');
+        const surfaceClickLabel = document.getElementById('surface-click-label');
         const stateLegendPanel = document.getElementById('state-legend-panel');
         const stateLegendList = document.getElementById('state-legend-list');
         const infoDebugToggle = document.getElementById('info-debug-toggle');
@@ -1299,6 +1310,7 @@
         const clearUserSitesBtn = document.getElementById('clear-user-sites');
 
         let isStateModeActive = false;
+        let isSurfaceClickSelectionActive = false;
         let isInfoDebugActive = false;
         let isCrosshairVisible = false;
         let pendingSiteData = null;
@@ -2047,6 +2059,7 @@
 
                     const geom = feature.geometry;
                     const type = geom ? geom.type : 'point';
+                    if (type === 'orbit') continue;
                     let distKm = 0;
                     let overlaps = false;
                     if (type === 'hemisphere') {
@@ -2057,16 +2070,6 @@
                         if (hPos.dot(curPos) > 0) {
                             overlaps = true;
                             distKm = distanceBetween(lat, lon, hLat, hLon);
-                        }
-                    } else if (type === 'orbit') {
-                        const entry = featureObjects[feature.id];
-                        if (entry && entry.satellite && entry.satellite.group) {
-                            const satLatLon = positionToLatLon(entry.satellite.group.position);
-                            distKm = distanceBetween(lat, lon, satLatLon.lat, satLatLon.lon);
-                            if (distKm < 800) overlaps = true;
-                        } else {
-                            distKm = 500;
-                            overlaps = true;
                         }
                     } else {
                         const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
@@ -2656,8 +2659,12 @@
 
                         featureItem.addEventListener('click', (e) => {
                             if (e.target.type === 'checkbox') return;
-                            if (typeof feature.lat === 'number' && typeof feature.lon === 'number') {
+                            if (feature.geometry && feature.geometry.type === 'orbit') {
+                                flyToOrbit(feature);
+                                showFeaturePopup(feature);
+                            } else if (typeof feature.lat === 'number' && typeof feature.lon === 'number') {
                                 flyToFeatureLocation(feature.lat, feature.lon);
+                                showFeaturePopup(feature);
                             }
                         });
 
@@ -3127,6 +3134,18 @@
             setTimeout(() => showMessage('', 'hidden'), 1800);
         });
 
+        function updateSurfaceClickUI() {
+            surfaceClickToggle.classList.toggle('on', isSurfaceClickSelectionActive);
+            surfaceClickLabel.textContent = isSurfaceClickSelectionActive ? 'ON' : 'OFF';
+        }
+        surfaceClickToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isSurfaceClickSelectionActive = !isSurfaceClickSelectionActive;
+            updateSurfaceClickUI();
+            showMessage(isSurfaceClickSelectionActive ? 'Surface Click Selection Enabled' : 'Surface Click Selection Disabled', 'info');
+            setTimeout(() => showMessage('', 'hidden'), 1800);
+        });
+
         function updateInfoDebugUI() {
             infoDebugToggle.classList.toggle('on', isInfoDebugActive);
             infoDebugLabel.textContent = isInfoDebugActive ? 'ON' : 'OFF';
@@ -3279,6 +3298,7 @@
 
         function handleCanvasClick(event) {
             if (isMapFrozen) return;
+            if (!isSurfaceClickSelectionActive) return;
             if (event.target !== renderer.domElement) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
@@ -3291,10 +3311,14 @@
             let foundFeature = null;
             for (const intersect of intersects) {
                 let obj = intersect.object;
+                if (!obj.visible) continue;
                 while (obj) {
                     if (obj.userData && obj.userData.featureId) {
-                        foundFeature = FEATURES.find(f => f.id === obj.userData.featureId);
-                        if (foundFeature) break;
+                        const feat = FEATURES.find(f => f.id === obj.userData.featureId);
+                        if (feat && featureActiveState.get(feat.id)) {
+                            foundFeature = feat;
+                            break;
+                        }
                     }
                     obj = obj.parent;
                 }
@@ -3308,6 +3332,7 @@
                 let minDistance = Infinity;
                 for (const f of FEATURES) {
                     if (f.geometry && f.geometry.type === 'orbit') continue;
+                    if (!featureActiveState.get(f.id)) continue;
                     const radius = f.radius_km || DEFAULT_RADIUS_KM;
                     const dist = distanceBetween(lat, lon, f.lat, f.lon);
                     if (dist < Math.max(radius, 150) && dist < minDistance) {
@@ -3401,21 +3426,32 @@
 
                 summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Operators planning activities within or adjacent to this zone must evaluate potential interference and observe international coordination guidelines. Authorization and continuing supervision remain the responsibility of the designated state party pursuant to Article VI of the Outer Space Treaty.`;
             } else {
-                const latStr = currentTelemetryLat >= 0 ? `${currentTelemetryLat.toFixed(2)}° N` : `${(-currentTelemetryLat).toFixed(2)}° S`;
-                const lonStr = lonToDisplay(currentTelemetryLon);
-                reportName = `Open Lunar Surface (${latStr}, ${lonStr})`;
-                categoryName = 'Unassessed Area';
-                tierNum = 3;
-                tierText = 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
-                sourceText = 'Lunar Telemetry Location Survey';
-                evidenceText = 'Not graded (Unassessed surface point)';
-                statusText = 'Unassessed';
-                dateText = 'N/A';
-                authText = 'N/A';
-                stateResp = 'None (Article II OST: Not subject to national appropriation)';
+                const isOrbitReport = targetFeature && targetFeature.geometry && targetFeature.geometry.type === 'orbit';
+                if (isOrbitReport) {
+                    reportName = `${targetFeature.name} (Orbital Domain)`;
+                } else {
+                    const latStr = currentTelemetryLat >= 0 ? `${currentTelemetryLat.toFixed(2)}° N` : `${(-currentTelemetryLat).toFixed(2)}° S`;
+                    const lonStr = lonToDisplay(currentTelemetryLon);
+                    reportName = `Open Lunar Surface (${latStr}, ${lonStr})`;
+                }
+                categoryName = targetFeature ? getCategoryLabel(targetFeature) : 'Unassessed Area';
+                tierNum = targetFeature ? (targetFeature.tier || 3) : 3;
+                tierText = tierNum === 1
+                    ? 'Tier 1: high protection, activity requires coordination and can be challenged.'
+                    : tierNum === 2
+                    ? 'Tier 2: coordination required before proceeding.'
+                    : 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
+                sourceText = targetFeature ? (targetFeature.source || 'IAU / Mission Catalog') : 'Lunar Telemetry Location Survey';
+                evidenceText = targetFeature ? (targetFeature.evidence_grade === 'A' ? 'Grade A' : 'Grade B') : 'Not graded (Unassessed surface point)';
+                statusText = targetFeature ? (targetFeature.review_status ? targetFeature.review_status.toUpperCase() : 'Assessed') : 'Unassessed';
+                dateText = targetFeature ? (targetFeature.date || 'Pending') : 'N/A';
+                authText = targetFeature ? (targetFeature.designation_authority || 'N/A') : 'N/A';
+                stateResp = targetFeature ? (targetFeature.state || 'None specified') : 'None (Article II OST: Not subject to national appropriation)';
                 disputeText = 'No active disputes recorded';
                 legalInstrumentText = 'Outer Space Treaty Article IX general due regard principles';
-                summaryText = `This location represents unassessed open lunar surface at coordinates ${latStr}, ${lonStr}. No static resource constraints or registered designations are recorded for this point in the current dataset. Operators are advised to perform local site verification and adhere to standard Article IX due regard principles.`;
+                summaryText = targetFeature
+                    ? `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics.`
+                    : `This location represents unassessed open lunar surface. Operators are advised to perform local site verification and adhere to standard Article IX due regard principles.`;
             }
 
             const eventDateLine = eventDateText ? `\nEvent date: ${eventDateText}` : "";
@@ -3617,13 +3653,14 @@ function copyText() {
         // --- Smooth Camera Navigation ---
         let cameraAnimation = null;
 
-        function flyToFeatureLocation(lat, lon) {
+        function flyToFeatureLocation(lat, lon, targetDistance = null) {
             const currentDist = camera.position.distanceTo(controls.target);
+            const targetDist = targetDistance || currentDist;
             const targetNormal = latLonToPosition(lat, lon, 1.0).normalize();
             const startVec = camera.position.clone().normalize();
             const startQuaternion = camera.quaternion.clone();
 
-            const targetPos = targetNormal.clone().multiplyScalar(currentDist);
+            const targetPos = targetNormal.clone().multiplyScalar(targetDist);
             const dummyCamera = camera.clone();
             dummyCamera.position.copy(targetPos);
             dummyCamera.lookAt(controls.target);
@@ -3638,8 +3675,24 @@ function copyText() {
                 duration: duration,
                 startQuaternion: startQuaternion,
                 endQuaternion: endQuaternion,
-                currentDist: currentDist
+                startDist: currentDist,
+                targetDist: targetDist
             };
+        }
+
+        function flyToOrbit(feature) {
+            // Highlight the orbit feature
+            if (featureObjects[feature.id]) {
+                const entry = featureObjects[feature.id];
+                if (entry.discObject) entry.discObject.visible = true;
+                if (entry.satellite) {
+                    entry.satellite.group.visible = true;
+                    entry.satellite.label.visible = true;
+                }
+            }
+            // Zoom out to distance 6.5 to frame full orbital path
+            const currentLatLon = positionToLatLon(camera.position);
+            flyToFeatureLocation(currentLatLon.lat, currentLatLon.lon, 6.5);
         }
 
         function animate() {
@@ -3659,8 +3712,9 @@ function copyText() {
                 camera.quaternion.copy(q);
 
                 // Recompute position relative to origin based on orientation
+                const currentAnimatedDist = THREE.MathUtils.lerp(cameraAnimation.startDist, cameraAnimation.targetDist, easeProgress);
                 const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion);
-                camera.position.copy(forward.multiplyScalar(cameraAnimation.currentDist));
+                camera.position.copy(forward.multiplyScalar(currentAnimatedDist));
 
                 if (progress >= 1.0) {
                     cameraAnimation = null;
