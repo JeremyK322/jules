@@ -1999,7 +1999,7 @@
             }
         }
 
-        const activeLayers = new Set(Object.keys(LAYER_DEFS));
+        const activeLayers = new Set();
         const categoryDiscState = new Map();
         const featureActiveState = new Map();
         const featureEnabledState = new Map();
@@ -2472,7 +2472,7 @@
                     feature
                 };
                 if (!featureActiveState.has(feature.id)) featureActiveState.set(feature.id, false);
-                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, true);
+                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, false);
 
                 if (currentMoon) {
                     if (discObject) currentMoon.add(discObject);
@@ -2531,7 +2531,7 @@
                 arrow.textContent = '>';
                 const catCheck = document.createElement('input');
                 catCheck.type = 'checkbox';
-                catCheck.checked = layerKeys.every(k => activeLayers.has(k));
+                catCheck.checked = layerKeys.length > 0 && layerKeys.every(k => activeLayers.has(k));
                 catCheck.dataset.category = catName;
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'cat-name';
@@ -2614,7 +2614,7 @@
                         featureItem.className = 'feature-item';
                         const featureCheck = document.createElement('input');
                         featureCheck.type = 'checkbox';
-                        featureCheck.checked = featureEnabledState.get(feature.id) ?? activeLayers.has(layerKey);
+                        featureCheck.checked = featureEnabledState.get(feature.id) ?? false;
                         featureCheck.dataset.featureId = feature.id;
                         featureCheck.dataset.layerKey = layerKey;
                         featureCheck.addEventListener('change', (e) => {
