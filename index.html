@@ -381,56 +381,11 @@
         }
         .slider-value { min-width: 32px; text-align: center; color: #ddd; font-size: 0.9rem; }
 
-        /* Info Display (bottom-right) */
-        #info-display {
-            position: absolute; bottom: 24px; right: 24px;
-            color: rgba(255,255,255,0.75);
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            padding: 10px 16px; border-radius: 8px; font-size: 0.85rem;
-            font-family: 'Courier New', monospace; z-index: 10;
-            border: 1px solid rgba(255,255,255,0.08); line-height: 1.7; min-width: 140px;
-            user-select: none; display: none;
-        }
-        #info-display.visible { display: block; }
-        #info-display-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        #info-display-header .title {
-            font-weight: bold;
-            color: #99b;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-        }
-        #info-toggle-btn {
-            background: none;
-            border: none;
-            color: #99b;
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 0 4px;
-            line-height: 1;
-            font-family: monospace;
-            font-weight: bold;
-        }
-        #info-toggle-btn:hover { color: #fff; }
-        #info-display-body { display: block; }
-        #info-display.collapsed #info-display-body { display: none; }
-        #info-display.collapsed #info-display-header {
-            margin-bottom: 0; padding-bottom: 0; border-bottom: none;
-        }
-        #info-display .label { color: #99b; margin-right: 8px; display: inline-block; min-width: 44px; }
-        #info-display .value { color: #dde; font-weight: bold; }
-
-        /* Centre overlap display (bottom-left telemetry HUD) */
+        /* Lunar Telemetry HUD (bottom-right) */
         #centre-overlap-display {
             position: absolute;
             bottom: 24px;
-            left: 24px;
+            right: 24px;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(8, 12, 24, 0.88);
             backdrop-filter: blur(10px);
@@ -857,9 +812,7 @@
             #planning-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 105px; }
             #help-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 185px; }
             #settings-panel { right: 10px; top: 50px; min-width: 160px; padding: 12px 14px; }
-            #info-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 110px; }
-            #info-display .label { min-width: 32px; }
-            #centre-overlap-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; left: 16px; min-width: 100px; max-width: 200px; }
+            #centre-overlap-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 100px; max-width: 200px; }
             #centre-overlap-display .label { min-width: 32px; }
             #layers-toggle { top: 10px; left: 10px; font-size: 0.85rem; padding: 6px 10px; }
             .planning-body .form-row { flex-direction: column; gap: 0; }
@@ -968,20 +921,6 @@
         <button id="telemetry-report-btn" class="popup-report-btn" style="margin-top:10px;width:100%;">Generate Report</button>
     </div>
 
-    <!-- Info display -->
-    <div id="info-display">
-        <div id="info-display-header">
-            <span class="title">INFO</span>
-            <button id="info-toggle-btn" title="Collapse/Expand">[-]</button>
-        </div>
-        <div id="info-display-body">
-            <div><span class="label">Dist</span><span class="value" id="dist">0.00</span></div>
-            <div><span class="label">Lat</span><span class="value" id="lat-display">0.00 deg</span></div>
-            <div><span class="label">Lon</span><span class="value" id="lon-display">0.00 deg</span></div>
-            <div><span class="label">Sens</span><span class="value" id="sens-display">1.00</span></div>
-            <div><span class="label">Rot</span><span class="value" id="rot-state">OFF</span></div>
-        </div>
-    </div>
 
     <!-- State Legend Panel -->
     <div id="state-legend-panel">
@@ -1120,7 +1059,6 @@
                         <li><strong>Reset View:</strong> Reset camera position</li>
                         <li><strong>Art. VI State Mode:</strong> Color features by responsible State Party</li>
                         <li><strong>Surface Click Selection:</strong> Enable/disable clicking directly on the Moon surface to select features and open report dialogs (Default: OFF)</li>
-                        <li><strong>Info Debug Panel:</strong> Show/hide camera distance & debug info</li>
                         <li><strong>Lock N/S Pole:</strong> Restrict camera to equatorial plane</li>
                         <li><strong>Auto-rotate:</strong> Continuous globe rotation</li>
                         <li><strong>Glow Opacity:</strong> Adjust feature disc transparency</li>
@@ -1170,17 +1108,11 @@
                 </div>
                 <div class="help-tab-pane" id="tab-info">
                     <h3>Information Panels</h3>
-                    <h4>Bottom-Left Telemetry</h4>
+                    <h4>Bottom-Right Lunar Telemetry HUD</h4>
                     <ul>
-                        <li><strong>LAT/LON:</strong> Coordinates at screen center</li>
-                        <li><strong>Status:</strong> Shows overlapping features at center point</li>
-                    </ul>
-                    <h4>Bottom-Right Info (Debug)</h4>
-                    <ul>
-                        <li><strong>Dist:</strong> Camera distance from Moon center</li>
-                        <li><strong>Lat/Lon:</strong> Camera viewpoint coordinates</li>
-                        <li><strong>Sens:</strong> Dynamic rotation sensitivity</li>
-                        <li><strong>Rot:</strong> Auto-rotation state</li>
+                        <li><strong>LAT / LON:</strong> Coordinates at globe crosshairs (center point)</li>
+                        <li><strong>Feature Status & Overlap:</strong> Evaluates overlapping designations, operational activity footprints, and harm zones at target coordinates</li>
+                        <li><strong>Generate Report:</strong> Captures high-resolution WebGL canvas snapshot and generates a printable audit compliance report</li>
                     </ul>
                 </div>
             </div>
@@ -1211,13 +1143,6 @@
             <div class="toggle">
                 <span class="toggle-label" id="surface-click-label">OFF</span>
                 <div class="toggle-switch" id="surface-click-toggle"><div class="slider"></div></div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <span class="label">Info Debug Panel</span>
-            <div class="toggle">
-                <span class="toggle-label" id="info-debug-label">OFF</span>
-                <div class="toggle-switch" id="info-debug-toggle"><div class="slider"></div></div>
             </div>
         </div>
         <div class="settings-item">
@@ -1282,8 +1207,6 @@
         const surfaceClickLabel = document.getElementById('surface-click-label');
         const stateLegendPanel = document.getElementById('state-legend-panel');
         const stateLegendList = document.getElementById('state-legend-list');
-        const infoDebugToggle = document.getElementById('info-debug-toggle');
-        const infoDebugLabel = document.getElementById('info-debug-label');
         const crosshairToggle = document.getElementById('crosshair-toggle');
         const crosshairLabel = document.getElementById('crosshair-label');
         const crosshairEl = document.getElementById('crosshair');
@@ -1313,17 +1236,11 @@
 
         let isStateModeActive = false;
         let isSurfaceClickSelectionActive = false;
-        let isInfoDebugActive = false;
         let isCrosshairVisible = false;
         let pendingSiteData = null;
         let currentCameraLat = 0;
         let currentCameraLon = 0;
 
-        const distSpan = document.getElementById('dist');
-        const latSpan = document.getElementById('lat-display');
-        const lonSpan = document.getElementById('lon-display');
-        const sensSpan = document.getElementById('sens-display');
-        const rotStateSpan = document.getElementById('rot-state');
         const opacitySlider = document.getElementById('opacity-slider');
         const opacityValue = document.getElementById('opacity-value');
         const layerList = document.getElementById('layer-list');
@@ -1331,8 +1248,7 @@
         const layersToggle = document.getElementById('layers-toggle');
         const layersClose = document.getElementById('layers-close');
         const globalToggle = document.getElementById('global-toggle');
-        const infoDisplay = document.getElementById('info-display');
-        const infoToggleBtn = document.getElementById('info-toggle-btn');
+        const centreOverlapDisplay = document.getElementById('centre-overlap-display');
         const centreLatEl = document.getElementById('centre-lat');
         const centreLonEl = document.getElementById('centre-lon');
         const centreOverlapText = document.getElementById('centre-overlap-text');
@@ -1381,14 +1297,6 @@
         }
 
         // --- Three.js Setup ---
-        let isInfoCollapsed = false;
-        infoToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            isInfoCollapsed = !isInfoCollapsed;
-            infoDisplay.classList.toggle('collapsed', isInfoCollapsed);
-            infoToggleBtn.textContent = isInfoCollapsed ? '[+]' : '[-]';
-        });
-
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050510);
         const INITIAL_CAM_POS = new THREE.Vector3(0, 0.6, 4.5);
@@ -3119,6 +3027,15 @@
 
         resetViewBtn.addEventListener('click', (e) => { e.stopPropagation(); resetView(); });
 
+        function adjustBottomRightPanels() {
+            if (isStateModeActive) {
+                const hudHeight = centreOverlapDisplay.offsetHeight || 160;
+                stateLegendPanel.style.bottom = `${hudHeight + 36}px`;
+            } else {
+                stateLegendPanel.style.bottom = '24px';
+            }
+        }
+
         function updateStateModeUI() {
             stateModeToggle.classList.toggle('on', isStateModeActive);
             stateModeLabel.textContent = isStateModeActive ? 'ON' : 'OFF';
@@ -3147,20 +3064,6 @@
             setTimeout(() => showMessage('', 'hidden'), 1800);
         });
 
-        function updateInfoDebugUI() {
-            infoDebugToggle.classList.toggle('on', isInfoDebugActive);
-            infoDebugLabel.textContent = isInfoDebugActive ? 'ON' : 'OFF';
-            infoDisplay.classList.toggle('visible', isInfoDebugActive);
-            adjustBottomRightPanels();
-        }
-        infoDebugToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            isInfoDebugActive = !isInfoDebugActive;
-            updateInfoDebugUI();
-            showMessage(isInfoDebugActive ? 'Info Debug Panel Enabled' : 'Info Debug Panel Disabled', 'info');
-            setTimeout(() => showMessage('', 'hidden'), 1500);
-        });
-
         function updateCrosshairUI() {
             crosshairToggle.classList.toggle('on', isCrosshairVisible);
             crosshairLabel.textContent = isCrosshairVisible ? 'ON' : 'OFF';
@@ -3175,15 +3078,6 @@
             setTimeout(() => showMessage('', 'hidden'), 1500);
         });
         updateCrosshairUI();
-
-        function adjustBottomRightPanels() {
-            if (isInfoDebugActive && isStateModeActive) {
-                const infoHeight = infoDisplay.offsetHeight || 160;
-                stateLegendPanel.style.bottom = `${infoHeight + 36}px`;
-            } else {
-                stateLegendPanel.style.bottom = '24px';
-            }
-        }
 
         function updateLockUI() {
             const on = isPoleLocked;
@@ -3204,7 +3098,6 @@
             const on = controls.autoRotate;
             rotToggle.classList.toggle('on', on);
             rotLabel.textContent = on ? 'ON' : 'OFF';
-            rotStateSpan.textContent = on ? 'ON' : 'OFF';
         }
         rotToggle.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -3729,7 +3622,6 @@ function copyText() {
             const maxDist = controls.maxDistance;
             const t = Math.max(0, Math.min(1, (dist - controls.minDistance) / (maxDist - controls.minDistance)));
             controls.rotateSpeed = 0.1 + t * 0.9;
-            sensSpan.textContent = controls.rotateSpeed.toFixed(2);
 
             const showLabels = dist < 3.0;
             const cameraDir = camera.position.clone().normalize();
@@ -3941,10 +3833,6 @@ function copyText() {
                     sat.label.visible = false;
                 }
             }
-
-            latSpan.textContent = lat >= 0 ? `${lat.toFixed(2)} deg N` : `${(-lat).toFixed(2)} deg S`;
-            lonSpan.textContent = lonToDisplay(lon);
-            distSpan.textContent = dist.toFixed(3);
 
             renderer.render(scene, camera);
         }
