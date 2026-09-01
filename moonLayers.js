@@ -2560,7 +2560,8 @@ export const CATEGORIES = {
     "impact",
     "orbits",
     "lagrange",
-    "crewed"
+    "crewed",
+    "operational_activity"
   ],
   "Environmental": [
     "psr",

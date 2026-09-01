@@ -1877,7 +1877,7 @@
             ring.computeLineDistances();
 
             // Label
-            const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24);
+            const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24, '(PLANNED)');
             const labelMat = new THREE.SpriteMaterial({
                 map: labelTex,
                 transparent: true,
@@ -1900,7 +1900,7 @@
             return { group, disc, ring, label };
         }
 
-        function createLabelTexture(text, fontSize = 32) {
+        function createLabelTexture(text, fontSize = 32, subtext = null) {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 96;
@@ -1912,13 +1912,16 @@
             ctx.shadowColor = 'rgba(0,0,0,0.9)';
             ctx.shadowBlur = 20;
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            const textY = subtext ? canvas.height / 2 - 8 : canvas.height / 2;
+            ctx.fillText(text, canvas.width/2, textY);
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(text, canvas.width/2, canvas.height/2);
-            ctx.font = `${fontSize * 0.4}px Arial, sans-serif`;
-            ctx.fillStyle = 'rgba(85,255,136,0.6)';
-            ctx.fillText('(PLANNED)', canvas.width/2, canvas.height - 14);
+            ctx.fillText(text, canvas.width/2, textY);
+            if (subtext) {
+                ctx.font = `${fontSize * 0.4}px Arial, sans-serif`;
+                ctx.fillStyle = 'rgba(85,255,136,0.8)';
+                ctx.fillText(subtext, canvas.width/2, canvas.height - 14);
+            }
             const texture = new THREE.CanvasTexture(canvas);
             texture.needsUpdate = true;
             return texture;
@@ -1984,7 +1987,7 @@
             }
         }
 
-        const activeLayers = new Set();
+        const activeLayers = new Set(Object.keys(LAYER_DEFS));
         const categoryDiscState = new Map();
         const featureActiveState = new Map();
         const featureEnabledState = new Map();
@@ -2701,17 +2704,7 @@
 
                 discCheck.addEventListener('change', (e) => {
                     categoryDiscState.set(catName, e.target.checked);
-                    harmMeshes.forEach(mesh => {
-                const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
-                if (!isDynamicHarmsEnabled || !parentActive) {
-                    mesh.visible = false;
-                    return;
-                }
-                if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
-                else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
-                else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
-            });
-            applyDiscVisibility();
+                    applyDiscVisibility();
                 });
 
                 header.addEventListener('click', (e) => {
