@@ -1248,14 +1248,14 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA CLPS Program Office",
-    "note": "Commercial lunar payload lander mission in Mare Crisium.",
+    "note": "First fully successful commercial lunar soft landing in Mare Crisium; operated upright for full ~14-day lunar day.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
     "designation_authority": "Firefly Aerospace / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-01-15"
+    "event_date": "2025-03-02"
   },
   {
     "id": "chandrayaan3",
@@ -1359,14 +1359,14 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
-    "note": "Commercial polar lander mission targeted near Shackleton.",
+    "note": "Commercial polar soft landing in a crater near Mons Mouton; landed on side, mission ended after ~13 hours due to power/thermal issues.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
     "designation_authority": "Intuitive Machines / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-01-01"
+    "event_date": "2025-03-06"
   },
   {
     "id": "change_6",
@@ -1581,14 +1581,14 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "ispace Flight Evaluation Report",
-    "note": "Commercial lunar mission impact coordinates.",
+    "note": "Commercial lunar lander mission; hard impact in Mare Frigoris on 5 June 2025.",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
     "designation_authority": "ispace / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-01-01"
+    "event_date": "2025-06-05"
   },
   {
     "id": "peregrine_impact",
