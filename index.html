@@ -1064,7 +1064,7 @@
     <div id="conflict-modal-overlay">
         <div id="conflict-modal">
             <div class="conflict-header">
-                <span class="title">️ Conflict Assessment Report</span>
+                <span class="title"> Conflict Assessment Report</span>
                 <button class="close-btn" id="conflict-close-btn" title="Close">X</button>
             </div>
             <div class="conflict-body" id="conflict-body-content">
@@ -1131,10 +1131,10 @@
                     <ul>
                         <li><strong>Master Governance Overlays:</strong>
                             <ul>
-                                <li><strong>️ Assessment Status & Provisional Mode:</strong> Renders map confidence into 4 states (Unassessed, Under Assessment, Assessed Open, Assessed Protected) with dates. Sites under active review carry provisional protection notices requiring public justification before proceeding.</li>
+                                <li><strong> Assessment Status & Provisional Mode:</strong> Renders map confidence into 4 states (Unassessed, Under Assessment, Assessed Open, Assessed Protected) with dates. Sites under active review carry provisional protection notices requiring public justification before proceeding.</li>
                                 <li><strong> Operational Activity Layer:</strong> Displays planned and active lunar surface missions, footprints, and triggers dynamic Article IX spatial overlap alerts when operational radii cross.</li>
-                                <li><strong>️ Dynamic Harms Layer (Computed):</strong> Computes procedural environmental footprints for Plume Surface Interaction (PSI-v1.2), Volatile Contamination (CONTAM-v1.0), and Transient EMI (EMI-v1.1) attached to operating assets.</li>
-                                <li><strong>️ Disputes, Salience & Recency:</strong> Highlights challenged designations with hatched textures, shows dispute register entries with deadlines, adjusts visual weight by evidence grade (A vs C), and flags status updates within 2 years.</li>
+                                <li><strong> Dynamic Harms Layer (Computed):</strong> Computes procedural environmental footprints for Plume Surface Interaction (PSI-v1.2), Volatile Contamination (CONTAM-v1.0), and Transient EMI (EMI-v1.1) attached to operating assets.</li>
+                                <li><strong> Disputes, Salience & Recency:</strong> Highlights challenged designations with hatched textures, shows dispute register entries with deadlines, adjusts visual weight by evidence grade (A vs C), and flags status updates within 2 years.</li>
                             </ul>
                         </li>
                         <li><strong>Orbit Feature Navigation:</strong> Click any orbit feature (e.g. Gateway / NRHO Orbit) in the layer menu to frame the full orbital trajectory at distance 6.500, highlight orbital satellites, and generate reports without requiring surface Lat/Lon.</li>
@@ -1607,7 +1607,7 @@
                 analysis.push({
                     article: 'Art. IX',
                     severity: 'HIGH',
-                    message: `️ Site overlaps with ${highTierOverlaps.length} Tier 1 zone(s). Mandatory consultation with affected States required before proceeding.`,
+                    message: ` Site overlaps with ${highTierOverlaps.length} Tier 1 zone(s). Mandatory consultation with affected States required before proceeding.`,
                     details: highTierOverlaps.map(o => `• ${o.name} (${o.distance.toFixed(1)} km overlap)`).join('\n')
                 });
             } else if (mediumTierOverlaps.length > 0) {
@@ -1643,7 +1643,7 @@
                 analysis.push({
                     article: 'Art. VI',
                     severity: 'WARNING',
-                    message: '️ No State Party entered. Art. VI requires a State to authorize and supervise national activities. Please specify a State Party.'
+                    message: ' No State Party entered. Art. VI requires a State to authorize and supervise national activities. Please specify a State Party.'
                 });
             }
 
@@ -1713,23 +1713,23 @@
                     <div style="font-size:0.85rem;color:#99b;">
                         <div> ${newSite.lat.toFixed(4)}°, ${newSite.lon.toFixed(4)}°</div>
                         <div> Radius: ${newSite.radius_km} km</div>
-                        <div>️ Actor: ${newSite.actor || 'Unspecified'}</div>
+                        <div> Actor: ${newSite.actor || 'Unspecified'}</div>
                         ${newSite.state && newSite.state.trim() ? `<div> State: ${newSite.state}</div>` : ''}
-                        <div>️ Tier: ${tierLabel}</div>
+                        <div> Tier: ${tierLabel}</div>
                         <div style="margin-top:6px;font-size:0.8rem;color:#667;">${newSite.description || ''}</div>
                     </div>
                 </div>
                 <div style="margin-bottom:12px;">
                     <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.85rem;">
-                        <span>️ Overlaps: <strong style="color:${overlaps.length > 0 ? '#ffaa55' : '#55ff88'}">${overlaps.length}</strong></span>
-                        <span>️ Tier 1: <strong style="color:${overlaps.filter(o => o.tier === 1).length > 0 ? '#ff5555' : '#55ff88'}">${overlaps.filter(o => o.tier === 1).length}</strong></span>
-                        <span>️ Tier 2: <strong>${overlaps.filter(o => o.tier === 2).length}</strong></span>
-                        <span>️ Tier 3: <strong>${overlaps.filter(o => o.tier === 3).length}</strong></span>
+                        <span> Overlaps: <strong style="color:${overlaps.length > 0 ? '#ffaa55' : '#55ff88'}">${overlaps.length}</strong></span>
+                        <span> Tier 1: <strong style="color:${overlaps.filter(o => o.tier === 1).length > 0 ? '#ff5555' : '#55ff88'}">${overlaps.filter(o => o.tier === 1).length}</strong></span>
+                        <span> Tier 2: <strong>${overlaps.filter(o => o.tier === 2).length}</strong></span>
+                        <span> Tier 3: <strong>${overlaps.filter(o => o.tier === 3).length}</strong></span>
                     </div>
                 </div>
             `;
 
-            html += `<h4 style="color:#55aaff;margin-bottom:8px;">️ OST Analysis</h4>`;
+            html += `<h4 style="color:#55aaff;margin-bottom:8px;"> OST Analysis</h4>`;
             for (const item of analysis) {
                 const severityClass = item.severity === 'HIGH' ? 'severity-high' :
                                     item.severity === 'MEDIUM' || item.severity === 'WARNING' ? 'severity-medium' :
@@ -1766,11 +1766,11 @@
             pendingSiteData = newSite;
 
             if (hasHighSeverity) {
-                conflictConfirmBtn.textContent = '️ Proceed with Caution';
+                conflictConfirmBtn.textContent = ' Proceed with Caution';
                 conflictConfirmBtn.style.background = '#ff5555';
                 conflictConfirmBtn.style.color = '#fff';
             } else if (hasMediumSeverity) {
-                conflictConfirmBtn.textContent = '️ Confirm & Place';
+                conflictConfirmBtn.textContent = ' Confirm & Place';
                 conflictConfirmBtn.style.background = '#ffaa55';
                 conflictConfirmBtn.style.color = '#000';
             } else {
@@ -1812,7 +1812,7 @@
             saveUserSites();
             renderUserSites();
             updateUserSiteVisibility();
-            showMessage('️ Site deleted', 'info');
+            showMessage(' Site deleted', 'info');
             setTimeout(() => showMessage('', 'hidden'), 1500);
         }
 
@@ -1823,7 +1823,7 @@
                 saveUserSites();
                 renderUserSites();
                 updateUserSiteVisibility();
-                showMessage('️ All planned sites cleared', 'info');
+                showMessage(' All planned sites cleared', 'info');
                 setTimeout(() => showMessage('', 'hidden'), 1500);
             }
         }
