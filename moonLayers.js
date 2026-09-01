@@ -10,61 +10,61 @@ export const STATE_DEFS = {
   "USA": {
     "name": "United States",
     "color": "#2b82c9",
-    "flag": "🇺🇸",
+    "flag": "",
     "note": "Article VI national responsibility for state (NASA) and commercial authorized entities (CLPS)."
   },
   "USSR": {
-    "name": "USSR (Historical)",
+    "name": "Russia (successor to USSR under state succession)",
     "color": "#cc0000",
-    "flag": "🛠️",
+    "flag": "",
     "note": "Historical Article VI state responsibility (1959–1991 Soviet lunar program)."
   },
   "Russia": {
     "name": "Russian Federation",
     "color": "#e63946",
-    "flag": "🇷🇺",
+    "flag": "",
     "note": "Post-1991 Article VI state responsibility (Roscosmos)."
   },
   "China": {
     "name": "China (CNSA)",
     "color": "#ffb703",
-    "flag": "🇨🇳",
+    "flag": "",
     "note": "Article VI national responsibility for state agencies (CNSA / CLEP)."
   },
   "India": {
     "name": "India (ISRO)",
     "color": "#fb8500",
-    "flag": "🇮🇳",
+    "flag": "",
     "note": "Article VI national responsibility for state agency (ISRO)."
   },
   "Japan": {
     "name": "Japan (JAXA / Commercial)",
     "color": "#ff4d6d",
-    "flag": "🇯🇵",
+    "flag": "",
     "note": "Article VI national responsibility for state (JAXA) and private licensed operators (ispace)."
   },
   "SouthKorea": {
     "name": "South Korea (KARI)",
     "color": "#00a896",
-    "flag": "🇰🇷",
+    "flag": "",
     "note": "Article VI national responsibility for state agency (KARI)."
   },
   "ESA": {
     "name": "ESA (Member States)",
     "color": "#00b4d8",
-    "flag": "🇪🇺",
+    "flag": "",
     "note": "Intergovernmental organization. Responsibility shared by ESA and member states under Article VI and Article XIII."
   },
   "Israel": {
     "name": "Israel",
     "color": "#48cae4",
-    "flag": "🇮🇱",
+    "flag": "",
     "note": "Article VI national authorization and continuing supervision for non-governmental entity (SpaceIL)."
   },
   "Pakistan": {
     "name": "Pakistan (SUPARCO)",
     "color": "#2a9d8f",
-    "flag": "🇵🇰",
+    "flag": "",
     "note": "Article VI national responsibility for payload operator SUPARCO (joint mission with CNSA)."
   }
 };
@@ -83,7 +83,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Basaltic mare plain formed during Upper Imbrian epoch.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -103,7 +103,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Vast impact basin filled with flooded mare basalt.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -122,7 +122,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Circular lunar mare located within Serenitatis basin.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -141,7 +141,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Isolated lunar mare located in Crisium basin.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -161,7 +161,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Largest lunar mare region on the western edge of near side.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -180,7 +180,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Target basin with concentric multiring scarp system.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -199,7 +199,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Small lunar mare forming central part of Nectaris basin.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -218,7 +218,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Circular mare basin encircled by concentric arcuate rilles.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -237,7 +237,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "One of the few mare regions situated on the lunar far side.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -256,7 +256,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side mare basin displaying high lunar swirl albedo features.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -275,7 +275,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Elongated mare located north of Mare Imbrium.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -294,7 +294,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Broad low-relief mare basin in eastern near side quadrant.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -313,7 +313,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Basaltic plain forming a bay on northwestern Mare Imbrium.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -333,7 +333,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Prominent young impact crater with high-albedo ray system.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -353,7 +353,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Terraced crater wall displaying central peak complex.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -374,7 +374,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Exceptionally bright impact structure on elevated plateau.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
@@ -393,7 +393,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Smooth dark basaltic floor surrounded by jagged rim peaks.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -412,7 +412,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Ancient degraded crater basin in southern lunar highlands.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -431,7 +431,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Rayed impact crater situated between Oceanus Procellarum and Mare Insularum.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -450,7 +450,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Flooded flat-floored impact crater in eastern Mare Imbrium.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -470,7 +470,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side crater featuring dark basalt floor and high central peak.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
@@ -489,7 +489,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side impact crater with prominent bright ray structure.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -509,7 +509,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Large deep far side impact basin.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -529,7 +529,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Rugged mountain range forming southeastern boundary of Mare Imbrium.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -548,7 +548,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Highland mountain wall separating Mare Imbrium and Mare Serenitatis.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -567,7 +567,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Northern mountain range intersected by Vallis Alpes.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -588,11 +588,11 @@ export const FEATURES = [
     "state": null,
     "source": "LRO LOLA / GRAIL Gravity Data",
     "note": "Largest and oldest recognized impact basin on the Moon.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mons_huygens",
@@ -608,7 +608,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Tallest mountain peak massif within Montes Apenninus.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -628,11 +628,11 @@ export const FEATURES = [
     "state": null,
     "source": "Apollo 15 Geological Mapping",
     "note": "Sinuous volcanic rille along edge of Montes Apenninus.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "rupes_recta",
@@ -648,7 +648,7 @@ export const FEATURES = [
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Linear fault scarp in eastern Mare Nubium.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
@@ -668,19 +668,19 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "political",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1969-07-20"
   },
   {
     "id": "apollo_12",
@@ -696,18 +696,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1969-11-19"
   },
   {
     "id": "apollo_14",
@@ -723,18 +723,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1971-02-05"
   },
   {
     "id": "apollo_15",
@@ -750,18 +750,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1971-07-30"
   },
   {
     "id": "apollo_16",
@@ -777,18 +777,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1972-04-21"
   },
   {
     "id": "apollo_17",
@@ -804,18 +804,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "crewed"
     ],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
-    "date": "1969-07-20",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Historic Site Proposal",
+    "mission_status": "completed",
+    "event_date": "1972-12-11"
   },
   {
     "id": "luna_9",
@@ -831,17 +831,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Space Program Documentation",
     "note": "First robotic soft landing on extraterrestrial body.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1966-02-03"
   },
   {
     "id": "luna_13",
@@ -857,17 +857,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Space Program Documentation",
     "note": "Robotic lander with soil density penetrometer.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1966-12-24"
   },
   {
     "id": "surveyor_1",
@@ -883,17 +883,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
     "note": "First operational US soft lunar landing.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1966-06-02"
   },
   {
     "id": "surveyor_3",
@@ -909,17 +909,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Lander visited by Apollo 12 astronaut crew.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1967-04-20"
   },
   {
     "id": "surveyor_5",
@@ -935,17 +935,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Provided alpha-scattering chemical analysis of regolith.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1967-09-11"
   },
   {
     "id": "surveyor_6",
@@ -961,17 +961,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
     "note": "First spacecraft to perform a hop off lunar surface.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1967-11-10"
   },
   {
     "id": "surveyor_7",
@@ -987,17 +987,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Landed near Tycho crater rim highlands.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1968-01-10"
   },
   {
     "id": "luna_16",
@@ -1013,17 +1013,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "First automated sample return mission.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1970-09-20"
   },
   {
     "id": "luna_17",
@@ -1039,17 +1039,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "Carried first remote-controlled robotic lunar rover.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1970-11-17"
   },
   {
     "id": "luna_20",
@@ -1065,17 +1065,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "Robotic highland sample return spacecraft.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1972-02-21"
   },
   {
     "id": "luna_21",
@@ -1091,17 +1091,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "Rover traversed Le Monnier crater basin.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1973-01-15"
   },
   {
     "id": "luna_24",
@@ -1117,17 +1117,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "Final Luna program deep regolith core sample return.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1976-08-18"
   },
   {
     "id": "change_3",
@@ -1143,17 +1143,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "CNSA Official Mission Briefing",
     "note": "First modern soft landing and rover deployment in Mare Imbrium.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))",
-    "mission_status": "completed"
+    "designation_authority": "CNSA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2013-12-14"
   },
   {
     "id": "change_4",
@@ -1169,18 +1169,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "political"
     ],
     "source": "CNSA Official Mission Briefing",
-    "note": "First soft landing on lunar far side inside Von Kármán crater.",
-    "date": "1970-01-01",
+    "note": "First soft landing on lunar far side inside Von K\u00e1rm\u00e1n crater.",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))",
-    "mission_status": "completed"
+    "designation_authority": "CNSA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2019-01-03"
   },
   {
     "id": "change_5",
@@ -1196,17 +1196,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "CNSA Official Mission Briefing",
     "note": "Automated sample return mission from Northern Oceanus Procellarum.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))",
-    "mission_status": "completed"
+    "designation_authority": "CNSA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2020-12-01"
   },
   {
     "id": "blue_ghost_1",
@@ -1223,17 +1223,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Program Office",
     "note": "Commercial lunar payload lander mission in Mare Crisium.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Firefly Aerospace / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2025-01-15"
   },
   {
     "id": "chandrayaan3",
@@ -1249,18 +1249,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "political"
     ],
     "source": "ISRO Mission Control Statement",
     "note": "First successful soft landing in high southern latitude region.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (India (ISRO))",
-    "mission_status": "completed"
+    "designation_authority": "ISRO / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2023-08-23"
   },
   {
     "id": "slim",
@@ -1276,17 +1276,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "JAXA Press Release",
     "note": "Pinpoint precision lunar landing technology demonstrator.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Japan (JAXA / Commercial))",
-    "mission_status": "completed"
+    "designation_authority": "JAXA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2024-01-19"
   },
   {
     "id": "im1_odysseus",
@@ -1303,17 +1303,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
     "note": "First commercial soft landing on high southern crater rim.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Intuitive Machines / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2024-02-22"
   },
   {
     "id": "im2_athena",
@@ -1330,17 +1330,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "landing",
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
     "note": "Commercial polar lander mission targeted near Shackleton.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Intuitive Machines / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2025-01-01"
   },
   {
     "id": "change_6",
@@ -1356,18 +1356,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "landing",
       "heritage",
       "political"
     ],
     "source": "CNSA Official Mission Briefing",
     "note": "First lunar far side sample return mission from SPA basin.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))",
-    "mission_status": "completed"
+    "designation_authority": "CNSA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2024-06-01"
   },
   {
     "id": "luna_2",
@@ -1383,18 +1383,18 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
       "heritage",
       "political"
     ],
     "source": "Soviet Academy of Sciences Record",
     "note": "First human-made object to contact lunar surface.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (USSR (Historical))",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1959-09-13"
   },
   {
     "id": "ranger_7",
@@ -1410,17 +1410,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
       "heritage"
     ],
     "source": "NASA Mission History",
     "note": "Transmitted high-resolution close-up TV images prior to surface impact.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1964-07-31"
   },
   {
     "id": "lcross",
@@ -1436,18 +1436,19 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
+      "heritage",
       "water_ice",
       "science_interest"
     ],
     "source": "NASA LCROSS Mission Data",
     "note": "Controlled impact revealing volatile water plume signature.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2009-10-09"
   },
   {
     "id": "chandrayaan2_crash",
@@ -1463,16 +1464,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact"
+      "heritage"
     ],
     "source": "ISRO Public Report",
     "note": "Lander hard impact debris location confirmed by LRO imagery.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (India (ISRO))",
-    "mission_status": "completed"
+    "designation_authority": "ISRO / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2019-09-06"
   },
   {
     "id": "luna_25_crash",
@@ -1488,16 +1490,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact"
+      "heritage"
     ],
     "source": "Roscosmos Press Release",
     "note": "Impact site resulting from off-nominal deorbit burn.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Russian Federation)",
-    "mission_status": "completed"
+    "designation_authority": "Roscosmos / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2023-08-19"
   },
   {
     "id": "hakuto_r_crash",
@@ -1514,16 +1517,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "impact"
+      "heritage"
     ],
     "source": "ispace Flight Evaluation Report",
     "note": "Commercial lander hard impact on Mare Frigoris.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Japan (JAXA / Commercial))",
-    "mission_status": "completed"
+    "designation_authority": "ispace / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2023-04-25"
   },
   {
     "id": "hakuto_r_m2",
@@ -1540,16 +1544,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "impact"
+      "heritage"
     ],
     "source": "ispace Flight Evaluation Report",
     "note": "Commercial lunar mission impact coordinates.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Japan (JAXA / Commercial))",
-    "mission_status": "completed"
+    "designation_authority": "ispace / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2025-01-01"
   },
   {
     "id": "peregrine_impact",
@@ -1566,16 +1571,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "impact"
+      "heritage"
     ],
     "source": "Astrobotic Flight Operations",
     "note": "Payload mission telemetry impact trajectory.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "Astrobotic / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2024-01-18"
   },
   {
     "id": "beresheet",
@@ -1592,17 +1598,17 @@ export const FEATURES = [
     ],
     "private": true,
     "tags": [
-      "impact",
       "heritage"
     ],
     "source": "SpaceIL Mission Analysis",
     "note": "First privately funded lunar lander impact site in Mare Serenitatis.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Israel)",
-    "mission_status": "completed"
+    "designation_authority": "SpaceIL / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2019-04-11"
   },
   {
     "id": "smart_1",
@@ -1618,17 +1624,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
       "heritage"
     ],
     "source": "ESA Science Operations",
     "note": "Controlled end-of-mission impact observed by Earth-based telescopes.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (ESA (Member States))",
-    "mission_status": "completed"
+    "designation_authority": "ESA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2006-09-03"
   },
   {
     "id": "grail_ebb_flow",
@@ -1644,17 +1650,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
       "heritage"
     ],
     "source": "NASA GRAIL Operations",
     "note": "Intentional mission end impacts near Sally Ride crater.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)",
-    "mission_status": "completed"
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2012-12-17"
   },
   {
     "id": "chandrayaan1_mip",
@@ -1670,17 +1676,17 @@ export const FEATURES = [
       9
     ],
     "tags": [
-      "impact",
       "heritage"
     ],
     "source": "ISRO Mission Report",
     "note": "Moon Impact Probe intentional hard landing near South Pole.",
-    "date": "1970-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (India (ISRO))",
-    "mission_status": "completed"
+    "designation_authority": "ISRO / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2008-11-14"
   },
   {
     "id": "shackleton",
@@ -1702,11 +1708,11 @@ export const FEATURES = [
     ],
     "source": "LRO LOLA / Mini-RF Spectral Data",
     "note": "Candidate SESI per CRP.14.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "cabeus",
@@ -1728,11 +1734,11 @@ export const FEATURES = [
     ],
     "source": "LCROSS Impact Spectroscopy",
     "note": "Candidate SESI per CRP.14.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "shoemaker",
@@ -1754,11 +1760,11 @@ export const FEATURES = [
     ],
     "source": "LRO LAMP / LCROSS Observations",
     "note": "Candidate SESI per CRP.14.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "haworth",
@@ -1780,11 +1786,11 @@ export const FEATURES = [
     ],
     "source": "LRO LOLA Albedo Mapping",
     "note": "Candidate SESI per CRP.14.",
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mineral_tranq",
@@ -1800,11 +1806,11 @@ export const FEATURES = [
     "tags": [
       "minerals"
     ],
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mineral_proc",
@@ -1820,11 +1826,11 @@ export const FEATURES = [
     "tags": [
       "minerals"
     ],
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mineral_imbrium",
@@ -1840,11 +1846,11 @@ export const FEATURES = [
     "tags": [
       "minerals"
     ],
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mineral_seren",
@@ -1860,11 +1866,11 @@ export const FEATURES = [
     "tags": [
       "minerals"
     ],
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "mineral_spa",
@@ -1880,11 +1886,11 @@ export const FEATURES = [
     "tags": [
       "minerals"
     ],
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "far_side_radio",
@@ -1907,11 +1913,11 @@ export const FEATURES = [
       "radius_km": 1737.4,
       "opacity": 0.12
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Pending Regulatory Review"
+    "designation_authority": "Map contributors, based on published scientific data"
   },
   {
     "id": "lro_orbit",
@@ -1937,11 +1943,11 @@ export const FEATURES = [
       "satellite_name": "LRO",
       "speed": 0.25
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)"
   },
   {
     "id": "danuri_orbit",
@@ -1967,11 +1973,11 @@ export const FEATURES = [
       "satellite_name": "Danuri",
       "speed": 0.3
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (South Korea (KARI))"
+    "designation_authority": "KARI (Korea Aerospace Research Institute)"
   },
   {
     "id": "chandrayaan2_orbiter",
@@ -1997,11 +2003,11 @@ export const FEATURES = [
       "satellite_name": "Chandrayaan-2",
       "speed": 0.22
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (India (ISRO))"
+    "designation_authority": "ISRO (Indian Space Research Organisation)"
   },
   {
     "id": "queqiao_l2",
@@ -2028,11 +2034,11 @@ export const FEATURES = [
       "satellite_name": "Queqiao",
       "speed": 0.15
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))"
+    "designation_authority": "CNSA (China National Space Administration)"
   },
   {
     "id": "queqiao2_relay",
@@ -2059,11 +2065,11 @@ export const FEATURES = [
       "satellite_name": "Queqiao-2",
       "speed": 0.18
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (China (CNSA))"
+    "designation_authority": "CNSA (China National Space Administration)"
   },
   {
     "id": "capstone_nrho",
@@ -2091,11 +2097,11 @@ export const FEATURES = [
       "satellite_name": "CAPSTONE",
       "speed": 0.2
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)"
+    "designation_authority": "Advanced Space / NASA"
   },
   {
     "id": "artemis_p1",
@@ -2121,11 +2127,11 @@ export const FEATURES = [
       "satellite_name": "ARTEMIS-P1",
       "speed": 0.28
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)"
   },
   {
     "id": "artemis_p2",
@@ -2151,11 +2157,11 @@ export const FEATURES = [
       "satellite_name": "ARTEMIS-P2",
       "speed": 0.26
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)"
   },
   {
     "id": "lunar_trailblazer",
@@ -2182,11 +2188,11 @@ export const FEATURES = [
       "satellite_name": "Trailblazer",
       "speed": 0.24
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (United States)"
+    "designation_authority": "NASA / Caltech"
   },
   {
     "id": "icube_q",
@@ -2217,11 +2223,11 @@ export const FEATURES = [
       "satellite_name": "ICUBE-Q",
       "speed": 0.3
     },
-    "date": "2024-01-01",
+    "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "OST Article VI State Authority (Pakistan (SUPARCO))"
+    "designation_authority": "SUPARCO / CNSA"
   },
   {
     "id": "artemis_3_target",
@@ -2501,7 +2507,7 @@ export const LAYER_DEFS = {
     "desc": "Pristine scientific environments requiring protection"
   },
   "heritage": {
-    "label": "Heritage Sites",
+    "label": "Heritage",
     "color": "#ff5555",
     "tags": [
       "heritage"
@@ -2564,10 +2570,12 @@ export const CATEGORIES = {
     "sensitive"
   ],
   "Intangible": [
-    "heritage",
     "political",
     "data_value",
     "view_shed"
+  ],
+  "Heritage": [
+    "heritage"
   ]
 };
 
