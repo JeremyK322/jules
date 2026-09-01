@@ -2653,6 +2653,14 @@
                         const featureLabel = document.createElement('span');
                         featureLabel.textContent = feature.name;
                         featureItem.appendChild(featureLabel);
+
+                        featureItem.addEventListener('click', (e) => {
+                            if (e.target.type === 'checkbox') return;
+                            if (typeof feature.lat === 'number' && typeof feature.lon === 'number') {
+                                flyToFeatureLocation(feature.lat, feature.lon);
+                            }
+                        });
+
                         featureList.appendChild(featureItem);
                     }
                     body.appendChild(featureList);
@@ -3606,9 +3614,59 @@ function copyText() {
         let highlightedFeatureIds = new Set();
         let lastTelemetryTime = 0;
 
+        // --- Smooth Camera Navigation ---
+        let cameraAnimation = null;
+
+        function flyToFeatureLocation(lat, lon) {
+            const currentDist = camera.position.distanceTo(controls.target);
+            const targetNormal = latLonToPosition(lat, lon, 1.0).normalize();
+            const startVec = camera.position.clone().normalize();
+            const startQuaternion = camera.quaternion.clone();
+
+            const targetPos = targetNormal.clone().multiplyScalar(currentDist);
+            const dummyCamera = camera.clone();
+            dummyCamera.position.copy(targetPos);
+            dummyCamera.lookAt(controls.target);
+            const endQuaternion = dummyCamera.quaternion.clone();
+
+            const angleRad = startVec.angleTo(targetNormal);
+            // 180 degrees (Math.PI) takes ~3.0s
+            const duration = Math.max(0.8, (angleRad / Math.PI) * 3.0);
+
+            cameraAnimation = {
+                startTime: clock.getElapsedTime(),
+                duration: duration,
+                startQuaternion: startQuaternion,
+                endQuaternion: endQuaternion,
+                currentDist: currentDist
+            };
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
+
+            if (cameraAnimation) {
+                const elapsed = clock.getElapsedTime() - cameraAnimation.startTime;
+                let progress = Math.min(1.0, elapsed / cameraAnimation.duration);
+                // Smooth acceleration and deceleration (ease-in-out curve)
+                const easeProgress = progress < 0.5
+                    ? 2 * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+                const q = new THREE.Quaternion();
+                q.slerpQuaternions(cameraAnimation.startQuaternion, cameraAnimation.endQuaternion, easeProgress);
+                camera.quaternion.copy(q);
+
+                // Recompute position relative to origin based on orientation
+                const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion);
+                camera.position.copy(forward.multiplyScalar(cameraAnimation.currentDist));
+
+                if (progress >= 1.0) {
+                    cameraAnimation = null;
+                }
+            }
+
             controls.update();
 
             const cameraWorldPos = camera.position;
