@@ -7,6 +7,17 @@
   let debateTargetLimit = 4;
   let secondBrainLog = [];
   let mainDebateLog = [];
+  let lastInjectedDebateIndex = 0;
+
+  function injectMainDebateToChatLog() {
+    if (!window.chatLog || lastInjectedDebateIndex >= mainDebateLog.length) return;
+    for (let i = lastInjectedDebateIndex; i < mainDebateLog.length; i++) {
+      window.chatLog.push(mainDebateLog[i]);
+    }
+    lastInjectedDebateIndex = mainDebateLog.length;
+    if (window.save) window.save('wc_chatLog', window.chatLog);
+    if (window.autoSave) window.autoSave();
+  }
 
   const MAIN_DEBATE_ROLE_SYS = "You are the main thread in a structured debate with a Second Brain instance. Your next response will be passed directly to the Second Brain. Do not address the human user unless you output %%%STOP. You must address your response to the Second Brain and start your response with 'Second Brain,'. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends. In Debate Mode, you never end the debate yourself. Your only job is to respond to the Second Brain's last message. You may not declare the debate over, you may not produce a closing summary, you may not thank the opponent, and you may not address the human user until the app tells you the debate has finished. If you believe the debate has reached a natural end, output [END_DEBATE] on a line by itself and then stop. Do not add any text after [END_DEBATE].";
   const SECOND_BRAIN_SYS = "You are the Second Brain in a structured debate. You have no memory of past work with the user or previous debate sessions. Your next response will be passed directly to the Main Thread. Do not address the human user unless you output %%%STOP. You must address your response to the Main Thread and start your response with 'Main Thread,'. If you lack information, output %%%STOP and your request. Memory and workspace tools are disabled during Debate Mode. Do not emit ADD, UPDATE, or DELETE markers while in this mode. Resume normal memory operations after the debate ends. You never end the debate yourself. Respond to the Main Thread's last message. If you believe the debate has reached a natural end, output [END_DEBATE] and then stop.";
@@ -28,10 +39,12 @@
       // Reset debate-specific chat windows on entry
       mainDebateLog = [];
       secondBrainLog = [];
+      lastInjectedDebateIndex = 0;
       debateTurnCount = 0;
       updateDebateUI();
       syncSplitChatViews();
     } else {
+      injectMainDebateToChatLog();
       if (btn) btn.classList.remove('active');
       if (debateBar) debateBar.classList.remove('active');
       if (splitWrapper) splitWrapper.classList.add('hidden');
@@ -147,16 +160,12 @@
     if (promptText && promptText.trim()) {
       mainDebateLog = [];
       secondBrainLog = [];
+      lastInjectedDebateIndex = 0;
       debateTurnCount = 0;
 
       const userFormatted = `[User]: ${promptText.trim()}`;
       const userEntry = { timestamp: new Date().toISOString(), role: 'user', content: userFormatted };
       mainDebateLog.push(userEntry);
-      if (window.chatLog) {
-        window.chatLog.push(userEntry);
-        window.save('wc_chatLog', window.chatLog);
-        if (window.autoSave) window.autoSave();
-      }
     }
 
     syncSplitChatViews();
@@ -237,11 +246,6 @@
 
         const mainAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: mainCleaned };
         mainDebateLog.push(mainAssistantEntry);
-        if (window.chatLog) {
-          window.chatLog.push(mainAssistantEntry);
-          window.save('wc_chatLog', window.chatLog);
-          if (window.autoSave) window.autoSave();
-        }
         appendBubbleColumn(chatCMain, 'assistant', mainCleaned, window.APP || 'The Adze');
 
         if (mainStoppedForClarification) {
@@ -305,11 +309,6 @@
 
         const secondMsgForMain = { timestamp: new Date().toISOString(), role: 'user', content: `[Second Brain]: ${secondReply}` };
         mainDebateLog.push(secondMsgForMain);
-        if (window.chatLog) {
-          window.chatLog.push(secondMsgForMain);
-          window.save('wc_chatLog', window.chatLog);
-          if (window.autoSave) window.autoSave();
-        }
         appendBubbleColumn(chatCMain, 'user', `[Second Brain]: ${secondReply}`, 'Second Brain');
 
         if (debateStopRequested) {
@@ -329,6 +328,7 @@
         chatInp.disabled = false;
         chatInp.focus();
       }
+      injectMainDebateToChatLog();
       updateDebateUI();
       if (!debateStopRequested && debateTurnCount >= debateTargetLimit) {
         if (window.setStatusMessage) window.setStatusMessage(`✅ Debate turn limit reached (${debateTurnCount}/${debateTargetLimit}).`);
