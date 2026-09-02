@@ -879,12 +879,6 @@
                 <span style="font-size:0.85rem;font-weight:bold;color:#55ff88;"> Planning</span>
                 <button id="clear-user-sites" style="background:none;border:none;color:#667;font-size:0.75rem;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='#ff5555'" onmouseout="this.style.color='#667'">Clear All</button>
             </div>
-            <div style="margin-bottom:8px;">
-                <label style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#8899aa; cursor:pointer;">
-                    <input type="checkbox" id="global-dispersion-toggle" />
-                    <span>Global Dispersion Domes</span>
-                </label>
-            </div>
             <div id="user-sites-container"></div>
         </div>
     </div>
@@ -1237,7 +1231,6 @@
         const planningColor = document.getElementById('planning-color');
         const planningTier = document.getElementById('planning-tier');
         const planningDispersion = document.getElementById('planning-dispersion');
-        const globalDispersionToggle = document.getElementById('global-dispersion-toggle');
         const planningDescription = document.getElementById('planning-description');
         const planningNotes = document.getElementById('planning-notes');
         const currentLocationDisplay = document.getElementById('current-location-display');
@@ -1805,37 +1798,11 @@
             const disc = new THREE.Mesh(discGeo, discMat);
             disc.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
 
-            // Border ring - dashed, thin, subtle
-            const ringPoints = [];
-            const ringSegments = 48;
-            const ringRadius = radiusKm / MOON_RADIUS_KM;
-            for (let i = 0; i <= ringSegments; i++) {
-                const thetaAngle = (i / ringSegments) * Math.PI * 2;
-                const x = ringRadius * Math.sin(thetaAngle);
-                const y = ringRadius * Math.cos(thetaAngle);
-                const p = new THREE.Vector3(0, y, x);
-                p.applyQuaternion(disc.quaternion);
-                p.add(pos);
-                ringPoints.push(p);
-            }
-            const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
-            const ringMat = new THREE.LineDashedMaterial({
-                color: new THREE.Color(color),
-                transparent: true,
-                opacity: 0.35,
-                dashSize: 0.015,
-                gapSize: 0.01,
-                depthWrite: false
-            });
-            const ring = new THREE.Line(ringGeo, ringMat);
-            ring.computeLineDistances();
-
             // 3D Dispersion Dome (Half-sphere into space)
             const domeMesh = createDispersionDomeMesh(radiusKm, color);
             domeMesh.position.copy(pos);
             domeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
-            const isDomeVisible = (globalDispersionToggle && globalDispersionToggle.checked) || site.show_dispersion;
-            domeMesh.visible = !!isDomeVisible;
+            domeMesh.visible = !!site.show_dispersion;
 
             // Label
             const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24, '(PLANNED)');
@@ -1855,11 +1822,10 @@
 
             const group = new THREE.Group();
             group.add(disc);
-            group.add(ring);
             group.add(domeMesh);
             group.add(label);
 
-            return { group, disc, ring, domeMesh, label };
+            return { group, disc, domeMesh, label };
         }
 
         function createLabelTexture(text, fontSize = 32, subtext = null) {
@@ -3047,19 +3013,8 @@
         });
         conflictConfirmBtn.addEventListener('click', confirmPlaceSite);
 
-        // --- Clear User Sites & Global Dispersion Toggle ---
+        // --- Clear User Sites ---
         clearUserSitesBtn.addEventListener('click', clearAllUserSites);
-        if (globalDispersionToggle) {
-            globalDispersionToggle.addEventListener('change', () => {
-                const isGlobalChecked = globalDispersionToggle.checked;
-                userSiteObjects.forEach((obj, siteId) => {
-                    const site = userSites.find(s => s.id === siteId);
-                    if (obj && obj.domeMesh) {
-                        obj.domeMesh.visible = isGlobalChecked || (site && site.show_dispersion);
-                    }
-                });
-            });
-        }
 
         // --- Settings Events ---
         loadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
