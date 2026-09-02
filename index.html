@@ -1814,7 +1814,6 @@
 
             // 3D Dispersion Dome (Half-sphere into space)
             const domeMesh = createDispersionDomeMesh(radiusKm, color);
-            domeMesh.position.copy(pos);
             domeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
             domeMesh.visible = !!site.show_dispersion;
 
