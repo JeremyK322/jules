@@ -1423,6 +1423,21 @@
             return `${absLon.toFixed(2)}° ${dir}`;
         }
 
+        function getCrosshairLatLon() {
+            if (!camera) return { lat: 0, lon: 0 };
+            const crosshairRaycaster = new THREE.Raycaster();
+            crosshairRaycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const targetMoon = currentMoon || fallbackMoon;
+            if (targetMoon) {
+                const intersects = crosshairRaycaster.intersectObject(targetMoon, true);
+                if (intersects.length > 0) {
+                    const localPt = targetMoon.worldToLocal(intersects[0].point.clone());
+                    return positionToLatLon(localPt);
+                }
+            }
+            return positionToLatLon(camera.position);
+        }
+
         const MOON_RADIUS_KM = 1737.4;
         const MOON_3D_RADIUS = 1;
         const DEFAULT_RADIUS_KM = 10;
@@ -1431,8 +1446,7 @@
 
         // --- Planning System ---
         function openPlanningModal() {
-            const lat = currentCameraLat;
-            const lon = currentCameraLon;
+            const { lat, lon } = getCrosshairLatLon();
             planningLat.value = lat.toFixed(4);
             planningLon.value = lon.toFixed(4);
 
@@ -3643,9 +3657,11 @@ function copyText() {
                 }
             }
 
-            const { lat, lon } = positionToLatLon(camera.position);
-            currentCameraLat = lat;
-            currentCameraLon = lon;
+            const crosshairCoords = getCrosshairLatLon();
+            currentCameraLat = crosshairCoords.lat;
+            currentCameraLon = crosshairCoords.lon;
+            const lat = currentCameraLat;
+            const lon = currentCameraLon;
 
             const activeTags = getActiveTags();
             const overlappingFeatures = [];
