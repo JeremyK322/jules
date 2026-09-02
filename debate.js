@@ -112,13 +112,48 @@
     if (el?.parentNode) el.remove();
   }
 
+  function calculateDebateTokens() {
+    let mainChars = 0;
+    mainDebateLog.forEach(m => mainChars += (m.content || '').length);
+    let secondChars = 0;
+    secondBrainLog.forEach(m => secondChars += (m.content || '').length);
+
+    const currentChars = mainChars + secondChars;
+    const estimateFn = window.estimateTokens || (c => Math.ceil((c / 3.5) * 1.10));
+    const formatFn = window.formatTokenCount || (t => t.toLocaleString());
+
+    const currentTokens = estimateFn(currentChars);
+
+    // Calculate average tokens per completed turn
+    let avgTokensPerTurn = 350; // default baseline per exchange
+    if (debateTurnCount > 0 && currentTokens > 0) {
+      avgTokensPerTurn = Math.ceil(currentTokens / debateTurnCount);
+    }
+
+    const remainingTurns = Math.max(0, debateTargetLimit - debateTurnCount);
+    const projectedTotalTokens = currentTokens + (remainingTurns * avgTokensPerTurn);
+
+    return {
+      currentTokens,
+      formattedCurrent: formatFn(currentTokens),
+      projectedTotalTokens,
+      formattedProjected: formatFn(projectedTotalTokens)
+    };
+  }
+
   function updateDebateUI() {
     const counter = document.getElementById('debateCounter');
     const btnStop = document.getElementById('btnStopDebate');
     const btnContinue = document.getElementById('btnContinueDebate');
     const turnSelect = document.getElementById('debateTurnSelect');
+    const tokenDisplay = document.getElementById('debateTurnTokens');
+    const projectedDisplay = document.getElementById('debateProjectedTokens');
 
     if (counter) counter.textContent = `Turn ${debateTurnCount} / ${debateTargetLimit}`;
+
+    const tokenStats = calculateDebateTokens();
+    if (tokenDisplay) tokenDisplay.textContent = `Tokens: ~${tokenStats.formattedCurrent}`;
+    if (projectedDisplay) projectedDisplay.textContent = `Projected Total: ~${tokenStats.formattedProjected}`;
 
     if (debateRunning) {
       if (btnStop) btnStop.classList.remove('hidden');

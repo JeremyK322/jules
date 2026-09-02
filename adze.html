@@ -421,7 +421,6 @@
         </div>
         <div class="ai-workspace-list" id="aiWorkspaceList"></div>
       </div>
-      <button class="sidebar-action-btn" id="btnOpenMemoryEditor">🧠 Memory Editor</button>
       <button class="sidebar-action-btn" id="btnOpenDirectMemory">✏️ Replace Permanent Memory</button>
       <button class="sidebar-action-btn hidden" id="btnUndoConsolidation">↩️ Undo Last Save</button>
     </div>
@@ -464,6 +463,8 @@
         <option value="deepseek-v4-pro">DeepSeek V4 Pro</option>
       </select>
       <span class="debate-counter" id="debateCounter">Turn 0 / 4</span>
+      <span class="debate-tokens" id="debateTurnTokens" style="font-weight:600; color:var(--peach); font-size:0.75rem;">Tokens: ~0</span>
+      <span class="debate-tokens" id="debateProjectedTokens" style="font-weight:600; color:var(--sage); font-size:0.75rem;">Projected Total: ~0</span>
       <button class="btn-stop-debate hidden" id="btnStopDebate">🛑 Stop Debate</button>
       <button class="hidden" id="btnContinueDebate">▶️ Continue Debate (+4 turns)</button>
       <button id="btnResetDebate">🔄 Reset Debate</button>
@@ -667,75 +668,6 @@
     </div>
   </div>
 
-  <!-- Memory Editor Modal -->
-  <div class="modal-overlay" id="memoryEditorOverlay" style="display:none;">
-    <div class="modal" style="max-width:1050px; width:95%;">
-      <button class="close-btn" id="btnCloseMemoryEditor">&times;</button>
-      <h3>🧠 3-Stage Memory Consolidation Relay</h3>
-      <div class="memory-editor-container">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; background:var(--surface-bg); padding:10px 14px; border-radius:8px; border:1px solid var(--border-color); flex-wrap:wrap;">
-          <button class="btn-secondary" id="btnLoadWorkspace" style="padding:6px 12px;">📥 Load Workspace</button>
-          <button class="btn-primary" id="btnRunStage1" style="padding:6px 12px;">🧠 Stage 1: SB Diagnosis</button>
-          <button class="btn-primary" id="btnRunStage2" style="padding:6px 12px; background:#4f46e5;">📖 Stage 2: Adze Review</button>
-          <button class="btn-primary" id="btnRunStage3" style="padding:6px 12px; background:#059669;">✨ Stage 3: QC Check</button>
-          <button class="btn-secondary" id="btnRunRelayPipeline" style="padding:6px 12px; border:1px dashed var(--border-color);">⚡ Auto Full Relay</button>
-
-          <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:0.75rem;">
-            <span id="stepTag1" style="padding:3px 8px; border-radius:4px; background:var(--chip-bg); color:var(--text-muted);">Stage 1: Second Brain</span>
-            <span>➔</span>
-            <span id="stepTag2" style="padding:3px 8px; border-radius:4px; background:var(--chip-bg); color:var(--text-muted);">Stage 2: The Adze Context</span>
-            <span>➔</span>
-            <span id="stepTag3" style="padding:3px 8px; border-radius:4px; background:var(--chip-bg); color:var(--text-muted);">Stage 3: Review & Commit</span>
-          </div>
-        </div>
-
-        <div class="memory-editor-progress" id="memoryEditorProgress" style="margin-bottom:10px;"></div>
-
-        <div class="memory-editor-row" style="gap:14px; display:flex;">
-          <div class="memory-editor-col" style="flex:1; display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label id="editorLeftLabel" style="font-weight:600;">Raw Workspace Input</label>
-              <div style="display:flex; gap:6px;">
-                <button class="btn-secondary" id="btnTabInput" style="padding:2px 8px; font-size:0.7rem;">Raw Input</button>
-                <button class="btn-secondary" id="btnTabSecondBrain" style="padding:2px 8px; font-size:0.7rem;">SB Proposal</button>
-                <button class="btn-secondary" id="btnTabAdzeWorkspace" style="padding:2px 8px; font-size:0.7rem;">Final Workspace</button>
-              </div>
-            </div>
-            <textarea id="memoryInput" placeholder="Paste workspace text here, or click Load Workspace..." style="flex:1; min-height:360px; font-family:monospace; font-size:0.8rem; line-height:1.4;"></textarea>
-          </div>
-
-          <div class="memory-editor-col" style="flex:1; display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label style="font-weight:600;">Pipeline Reports & Change Log</label>
-              <div style="display:flex; gap:6px;">
-                <button class="btn-secondary" id="btnSendProposalToChat" style="padding:2px 8px; font-size:0.7rem; background:var(--accent-color); color:#fff;" title="Send Second Brain's proposed changes into main chat to discuss with The Adze">💬 Send SB Proposal to Chat</button>
-                <button class="btn-secondary" id="btnTabChangeLog" style="padding:2px 8px; font-size:0.7rem;">Change Log</button>
-                <button class="btn-secondary" id="btnTabQualityCheck" style="padding:2px 8px; font-size:0.7rem;">Quality Check</button>
-              </div>
-            </div>
-            <div id="memoryEditorOutputs" style="flex:1; max-height:360px; overflow-y:auto; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:6px; padding:10px; font-size:0.78rem;">
-              <div style="color:var(--text-muted); font-style:italic; padding:20px; text-align:center;">
-                Click "Run 3-Stage Relay" to start the pipeline.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:10px;">
-          <div style="display:flex; gap:10px; align-items:center;">
-            <input type="text" id="memoryCorrectionInput" placeholder="Optional correction instruction for Stage 2 re-run..." style="flex:1; padding:6px 10px; border-radius:6px; background:var(--bg-input); border:1px solid var(--border-accent); color:var(--text-primary); font-size:0.8rem;">
-            <button class="btn-secondary" id="btnApplyCorrectionStage2" style="padding:6px 12px; font-size:0.75rem;">✏️ Re-run Stage 2 with Correction</button>
-          </div>
-          <div class="btn-row" style="margin:0; display:flex; gap:10px; align-items:center; justify-content:flex-end;">
-            <input type="text" id="memoryTitleInput" placeholder="Title for committed workspace (optional)" style="flex:1; padding:6px 10px; border-radius:6px; background:var(--bg-input); border:1px solid var(--border-accent); color:var(--text-primary); margin:0;">
-            <button class="btn-danger" id="btnRejectConsolidation" style="padding:6px 16px;">❌ Reject & Keep Original</button>
-            <button class="btn-primary" id="btnApproveCommitWorkspace" style="background:var(--accent-color); font-weight:600; padding:6px 16px;">✅ Approve & Commit to Permanent Memory</button>
-            <button class="btn-secondary" id="btnCancelMemoryEditor">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="animations.js"></script>
   <script src="memory.js"></script>
@@ -821,8 +753,40 @@
       async function autoSave(){if(window.electronAPI&&window.electronAPI.saveData){const data=buildBackupData();await window.electronAPI.saveData(data);}}
       window.autoSave = autoSave;
 
+      const MAX_TOKENS = 1_100_000;
+      window.MAX_TOKENS = MAX_TOKENS;
+
+      function estimateTokens(charCount) {
+        if (!charCount || charCount <= 0) return 0;
+        return Math.ceil((charCount / 3.5) * 1.10);
+      }
+      window.estimateTokens = estimateTokens;
+
+      function formatTokenCount(tokens) {
+        if (!tokens || tokens <= 0) return '0';
+        if (tokens >= 1_000_000) {
+          return (tokens / 1_000_000).toFixed(1) + 'M';
+        }
+        if (tokens >= 1_000) {
+          return tokens.toLocaleString();
+        }
+        return tokens.toString();
+      }
+      window.formatTokenCount = formatTokenCount;
+
       function countTotalChars(){let chars=0;documents.forEach(d=>{if(d.type==='reference')chars+=(d.summary||'').length;else chars+=d.content.length;});savedScenes.forEach(s=>chars+=s.content.length);aiDocs.forEach(d=>chars+=d.content.length);return chars;}
-      function updateContextBar(){const used=countTotalChars();const pct=Math.min(100,Math.round((used/MAX_CHARS)*100));if(contextFill){contextFill.style.width=pct+'%';contextFill.className='context-bar-fill '+(pct>85?'high':pct>50?'mid':'low');}if(contextPct)contextPct.textContent=pct+'%';}
+      function updateContextBar(){
+        const totalChars = countTotalChars();
+        const tokens = estimateTokens(totalChars);
+        const pct = Math.min(100, Math.round((tokens / MAX_TOKENS) * 100));
+        if (contextFill) {
+          contextFill.style.width = pct + '%';
+          contextFill.className = 'context-bar-fill ' + (pct > 85 ? 'high' : pct > 50 ? 'mid' : 'low');
+        }
+        if (contextPct) {
+          contextPct.textContent = `${formatTokenCount(tokens)} / 1.1M tokens (${pct}%)`;
+        }
+      }
       window.updateContextBar = updateContextBar;
 
       function load(key,def){try{const raw=localStorage.getItem('policy_'+key);return raw?JSON.parse(raw):def;}catch(e){return def;}}
@@ -1362,7 +1326,6 @@
         $('logOverlay').addEventListener('click',(e)=>{if(e.target===$('logOverlay'))$('logOverlay').style.display='none';});
         $('previewOverlay').addEventListener('click',(e)=>{if(e.target===$('previewOverlay'))$('previewOverlay').style.display='none';});
         $('duplicateOverlay').addEventListener('click',(e)=>{if(e.target===$('duplicateOverlay'))$('duplicateOverlay').style.display='none';});
-        $('memoryEditorOverlay').addEventListener('click',(e)=>{if(e.target===$('memoryEditorOverlay'))if(window.closeMemoryEditor)window.closeMemoryEditor();});
 
         if (window.showUndoButtonIfArchive) window.showUndoButtonIfArchive();
       }
