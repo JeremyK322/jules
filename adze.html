@@ -850,10 +850,16 @@
       // ── API Status Functions ────────────────────
       function updateApiDot(){const hasKey = apiKey || xaiApiKey || anthropicApiKey; if($('apiDot'))$('apiDot').className='api-dot '+(hasKey?'set':'unset');if($('apiStatus'))$('apiStatus').innerHTML=`<span class="api-dot ${hasKey?'set':'unset'}"></span> API key`;}
 
-      function hasActiveApiKey(){
-        if (currentModel.startsWith('claude')) return !!anthropicApiKey;
-        if (currentModel.startsWith('grok')) return !!(xaiApiKey || apiKey);
+      function hasActiveApiKeyForModel(model) {
+        const m = model || currentModel;
+        if (m.startsWith('claude')) return !!anthropicApiKey;
+        if (m.startsWith('grok')) return !!(xaiApiKey || apiKey);
         return !!apiKey;
+      }
+      window.hasActiveApiKeyForModel = hasActiveApiKeyForModel;
+
+      function hasActiveApiKey(){
+        return hasActiveApiKeyForModel(currentModel);
       }
       window.hasActiveApiKey = hasActiveApiKey;
 
@@ -1088,8 +1094,8 @@
             if (attempts <= maxRetries) {
               showToast(`⚠️ Non-English/invalid response on attempt ${attempts}. Retrying in English...`);
               activeMessages = [
-                ...messages,
-                { role: 'system', content: '[System Instruction]: Critical rule violation. Respond in English only using standard Latin script.' }
+                { role: 'system', content: '[System Instruction]: Critical rule violation. Respond in English only using standard Latin script.' },
+                ...messages
               ];
             }
           } catch (err) {

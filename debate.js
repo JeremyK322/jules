@@ -134,7 +134,13 @@
     const chatCMain = document.getElementById('chatContainerMain');
     const chatCSecond = document.getElementById('chatContainerSecond');
 
-    if (!window.hasActiveApiKey || !window.hasActiveApiKey() || debateRunning) return;
+    if (!window.hasActiveApiKeyForModel) return;
+    if (!window.hasActiveApiKeyForModel() || !window.hasActiveApiKeyForModel(window.secondBrainModel)) {
+      const missingFor = !window.hasActiveApiKeyForModel() ? "Main model" : "Second Brain model";
+      if (window.showToast) window.showToast(`⚠️ API key missing for ${missingFor}. Please check Settings.`);
+      return;
+    }
+    if (debateRunning) return;
     debateRunning = true;
     debateStopRequested = false;
     window.waiting = true;
