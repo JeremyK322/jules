@@ -422,6 +422,7 @@
         <div class="ai-workspace-list" id="aiWorkspaceList"></div>
       </div>
       <button class="sidebar-action-btn" id="btnOpenMemoryEditor">🧠 Memory Editor</button>
+      <button class="sidebar-action-btn" id="btnOpenDirectMemory">✏️ Replace Permanent Memory</button>
       <button class="sidebar-action-btn hidden" id="btnUndoConsolidation">↩️ Undo Last Save</button>
     </div>
     <div class="context-bar" id="contextBar">
@@ -647,6 +648,23 @@
       <h3>⚠️ Duplicate Document</h3>
       <div class="duplicate-warning"><p>A document named <span class="dup-name" id="dupChapterName"></span> already exists.</p><p style="font-size:0.75rem;">Replace existing or keep both?</p></div>
       <div class="btn-row"><button class="btn-secondary" id="btnKeepBoth">Keep Both</button><button class="btn-danger" id="btnReplaceExisting">Replace</button></div>
+    </div>
+  </div>
+
+  <!-- Direct Memory Replace Modal -->
+  <div class="modal-overlay" id="directMemoryOverlay" style="display:none;">
+    <div class="modal" style="max-width:700px;">
+      <button class="close-btn" id="btnCloseDirectMemory">&times;</button>
+      <h3>✏️ Direct Memory Replacement</h3>
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Paste your updated workspace or permanent memory below. Committing will remove all existing AI workspace entries and replace them with this content.</p>
+      <label>Memory Title (Optional)</label>
+      <input type="text" id="directMemoryTitleInput" placeholder="e.g. Consolidated Permanent Memory">
+      <label>Memory Content</label>
+      <textarea id="directMemoryInput" placeholder="Paste updated memory text here..." style="min-height:280px; font-family:var(--font-mono); font-size:0.8rem; line-height:1.4;"></textarea>
+      <div class="btn-row">
+        <button class="btn-secondary" id="btnCancelDirectMemory">Cancel</button>
+        <button class="btn-primary" id="btnCommitDirectMemory" style="background:var(--lavender-soft); border-color:var(--lavender); font-weight:600;">Commit to Memory</button>
+      </div>
     </div>
   </div>
 
