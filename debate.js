@@ -102,7 +102,6 @@
     const counter = document.getElementById('debateCounter');
     const btnStop = document.getElementById('btnStopDebate');
     const btnContinue = document.getElementById('btnContinueDebate');
-    const btnSummarise = document.getElementById('btnSummariseOutcome');
     const turnSelect = document.getElementById('debateTurnSelect');
 
     if (counter) counter.textContent = `Turn ${debateTurnCount} / ${debateTargetLimit}`;
@@ -110,20 +109,14 @@
     if (debateRunning) {
       if (btnStop) btnStop.classList.remove('hidden');
       if (btnContinue) btnContinue.classList.add('hidden');
-      if (btnSummarise) btnSummarise.classList.add('hidden');
       if (turnSelect) turnSelect.disabled = true;
     } else {
       if (btnStop) btnStop.classList.add('hidden');
       if (turnSelect) turnSelect.disabled = false;
       if (debateTurnCount >= debateTargetLimit && debateTurnCount > 0) {
         if (btnContinue) btnContinue.classList.remove('hidden');
-        if (btnSummarise) btnSummarise.classList.remove('hidden');
-      } else if (debateTurnCount > 0) {
-        if (btnContinue) btnContinue.classList.add('hidden');
-        if (btnSummarise) btnSummarise.classList.remove('hidden');
       } else {
         if (btnContinue) btnContinue.classList.add('hidden');
-        if (btnSummarise) btnSummarise.classList.add('hidden');
       }
     }
   }
@@ -159,6 +152,11 @@
       const userFormatted = `[User]: ${promptText.trim()}`;
       const userEntry = { timestamp: new Date().toISOString(), role: 'user', content: userFormatted };
       mainDebateLog.push(userEntry);
+      if (window.chatLog) {
+        window.chatLog.push(userEntry);
+        window.save('wc_chatLog', window.chatLog);
+        if (window.autoSave) window.autoSave();
+      }
     }
 
     syncSplitChatViews();
@@ -239,6 +237,11 @@
 
         const mainAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: mainCleaned };
         mainDebateLog.push(mainAssistantEntry);
+        if (window.chatLog) {
+          window.chatLog.push(mainAssistantEntry);
+          window.save('wc_chatLog', window.chatLog);
+          if (window.autoSave) window.autoSave();
+        }
         appendBubbleColumn(chatCMain, 'assistant', mainCleaned, window.APP || 'The Adze');
 
         if (mainStoppedForClarification) {
@@ -302,6 +305,11 @@
 
         const secondMsgForMain = { timestamp: new Date().toISOString(), role: 'user', content: `[Second Brain]: ${secondReply}` };
         mainDebateLog.push(secondMsgForMain);
+        if (window.chatLog) {
+          window.chatLog.push(secondMsgForMain);
+          window.save('wc_chatLog', window.chatLog);
+          if (window.autoSave) window.autoSave();
+        }
         appendBubbleColumn(chatCMain, 'user', `[Second Brain]: ${secondReply}`, 'Second Brain');
 
         if (debateStopRequested) {
@@ -328,70 +336,12 @@
     }
   }
 
-  async function summariseDebateOutcome() {
-    const sendBtn = document.getElementById('btnSend');
-    const chatInp = document.getElementById('chatInput');
-    const chatCMain = document.getElementById('chatContainerMain');
-
-    if (debateRunning || !window.hasActiveApiKey || !window.hasActiveApiKey()) return;
-    window.waiting = true;
-    if (sendBtn) sendBtn.disabled = true;
-    if (chatInp) chatInp.disabled = true;
-    if (window.setStatusMessage) window.setStatusMessage('📊 Main Thread synthesising debate outcome…');
-    const typingMain = showTypingColumn(chatCMain);
-
-    try {
-      const summaryReq = {
-        role: 'user',
-        content: '[System Request]: The debate session is complete. Read the full debate transcript above and provide a short summary addressing: 1) What was challenged, 2) What held, 3) What changed, and 4) What the final decision is. Provide a clear decision, not just a transcript.'
-      };
-      const { prompt: baseSysPrompt } = window.buildSystemPrompt();
-      const sysPrompt = MAIN_DEBATE_ROLE_SYS + "\n\n" + baseSysPrompt;
-      const messages = [
-        { role: 'system', content: sysPrompt },
-        ...mainDebateLog.map(e => ({ role: e.role, content: e.content })),
-        summaryReq
-      ];
-
-      const summaryReply = await window.callApi(messages);
-      removeTyping(typingMain);
-      const { cleanedReply } = window.processActions(summaryReply);
-
-      const summaryEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: cleanedReply };
-      mainDebateLog.push(summaryEntry);
-      appendBubbleColumn(chatCMain, 'assistant', cleanedReply, window.APP || 'The Adze');
-
-      // Append debate summary into main chat history (chatLog)
-      const mainChatSummaryEntry = {
-        timestamp: new Date().toISOString(),
-        role: 'assistant',
-        content: `⚔️ **Debate Outcome Summary**\n\n${cleanedReply}`
-      };
-      window.chatLog.push(mainChatSummaryEntry);
-      window.save('wc_chatLog', window.chatLog);
-      if (window.autoSave) window.autoSave();
-
-      if (window.setStatusMessage) window.setStatusMessage('✅ Debate outcome synthesised and added to main chat history.');
-    } catch (err) {
-      removeTyping(typingMain);
-      if (window.showToast) window.showToast('Summary error: ' + (err.message || 'Error'));
-    } finally {
-      window.waiting = false;
-      if (sendBtn) sendBtn.disabled = false;
-      if (chatInp) {
-        chatInp.disabled = false;
-        chatInp.focus();
-      }
-    }
-  }
-
   function initDebateModule() {
     const btnToggle = document.getElementById('btnDebateToggle');
     const turnSelect = document.getElementById('debateTurnSelect');
     const btnStop = document.getElementById('btnStopDebate');
     const btnContinue = document.getElementById('btnContinueDebate');
     const btnReset = document.getElementById('btnResetDebate');
-    const btnSummarise = document.getElementById('btnSummariseOutcome');
     const secondBrainSelect = document.getElementById('debateSecondBrainModelSelect');
 
     if (btnToggle) btnToggle.addEventListener('click', () => toggleDebateMode());
@@ -436,10 +386,6 @@
           if (window.showToast) window.showToast('Cannot reset debate while running.');
         }
       });
-    }
-
-    if (btnSummarise) {
-      btnSummarise.addEventListener('click', summariseDebateOutcome);
     }
 
     if (secondBrainSelect) {
