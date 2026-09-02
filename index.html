@@ -250,7 +250,7 @@
         }
         #planning-btn:hover { background: rgba(60,60,120,0.9); border-color: #aaccff; transform: scale(1.05); }
         #help-btn {
-            position: absolute; top: 20px; right: 230px; z-index: 30;
+            position: absolute; top: 20px; right: 198px; z-index: 30;
             font-size: 0.9rem; font-weight: bold; color: #fff;
             background: rgba(20,20,40,0.85); backdrop-filter: blur(4px);
             padding: 8px 14px; border-radius: 20px; cursor: pointer;
@@ -809,8 +809,8 @@
             #layers-panel { top: 10px; left: 10px; padding: 10px 12px; min-width: 180px; max-width: 280px; font-size: 0.8rem; }
             #layers-panel .title { font-size: 0.9rem; }
             #gear { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 10px; }
-            #planning-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 105px; }
-            #help-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 185px; }
+            #planning-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 95px; }
+            #help-btn { font-size: 0.8rem; padding: 6px 12px; top: 10px; right: 155px; }
             #settings-panel { right: 10px; top: 50px; min-width: 160px; padding: 12px 14px; }
             #centre-overlap-display { font-size: 0.75rem; padding: 6px 10px; bottom: 16px; right: 16px; min-width: 100px; max-width: 200px; }
             #centre-overlap-display .label { min-width: 32px; }
@@ -878,6 +878,12 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                 <span style="font-size:0.85rem;font-weight:bold;color:#55ff88;"> Planning</span>
                 <button id="clear-user-sites" style="background:none;border:none;color:#667;font-size:0.75rem;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='#ff5555'" onmouseout="this.style.color='#667'">Clear All</button>
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#8899aa; cursor:pointer;">
+                    <input type="checkbox" id="global-dispersion-toggle" />
+                    <span>Global Dispersion Domes</span>
+                </label>
             </div>
             <div id="user-sites-container"></div>
         </div>
@@ -982,6 +988,13 @@
                         <option value="1">Tier 1 - Critical Constraint (e.g., exclusion zone, heritage)</option>
                     </select>
                     <div class="hint">Tier determines priority in conflict detection and OST obligations.</div>
+                </div>
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal; color:#cbd5e1;">
+                        <input type="checkbox" id="planning-dispersion" checked style="width:16px;height:16px;accent-color:#55ff88;" />
+                        <span>Show Space Dispersion Dome (Dust/Radiological/Plume)</span>
+                    </label>
+                    <div class="hint">Renders a 3D translucent half-sphere dome extending into space matching the site radius.</div>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -1223,6 +1236,8 @@
         const planningRadius = document.getElementById('planning-radius');
         const planningColor = document.getElementById('planning-color');
         const planningTier = document.getElementById('planning-tier');
+        const planningDispersion = document.getElementById('planning-dispersion');
+        const globalDispersionToggle = document.getElementById('global-dispersion-toggle');
         const planningDescription = document.getElementById('planning-description');
         const planningNotes = document.getElementById('planning-notes');
         const currentLocationDisplay = document.getElementById('current-location-display');
@@ -1741,6 +1756,23 @@
         // --- User Site 3D Objects - Curved disc with no meridian line ---
         const userSiteObjects = new Map();
 
+        function createDispersionDomeMesh(radiusKm, colorHex) {
+            const radius3D = radiusKm / MOON_RADIUS_KM;
+            const segs = 32;
+            const domeGeo = new THREE.SphereGeometry(radius3D, segs, Math.floor(segs / 2), 0, Math.PI * 2, 0, Math.PI / 2);
+            const domeMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(colorHex),
+                transparent: true,
+                opacity: 0.18,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.AdditiveBlending
+            });
+            const domeMesh = new THREE.Mesh(domeGeo, domeMat);
+            return domeMesh;
+        }
+
         function createUserSiteDisc(site) {
             const color = site.color || '#00ff88';
             const radiusKm = site.radius_km || 5;
@@ -1798,6 +1830,13 @@
             const ring = new THREE.Line(ringGeo, ringMat);
             ring.computeLineDistances();
 
+            // 3D Dispersion Dome (Half-sphere into space)
+            const domeMesh = createDispersionDomeMesh(radiusKm, color);
+            domeMesh.position.copy(pos);
+            domeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
+            const isDomeVisible = (globalDispersionToggle && globalDispersionToggle.checked) || site.show_dispersion;
+            domeMesh.visible = !!isDomeVisible;
+
             // Label
             const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24, '(PLANNED)');
             const labelMat = new THREE.SpriteMaterial({
@@ -1817,9 +1856,10 @@
             const group = new THREE.Group();
             group.add(disc);
             group.add(ring);
+            group.add(domeMesh);
             group.add(label);
 
-            return { group, disc, ring, label };
+            return { group, disc, ring, domeMesh, label };
         }
 
         function createLabelTexture(text, fontSize = 32, subtext = null) {
@@ -1972,14 +2012,14 @@
                     if (type === 'orbit') continue;
                     let distKm = 0;
                     let overlaps = false;
-                    if (type === 'hemisphere') {
+                    if (type === 'hemisphere' || type === 'spherical_cap') {
                         const hLat = geom.lat ?? 0;
                         const hLon = geom.lon ?? 180;
-                        const hPos = latLonToPosition(hLat, hLon, 1);
-                        const curPos = latLonToPosition(lat, lon, 1);
-                        if (hPos.dot(curPos) > 0) {
+                        const angularRadiusDeg = geom.angular_radius_deg || (type === 'hemisphere' ? 90 : 75);
+                        const maxDistKm = (angularRadiusDeg / 180) * Math.PI * MOON_RADIUS_KM;
+                        distKm = distanceBetween(lat, lon, hLat, hLon);
+                        if (distKm <= maxDistKm) {
                             overlaps = true;
-                            distKm = distanceBetween(lat, lon, hLat, hLon);
                         }
                     } else {
                         const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
@@ -2290,11 +2330,13 @@
                     labelSprite.userData.featureId = feature.id;
                     allLabels.push(labelSprite);
                 }
-                else if (type === 'hemisphere') {
+                else if (type === 'hemisphere' || type === 'spherical_cap') {
                     const radius3D = MOON_3D_RADIUS * 1.01;
                     const segs = 48;
-                    const geo = new THREE.SphereGeometry(radius3D, segs, segs/2, 0, Math.PI*2, 0, Math.PI/2);
-                    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
+                    const angularRadiusRad = ((geom.angular_radius_deg || (type === 'hemisphere' ? 90 : 75)) * Math.PI) / 180;
+                    const opacity = geom.opacity || 0.14;
+                    const geo = new THREE.SphereGeometry(radius3D, segs, segs/2, 0, Math.PI*2, 0, angularRadiusRad);
+                    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: opacity, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
                     const mesh = new THREE.Mesh(geo, mat);
                     const hLat = geom.lat ?? 0;
                     const hLon = geom.lon ?? 180;
@@ -2967,6 +3009,7 @@
             const radius = parseFloat(planningRadius.value);
             const color = planningColor.value;
             const tier = parseInt(planningTier.value);
+            const showDispersion = planningDispersion ? planningDispersion.checked : true;
             const description = planningDescription.value.trim();
             const notes = planningNotes.value.trim();
 
@@ -2987,6 +3030,7 @@
                 radius_km: radius,
                 color: color,
                 tier: tier,
+                show_dispersion: showDispersion,
                 description: description,
                 notes: notes || '',
                 active: true
@@ -3003,8 +3047,19 @@
         });
         conflictConfirmBtn.addEventListener('click', confirmPlaceSite);
 
-        // --- Clear User Sites ---
+        // --- Clear User Sites & Global Dispersion Toggle ---
         clearUserSitesBtn.addEventListener('click', clearAllUserSites);
+        if (globalDispersionToggle) {
+            globalDispersionToggle.addEventListener('change', () => {
+                const isGlobalChecked = globalDispersionToggle.checked;
+                userSiteObjects.forEach((obj, siteId) => {
+                    const site = userSites.find(s => s.id === siteId);
+                    if (obj && obj.domeMesh) {
+                        obj.domeMesh.visible = isGlobalChecked || (site && site.show_dispersion);
+                    }
+                });
+            });
+        }
 
         // --- Settings Events ---
         loadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
@@ -3661,12 +3716,13 @@ function copyText() {
                 const geom = feature.geometry;
                 const type = geom ? geom.type : 'point';
                 let overlaps = false;
-                if (type === 'hemisphere') {
+                if (type === 'hemisphere' || type === 'spherical_cap') {
                     const hLat = geom.lat ?? 0;
                     const hLon = geom.lon ?? 180;
-                    const hPos = latLonToPosition(hLat, hLon, 1);
-                    const curPos = latLonToPosition(lat, lon, 1);
-                    if (hPos.dot(curPos) > 0) overlaps = true;
+                    const angularRadiusDeg = geom.angular_radius_deg || (type === 'hemisphere' ? 90 : 75);
+                    const maxDistKm = (angularRadiusDeg / 180) * Math.PI * MOON_RADIUS_KM;
+                    const d = distanceBetween(lat, lon, hLat, hLon);
+                    if (d <= maxDistKm) overlaps = true;
                 } else {
                     const featureRadius = feature.radius_km || DEFAULT_RADIUS_KM;
                     const detectionRadius = Math.max(featureRadius, MIN_DETECTION_KM);

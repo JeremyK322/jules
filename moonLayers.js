@@ -1933,7 +1933,7 @@ export const FEATURES = [
   },
   {
     "id": "far_side_radio",
-    "name": "Radio Quiet Zone (Far Side)",
+    "name": "Radio Quiet Zone (Far Side / SZM)",
     "tags": [
       "radio_quiet"
     ],
@@ -1943,20 +1943,21 @@ export const FEATURES = [
     "articles": [
       9
     ],
-    "source": "ITU Radio Regulations, Article 22.22; OST Article IX",
-    "note": "Protected spectrum zone for low-frequency radio astronomy free from terrestrial RFI.",
+    "source": "ITU Radio Regulations, Article 22.22; Bassett et al. Electrodynamics; Maccone (195° E/180° Antipode)",
+    "note": "Shielded Zone of the Moon (SZM) per ITU Radio Regulations Art. 22.22. Modeled as a ~75° angular radius cap (~150° longitude span from 105°E to 105°W) representing practical RFI attenuation (-80 dB threshold at low frequencies), with a ~30° core Protected Antipode Circle around (0°, 180°).",
     "geometry": {
-      "type": "hemisphere",
+      "type": "spherical_cap",
       "lat": 0,
       "lon": 180,
-      "radius_km": 1737.4,
-      "opacity": 0.12
+      "angular_radius_deg": 75,
+      "radius_km": 2274,
+      "opacity": 0.14
     },
     "date": "Pending",
-    "evidence_grade": "B",
+    "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "ITU / International Radio Astronomy Community"
   },
   {
     "id": "lro_orbit",
