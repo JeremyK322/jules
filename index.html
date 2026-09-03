@@ -3383,6 +3383,7 @@
             const canvasImg = renderer.domElement.toDataURL('image/png');
 
             let reportName, categoryName, tierNum, tierText, sourceText, evidenceText, statusText, dateText, eventDateText = null, authText, stateResp, disputeText, legalInstrumentText, summaryText;
+            let legalBasisText = 'None specified', legalStatusEffectText = 'none', responsibleStatesText = 'None specified', authorizingAgencyText = 'None specified', authorizationIdText = 'None', authorizationDateText = 'None', supervisionStatusText = 'None', coordinationRequiredText = 'No', coordinationMechanismText = 'None', disputePartiesText = 'None', statusDateText = 'None';
 
             if (targetFeature) {
                 tierNum = targetFeature.tier || 3;
@@ -3632,8 +3633,12 @@ function copyText() {
 
             const reportWin = window.open('', '_blank', 'width=900,height=900');
             if (reportWin) {
-                reportWin.document.write(reportHtml);
-                reportWin.document.close();
+                try {
+                    reportWin.document.write(reportHtml);
+                    reportWin.document.close();
+                } catch (e) {
+                    console.warn('Error writing report window:', e);
+                }
 
                 const checkClosed = setInterval(() => {
                     if (reportWin.closed) {
@@ -3641,6 +3646,10 @@ function copyText() {
                         unfreezeMap();
                     }
                 }, 500);
+            } else {
+                showMessage('Report popup blocked. Please allow popups for this site.', 'error');
+                unfreezeMap();
+                setTimeout(() => showMessage('', 'hidden'), 3500);
             }
         }
 
