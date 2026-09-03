@@ -449,16 +449,20 @@
         .hud-status-dot {
             width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: #4a8;
-            box-shadow: 0 0 6px rgba(68, 170, 136, 0.6);
+            background-color: #44ff88;
+            box-shadow: 0 0 6px rgba(68, 255, 136, 0.6);
         }
-        .hud-status-dot.active-constraint {
-            background-color: #ff5555;
-            box-shadow: 0 0 8px rgba(255, 85, 85, 0.8);
+        .hud-status-dot.tier-1 {
+            background-color: #ff4444;
+            box-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
         }
-        .hud-status-dot.active-warning {
-            background-color: #ffaa00;
-            box-shadow: 0 0 8px rgba(255, 170, 0, 0.8);
+        .hud-status-dot.tier-2 {
+            background-color: #ffaa44;
+            box-shadow: 0 0 8px rgba(255, 170, 68, 0.8);
+        }
+        .hud-status-dot.tier-3 {
+            background-color: #44ff88;
+            box-shadow: 0 0 6px rgba(68, 255, 136, 0.6);
         }
         #centre-overlap-text {
             color: #eeeeee;
@@ -3392,6 +3396,7 @@
             const canvasImg = renderer.domElement.toDataURL('image/png');
 
             let reportName, categoryName, tierNum, tierText, sourceText, evidenceText, statusText, dateText, eventDateText = null, authText, stateResp, disputeText, legalInstrumentText, summaryText;
+            let ostObligationsTriggeredText = 'Article II (Non-appropriation) & Article IX (Due Regard & Non-Interference)';
             let legalBasisText = 'None specified', legalStatusEffectText = 'none', responsibleStatesText = 'None specified', authorizingAgencyText = 'None specified', authorizationIdText = 'None', authorizationDateText = 'None', supervisionStatusText = 'None', coordinationRequiredText = 'No', coordinationMechanismText = 'None', disputePartiesText = 'None', statusDateText = 'None';
 
             if (targetFeature) {
@@ -3461,6 +3466,23 @@
                     ? `Active challenge by ${targetFeature.dispute_details.challenger || 'Challenger'}. Justification: ${targetFeature.dispute_details.justification || 'Pending'}. Deadline: ${targetFeature.dispute_details.response_deadline || 'None'}.`
                     : 'No active disputes recorded';
 
+                if (targetFeature.articles && targetFeature.articles.length > 0) {
+                    const mappedArts = targetFeature.articles.map(a => {
+                        if (a === 2) return 'Article II (Non-appropriation)';
+                        if (a === 3) return 'Article III (International Law & UN Charter)';
+                        if (a === 6) return 'Article VI (State Responsibility & Supervision)';
+                        if (a === 8) return 'Article VIII (Jurisdiction & Control)';
+                        if (a === 9) return 'Article IX (Due Regard & Harmful Interference)';
+                        if (a === 11) return 'Article XI (Transparency & UN Notification)';
+                        return `Article ${a}`;
+                    });
+                    ostObligationsTriggeredText = mappedArts.join('; ');
+                } else if (targetFeature.legal_basis && targetFeature.legal_basis.includes('Article VI')) {
+                    ostObligationsTriggeredText = 'Article VI (State Responsibility & Authorization) & Article IX (Due Regard & Non-Interference)';
+                } else {
+                    ostObligationsTriggeredText = 'Article IX (Due Regard & Harmful Interference)';
+                }
+
                 summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
             } else {
                 const isOrbitReport = targetFeature && targetFeature.geometry && targetFeature.geometry.type === 'orbit';
@@ -3492,7 +3514,7 @@
             }
 
             const eventDateLine = eventDateText ? `\nEvent date: ${eventDateText}` : "";
-            const textBlockToCopy = `LUNAR CONSTRAINT MAP REPORT\nTitle: ${reportName} - ${categoryName}\n\nHEADLINE FIELDS\nName: ${reportName}\nCategory: ${categoryName}\nTier: Tier ${tierNum}\nWhat that means: ${tierText}\n\nRECORD SECTIONS\nSource: ${sourceText}\nEvidence: ${evidenceText}\nStatus: ${statusText}\nAssessed on: ${dateText}${eventDateLine}\nDesignated by: ${authText}\nState responsible: ${stateResp}\nDispute status: ${disputeText}\nRelevant legal instrument: ${legalInstrumentText}\n\nPLAIN LANGUAGE SUMMARY\n${summaryText}\n\nFOOTER\nAbsence from this report does not mean an area is free of constraint. This report is a rendering of the current record, not a legal determination.`;
+            const textBlockToCopy = `LUNAR CONSTRAINT MAP REPORT\nTitle: ${reportName} - ${categoryName}\n\nHEADLINE FIELDS\nName: ${reportName}\nCategory: ${categoryName}\nTier: Tier ${tierNum}\nWhat that means: ${tierText}\nOST Obligations Triggered: ${ostObligationsTriggeredText}\n\nRECORD SECTIONS\nSource: ${sourceText}\nEvidence: ${evidenceText}\nStatus: ${statusText}\nAssessed on: ${dateText}${eventDateLine}\nDesignated by: ${authText}\nState responsible: ${stateResp}\nDispute status: ${disputeText}\nRelevant legal instrument: ${legalInstrumentText}\n\nPLAIN LANGUAGE SUMMARY\n${summaryText}\n\nFOOTER\nAbsence from this report does not mean an area is free of constraint. This report is a rendering of the current record, not a legal determination.`;
 
             const reportHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -3543,6 +3565,10 @@ h1 { font-size: 1.5rem; margin-top: 0; color: #93c5fd; border-bottom: 1px solid 
         <div class="field-full">
             <div class="field-label">What that means</div>
             <div class="field-value">${tierText}</div>
+        </div>
+        <div class="field-full">
+            <div class="field-label">OST Obligations Triggered</div>
+            <div class="field-value" style="color: #38bdf8; font-weight: bold;">${ostObligationsTriggeredText}</div>
         </div>
     </div>
 
@@ -3904,14 +3930,11 @@ function copyText() {
                 const statusInfo = getFeatureStatus(lat, lon);
                 if (statusInfo) {
                     centreOverlapText.innerHTML = statusInfo.html;
-                    if (statusInfo.tier === 1 || statusInfo.articles.includes(9)) {
-                        hudStatusDotEl.className = 'hud-status-dot active-constraint';
-                    } else {
-                        hudStatusDotEl.className = 'hud-status-dot active-warning';
-                    }
+                    const tierClass = statusInfo.tier === 1 ? 'tier-1' : (statusInfo.tier === 2 ? 'tier-2' : 'tier-3');
+                    hudStatusDotEl.className = `hud-status-dot ${tierClass}`;
                 } else {
                     centreOverlapText.textContent = 'Open (No active constraints)';
-                    hudStatusDotEl.className = 'hud-status-dot';
+                    hudStatusDotEl.className = 'hud-status-dot tier-3';
                 }
             }
 
