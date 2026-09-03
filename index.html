@@ -2094,10 +2094,11 @@
                 html += `<div class="hud-detail-line"><strong>Type:</strong> Unassessed</div>`;
                 html += `<div class="hud-detail-line"><strong>Tier or status:</strong> Unassessed</div>`;
                 html += `<div class="hud-detail-line"><strong>State:</strong> None</div>`;
+                html += `<div class="hud-detail-line" style="color:#a5f3fc;"><strong>OST Obligations:</strong> Art. II (Non-appropriation) & Art. IX (Due regard)</div>`;
                 return {
                     html,
                     tier: 3,
-                    articles: []
+                    articles: [2, 9]
                 };
             }
 
@@ -2120,12 +2121,20 @@
             const statusText = feature.review_status ? feature.review_status.replace('_', ' ').toUpperCase() : `Tier ${feature.tier || 3}`;
             const stateText = feature.state && feature.state.trim() ? feature.state : 'None';
 
+            let ostText = 'Art. IX (Due regard)';
+            if (feature.articles && feature.articles.length > 0) {
+                ostText = feature.articles.map(a => `Art. ${a}`).join(', ');
+            } else if (feature.legal_basis && feature.legal_basis.includes('Article VI')) {
+                ostText = 'Art. VI (State responsibility) & Art. IX';
+            }
+
             let html = `<div class="hud-detail-line"><strong>Feature:</strong> ${feature.name}</div>`;
             html += `<div class="hud-detail-line"><strong>Type:</strong> ${categoryLabel}</div>`;
             html += `<div class="hud-detail-line"><strong>Tier or status:</strong> ${statusText}</div>`;
             html += `<div class="hud-detail-line"><strong>State:</strong> ${stateText}</div>`;
+            html += `<div class="hud-detail-line" style="color:#a5f3fc;"><strong>OST Obligations:</strong> ${ostText}</div>`;
 
-            // Optional 5th line only for overlap
+            // Optional overlap line
             if (overlappingFeatures.length > 1) {
                 const otherNames = overlappingFeatures.slice(1).map(o => o.feature.name).join(', ');
                 html += `<div class="hud-detail-line" style="color:#ffaa00;"><strong>Overlap:</strong> ${otherNames}</div>`;
@@ -3446,13 +3455,13 @@
                     ? 'ITU Radio Regulations Article 22.22 and Outer Space Treaty Article IX'
                     : (targetFeature.articles && targetFeature.articles.length > 0
                         ? `Outer Space Treaty Articles ${targetFeature.articles.join(' and ')}`
-                        : 'Outer Space Treaty Article IX general due regard principles'));
+                        : 'Outer Space Treaty Article IX (Due regard & non-interference)'));
 
                 disputeText = targetFeature.disputed && targetFeature.dispute_details
                     ? `Active challenge by ${targetFeature.dispute_details.challenger || 'Challenger'}. Justification: ${targetFeature.dispute_details.justification || 'Pending'}. Deadline: ${targetFeature.dispute_details.response_deadline || 'None'}.`
                     : 'No active disputes recorded';
 
-                summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Operators planning activities within or adjacent to this zone must evaluate potential interference and observe international coordination guidelines. Authorization and continuing supervision remain the responsibility of the designated state party pursuant to Article VI of the Outer Space Treaty.`;
+                summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
             } else {
                 const isOrbitReport = targetFeature && targetFeature.geometry && targetFeature.geometry.type === 'orbit';
                 if (isOrbitReport) {
@@ -3474,12 +3483,12 @@
                 statusText = targetFeature ? (targetFeature.review_status ? targetFeature.review_status.toUpperCase() : 'Assessed') : 'Unassessed';
                 dateText = targetFeature ? (targetFeature.date || 'Pending') : 'N/A';
                 authText = targetFeature ? (targetFeature.designation_authority || 'N/A') : 'N/A';
-                stateResp = targetFeature ? (targetFeature.state || 'None specified') : 'None (Article II OST: Not subject to national appropriation)';
+                stateResp = targetFeature ? (targetFeature.state || 'None specified') : 'None (OST Article II: Non-appropriation by claim, use or occupation)';
                 disputeText = 'No active disputes recorded';
-                legalInstrumentText = 'Outer Space Treaty Article IX general due regard principles';
+                legalInstrumentText = 'Outer Space Treaty Articles II (Non-appropriation) and IX (Due Regard)';
                 summaryText = targetFeature
-                    ? `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics.`
-                    : `This location represents unassessed open lunar surface. Operators are advised to perform local site verification and adhere to standard Article IX due regard principles.`;
+                    ? `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics. OST Article VI state authorization and supervision apply.`
+                    : `This location represents unassessed open lunar surface. Under OST Article II, no part of the lunar surface is subject to national appropriation. Operators must adhere to OST Article IX due regard obligations and consult prior to undertaking activities that could cause harmful interference.`;
             }
 
             const eventDateLine = eventDateText ? `\nEvent date: ${eventDateText}` : "";
@@ -3607,6 +3616,19 @@ h1 { font-size: 1.5rem; margin-top: 0; color: #93c5fd; border-bottom: 1px solid 
             <div class="field-label">Dispute Parties & Status Date</div>
             <div class="field-value">${disputePartiesText} (${statusDateText})</div>
         </div>
+    </div>
+
+    <div class="section-title">Outer Space Treaty (OST) Core Obligations</div>
+    <div class="summary-box" style="border-left-color: #38bdf8; background: #0f2942;">
+        <strong>Applicable OST Framework:</strong> ${legalInstrumentText}<br><br>
+        <strong>Key Treaty Obligations:</strong>
+        <ul style="margin: 8px 0 0 18px; padding: 0;">
+            <li><strong>Article II (Non-Appropriation):</strong> Outer space, including the Moon, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.</li>
+            <li><strong>Article VI (State Responsibility & Authorization):</strong> States Parties bear international responsibility for national activities in outer space, including the Moon, whether carried out by governmental agencies or non-governmental entities. Non-governmental entities require authorization and continuing supervision by the appropriate State Party.</li>
+            <li><strong>Article VIII (Jurisdiction & Control):</strong> A State Party retains jurisdiction and control over spacecraft and personnel launched into outer space that are registered on its launch registry.</li>
+            <li><strong>Article IX (Due Regard & Consultation):</strong> States Parties shall conduct all activities on the Moon with due regard to the corresponding interests of all other States Parties. If an activity would cause potentially harmful interference with activities of other States Parties, appropriate international consultations must be undertaken prior to proceeding.</li>
+            <li><strong>Article XI (Transparency & Information Sharing):</strong> States Parties agree to inform the Secretary-General of the United Nations as well as the public and the international scientific community of the nature, conduct, locations and results of space activities.</li>
+        </ul>
     </div>
 
     <div class="section-title">Plain Language Summary</div>
