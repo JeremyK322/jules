@@ -1429,8 +1429,9 @@
             const targetMoon = currentMoon || fallbackMoon;
             if (targetMoon) {
                 const intersects = crosshairRaycaster.intersectObject(targetMoon, true);
-                if (intersects.length > 0) {
-                    const worldPt = intersects[0].point.clone();
+                const surfaceHit = intersects.find(hit => hit.object.isMesh && !hit.object.userData.featureId && !hit.object.userData.harmType);
+                if (surfaceHit) {
+                    const worldPt = surfaceHit.point.clone();
                     const invMatrix = targetMoon.matrixWorld.clone().invert();
                     const localPt = worldPt.applyMatrix4(invMatrix);
                     return positionToLatLon(localPt);
@@ -3875,6 +3876,18 @@ function copyText() {
         window.hideFeaturePopup = hideFeaturePopup;
         window.openReportWindow = openReportWindow;
         window.unfreezeMap = unfreezeMap;
+        window.flyToFeatureLocation = flyToFeatureLocation;
+        window.getCrosshairLatLon = getCrosshairLatLon;
+        window.controls = controls;
+        window.userSiteObjects = userSiteObjects;
+        window.userSites = userSites;
+        window.featureObjects = featureObjects;
+        window.latLonToPosition = latLonToPosition;
+        window.positionToLatLon = positionToLatLon;
+        window.THREE = THREE;
+        window.camera = camera;
+        window.currentMoon = currentMoon;
+        window.moonMeshes = moonMeshes;
         Object.defineProperty(window, 'isMapFrozen', { get: () => isMapFrozen });
 
         console.log('Lunar Constraint Map with Camera-Based Planning and Curved Discs initialized.');
