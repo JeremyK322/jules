@@ -1,16 +1,14 @@
-// ── Background Animation (Fireflies & Ember Fire) ────────────────────
+// ── Bioluminescent Ocean Waves & Electric Blue Algae Animation ────────────
 (function(window) {
   let bgCanvas, ctx;
-  let fireIntensity = 0.0;
-  const maxFire = 0.45;
-  const fireDecay = 0.0000005;
-  const embers = [];
-  const MAX_EMBERS = 70;
-  const glowbugs = [];
-  const keyMap = {};
-  const bugDecay = 0.00025;
+  let activityIntensity = 0.15; // Ambient activity level
+  const maxActivity = 1.0;
+  const activityDecay = 0.00015; // Decay rate per ms
+
+  const algaeParticles = [];
+  const MAX_ALGAE = 120;
   let lastFrameTime = 0;
-  const FRAME_INTERVAL = 1000 / 30;
+  const FRAME_INTERVAL = 1000 / 30; // 30 FPS target
 
   function resizeCanvas() {
     if (!bgCanvas) return;
@@ -18,30 +16,51 @@
     bgCanvas.height = window.innerHeight;
   }
 
-  class Ember {
-    constructor(x, y, i) {
-      this.x = x;
-      this.y = y;
-      this.vx = (Math.random() - 0.5) * 0.7;
-      this.vy = -Math.random() * 0.9 - 0.3;
-      this.life = 1;
-      this.decay = 0.003 + Math.random() * 0.005;
-      this.size = 1 + Math.random() * 2.2;
-      this.intensity = i;
+  class BioAlgae {
+    constructor(x, y, isBloom = false) {
+      this.x = x !== undefined ? x : Math.random() * (bgCanvas ? bgCanvas.width : window.innerWidth);
+      this.y = y !== undefined ? y : (bgCanvas ? bgCanvas.height : window.innerHeight) - Math.random() * (bgCanvas ? bgCanvas.height * 0.6 : 400);
+      this.vx = (Math.random() - 0.5) * 0.8;
+      this.vy = -Math.random() * 0.6 - 0.2;
+      this.size = 1.5 + Math.random() * 3.5;
+      this.life = 1.0;
+      this.decay = 0.002 + Math.random() * 0.004;
+      this.hue = 180 + Math.random() * 35; // Cyan (180) to Electric Blue (215)
+      this.brightness = isBloom ? 0.9 + Math.random() * 0.1 : 0.4 + Math.random() * 0.5;
+      this.phase = Math.random() * Math.PI * 2;
+      this.pulseSpeed = 0.002 + Math.random() * 0.003;
     }
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.vx *= 0.998;
-      this.vy -= 0.0008;
+
+    update(dt) {
+      const now = performance.now();
+      this.x += this.vx + Math.sin(now * 0.001 + this.phase) * 0.5;
+      this.y += this.vy + Math.cos(now * 0.0012 + this.phase) * 0.3;
       this.life -= this.decay;
+      this.brightness = Math.min(1.0, this.brightness + Math.sin(now * this.pulseSpeed) * 0.05);
+
+      if (this.x < -20) this.x = (bgCanvas ? bgCanvas.width : window.innerWidth) + 20;
+      if (this.x > (bgCanvas ? bgCanvas.width : window.innerWidth) + 20) this.x = -20;
     }
-    draw(ctx, baseColor) {
+
+    draw(ctx) {
       if (this.life <= 0) return;
-      const a = this.life * 0.7 * (this.intensity / maxFire);
+      const alpha = Math.max(0, this.life * this.brightness * (0.4 + activityIntensity * 0.6));
+      const glowRadius = this.size * (6 + activityIntensity * 8);
+
+      // Outer glowing halo
+      const glowGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
+      glowGrad.addColorStop(0, `hsla(${this.hue}, 100%, 65%, ${alpha * 0.7})`);
+      glowGrad.addColorStop(0.4, `hsla(${this.hue}, 90%, 50%, ${alpha * 0.25})`);
+      glowGrad.addColorStop(1, 'transparent');
+
       ctx.save();
-      ctx.globalAlpha = a;
-      ctx.fillStyle = baseColor;
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Intense bioluminescent core
+      ctx.fillStyle = `hsla(${this.hue}, 100%, 88%, ${alpha})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -49,150 +68,130 @@
     }
   }
 
-  function createGlowbugs() {
-    const keys = ['e','a','t','s','n','r','o','i','l','d','h','m','u','w','y','*'];
-    keys.forEach(k => {
-      let hue;
-      if (k === '*') hue = 90;
-      else if (['e','a','t','s'].includes(k)) hue = 55 + Math.random() * 25;
-      else if (['n','r','o','i'].includes(k)) hue = 75 + Math.random() * 35;
-      else if (['l','d','h'].includes(k)) hue = 100 + Math.random() * 45;
-      else hue = 60 + Math.random() * 70;
-
-      const bug = {
-        key: k,
-        hue,
-        sat: 30 + Math.random() * 30,
-        light: 75 + Math.random() * 15,
-        brightness: 0,
-        x: Math.random() * (bgCanvas ? bgCanvas.width : window.innerWidth),
-        y: Math.random() * (bgCanvas ? bgCanvas.height : window.innerHeight),
-        targetX: Math.random() * (bgCanvas ? bgCanvas.width : window.innerWidth),
-        targetY: Math.random() * (bgCanvas ? bgCanvas.height : window.innerHeight),
-        vx: 0,
-        vy: 0,
-        size: 2.5 + Math.random() * 4.5,
-        phase: Math.random() * Math.PI * 2
-      };
-      glowbugs.push(bug);
-      keyMap[k] = glowbugs.length - 1;
-    });
-  }
-
-  function boostBug(keyChar) {
-    const idx = keyMap[keyChar] !== undefined ? keyMap[keyChar] : keyMap['*'];
-    if (idx === undefined || !glowbugs[idx]) return;
-    const bug = glowbugs[idx];
-    bug.brightness = Math.min(bug.brightness + 0.55, 1);
-    bug.targetX = Math.random() * bgCanvas.width;
-    bug.targetY = Math.random() * bgCanvas.height;
-    if (idx !== keyMap['*']) {
-      const fallback = glowbugs[keyMap['*']];
-      if (fallback) fallback.brightness = Math.min(fallback.brightness + 0.12, 0.75);
+  function createInitialAlgae() {
+    algaeParticles.length = 0;
+    const initialCount = Math.floor(MAX_ALGAE * 0.4);
+    for (let i = 0; i < initialCount; i++) {
+      algaeParticles.push(new BioAlgae());
     }
   }
 
-  function updateFire(dt) {
-    fireIntensity = Math.max(0, fireIntensity - fireDecay * dt);
-    const targetCount = Math.floor(MAX_EMBERS * (fireIntensity / maxFire));
-    while (embers.length < targetCount && embers.length < MAX_EMBERS) {
-      const x = bgCanvas.width / 2 + (Math.random() - 0.5) * 140;
-      const y = bgCanvas.height - 25 + Math.random() * 20;
-      embers.push(new Ember(x, y, fireIntensity));
-    }
-    for (let i = embers.length - 1; i >= 0; i--) {
-      embers[i].update();
-      if (embers[i].life <= 0) embers.splice(i, 1);
-    }
-  }
-
-  function updateGlowbugs(dt) {
-    const now = performance.now();
-    glowbugs.forEach(bug => {
-      bug.brightness = Math.max(bug.brightness - bugDecay * dt, 0);
-      if (bug.brightness < 0.03 && Math.random() < 0.01) {
-        bug.targetX = Math.random() * bgCanvas.width;
-        bug.targetY = Math.random() * bgCanvas.height;
+  function boostAlgaeBloom() {
+    // Add pulsing bioluminescent algae particles on keypress or AI response
+    const bloomCount = 3 + Math.floor(activityIntensity * 8);
+    for (let i = 0; i < bloomCount; i++) {
+      if (algaeParticles.length < MAX_ALGAE) {
+        const x = Math.random() * bgCanvas.width;
+        const y = bgCanvas.height - Math.random() * (bgCanvas.height * 0.5);
+        algaeParticles.push(new BioAlgae(x, y, true));
       }
-      const hoverX = Math.sin(now * 0.0018 + bug.phase) * 30;
-      const hoverY = Math.cos(now * 0.0022 + bug.phase) * 22;
-      const destX = bug.targetX + hoverX;
-      const destY = bug.targetY + hoverY;
-      const speed = 0.02 + bug.brightness * 0.12;
-      bug.vx += (destX - bug.x) * speed * 0.012;
-      bug.vy += (destY - bug.y) * speed * 0.012;
-      bug.vx *= 0.96;
-      bug.vy *= 0.96;
-      bug.x += bug.vx;
-      bug.y += bug.vy;
-      if (bug.x < -50) bug.x = bgCanvas.width + 50;
-      if (bug.x > bgCanvas.width + 50) bug.x = -50;
-      if (bug.y < -50) bug.y = bgCanvas.height + 50;
-      if (bug.y > bgCanvas.height + 50) bug.y = -50;
-    });
+    }
+  }
+
+  function drawBioluminescentWaves(time) {
+    if (!ctx || !bgCanvas) return;
+    const width = bgCanvas.width;
+    const height = bgCanvas.height;
+
+    // Number of active wave layers scales with AI activity (3 to 6 waves)
+    const waveCount = 3 + Math.floor(activityIntensity * 3);
+    const baseWaveHeight = height * 0.25;
+
+    for (let i = 0; i < waveCount; i++) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+
+      const waveSpeed = (0.0008 + i * 0.0004) * (1 + activityIntensity * 1.5);
+      const amplitude = (15 + i * 12) * (1 + activityIntensity * 1.8);
+      const frequency = 0.004 - i * 0.0006;
+
+      for (let x = 0; x <= width; x += 15) {
+        const y = height - baseWaveHeight + (i * 25) +
+                  Math.sin(x * frequency + time * waveSpeed + i) * amplitude +
+                  Math.cos(x * frequency * 0.5 + time * waveSpeed * 0.7) * (amplitude * 0.5);
+        ctx.lineTo(x, y);
+      }
+
+      ctx.lineTo(width, height);
+      ctx.closePath();
+
+      // Wave color gradients (deep abyssal ocean to electric cyan crests)
+      const hue = 185 + i * 10; // Cyan to Deep Sapphire Blue
+      const alpha = (0.06 + (i * 0.03)) * (0.8 + activityIntensity * 1.2);
+
+      const grad = ctx.createLinearGradient(0, height - baseWaveHeight, 0, height);
+      grad.addColorStop(0, `hsla(${hue}, 100%, 60%, ${alpha * 1.5})`); // Crest bioluminescence
+      grad.addColorStop(0.3, `hsla(${hue - 15}, 85%, 40%, ${alpha * 0.8})`);
+      grad.addColorStop(1, `hsla(220, 90%, 10%, ${alpha * 0.4})`); // Deep ocean abyss
+
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function updateSystem(dt) {
+    // Slowly decay activity back to ambient floor
+    activityIntensity = Math.max(0.12, activityIntensity - activityDecay * dt);
+
+    // Maintain target algae particle count proportional to AI activity
+    const targetAlgaeCount = Math.floor(25 + (MAX_ALGAE - 25) * (activityIntensity / maxActivity));
+    while (algaeParticles.length < targetAlgaeCount) {
+      algaeParticles.push(new BioAlgae());
+    }
+
+    // Update particles
+    for (let i = algaeParticles.length - 1; i >= 0; i--) {
+      algaeParticles[i].update(dt);
+      if (algaeParticles[i].life <= 0) {
+        algaeParticles.splice(i, 1);
+      }
+    }
   }
 
   function drawBackground() {
     if (!ctx || !bgCanvas) return;
+    const now = performance.now();
     ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-    if (fireIntensity > 0.001) {
-      const r = 80 + fireIntensity * 600;
-      const g = 20 + fireIntensity * 450;
-      const b = 30 - fireIntensity * 100;
-      const baseColor = `rgb(${Math.min(r, 255)},${Math.min(g, 255)},${Math.max(b, 0)})`;
-      const grad = ctx.createRadialGradient(
-        bgCanvas.width / 2, bgCanvas.height - 10, 0,
-        bgCanvas.width / 2, bgCanvas.height - 10, 280 + fireIntensity * 350
-      );
-      grad.addColorStop(0, `rgba(${Math.min(r, 255)},${Math.min(g, 255)},${Math.max(b, 0)},${0.15 + fireIntensity * 0.4})`);
-      grad.addColorStop(0.6, `rgba(${Math.min(r, 255)},${Math.min(g, 255)},${Math.max(b, 0)},0.03)`);
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-      embers.forEach(ember => ember.draw(ctx, baseColor));
-    }
-    glowbugs.forEach(bug => {
-      const alpha = bug.brightness * 0.85;
-      if (alpha < 0.02) return;
-      const halo = bug.size * 9 + bug.brightness * 22;
-      const haloGrad = ctx.createRadialGradient(bug.x, bug.y, 0, bug.x, bug.y, halo);
-      haloGrad.addColorStop(0, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,${alpha * 0.45})`);
-      haloGrad.addColorStop(0.5, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,0)`);
-      haloGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = haloGrad;
-      ctx.beginPath();
-      ctx.arc(bug.x, bug.y, halo, 0, Math.PI * 2);
-      ctx.fill();
 
-      const core = bug.size * 1.6 + bug.brightness * 3.5;
-      const coreGrad = ctx.createRadialGradient(bug.x, bug.y, 0, bug.x, bug.y, core);
-      coreGrad.addColorStop(0, `hsla(${bug.hue},25%,92%,${alpha * 0.9})`);
-      coreGrad.addColorStop(0.3, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,${alpha * 0.9})`);
-      coreGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = coreGrad;
-      ctx.beginPath();
-      ctx.arc(bug.x, bug.y, core, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    // Deep ocean atmospheric radial background
+    const bgGrad = ctx.createRadialGradient(
+      bgCanvas.width / 2, bgCanvas.height * 0.8, 0,
+      bgCanvas.width / 2, bgCanvas.height * 0.8, bgCanvas.width * 0.8
+    );
+    bgGrad.addColorStop(0, `rgba(4, 25, 45, ${0.2 + activityIntensity * 0.35})`);
+    bgGrad.addColorStop(0.6, `rgba(2, 12, 25, ${0.1 + activityIntensity * 0.2})`);
+    bgGrad.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+    // Render waves
+    drawBioluminescentWaves(now);
+
+    // Render bio-algae plankton particles
+    algaeParticles.forEach(p => p.draw(ctx));
   }
 
-  let lastTimestamp = 0;
   function animationLoop(ts) {
     if (ts - lastFrameTime < FRAME_INTERVAL) {
       requestAnimationFrame(animationLoop);
       return;
     }
+    const dt = Math.min(ts - lastFrameTime, 100);
     lastFrameTime = ts;
-    const dt = Math.min(ts - lastTimestamp, 100);
-    lastTimestamp = ts;
-    updateFire(dt);
-    updateGlowbugs(dt);
+
+    updateSystem(dt);
     drawBackground();
     requestAnimationFrame(animationLoop);
   }
 
   function boostFire(chars) {
-    fireIntensity = Math.min(maxFire, fireIntensity + Math.min(0.25, (chars / 4000) * 0.2));
+    // Increase activity intensity as AI generates responses
+    const boost = Math.min(0.35, (chars / 2500) * 0.25);
+    activityIntensity = Math.min(maxActivity, activityIntensity + boost);
+    boostAlgaeBloom();
   }
 
   function initAnimations() {
@@ -200,14 +199,16 @@
     if (!bgCanvas) return;
     ctx = bgCanvas.getContext('2d');
     resizeCanvas();
-    createGlowbugs();
+    createInitialAlgae();
     window.addEventListener('resize', resizeCanvas);
+
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
-        const key = e.key;
-        if (key.length === 1) boostBug(key.toLowerCase());
+        activityIntensity = Math.min(maxActivity, activityIntensity + 0.03);
+        if (Math.random() < 0.3) boostAlgaeBloom();
       }
     });
+
     requestAnimationFrame(animationLoop);
   }
 
