@@ -2264,6 +2264,7 @@
                         color = '#94a3b8'; // Muted slate outline
                         opacity = 0.05; // Thin outline, virtually no fill
                         break;
+                    case 'proposed_protected':
                     case 'assessed_protected':
                         color = '#64748b'; // Muted slate fill
                         opacity = 0.4;
@@ -3447,7 +3448,9 @@
                     ? 'Grade C - Unverified assertion or preliminary estimate'
                     : 'Not graded';
 
-                statusText = targetFeature.review_status === 'assessed_protected'
+                statusText = targetFeature.review_status === 'proposed_protected'
+                    ? 'Proposed Protected'
+                    : targetFeature.review_status === 'assessed_protected'
                     ? 'Assessed Protected'
                     : targetFeature.review_status === 'assessed_open'
                     ? 'Assessed Open'
@@ -3457,7 +3460,7 @@
 
                 eventDateText = targetFeature.event_date || null;
                 dateText = targetFeature.date || 'Pending';
-                authText = targetFeature.designation_authority || 'IAU / Regulatory Framework';
+                authText = targetFeature.designation_authority || 'Proposed by map contributors';
 
                 legalBasisText = targetFeature.legal_basis || 'None specified';
                 legalStatusEffectText = targetFeature.legal_status_effect || 'none';
