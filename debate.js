@@ -283,6 +283,7 @@
         const mainAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: mainCleaned };
         mainDebateLog.push(mainAssistantEntry);
         appendBubbleColumn(chatCMain, 'assistant', mainCleaned, window.APP || 'The Adze');
+        if (window.boostFire) window.boostFire(mainCleaned.length, mainCleaned);
 
         if (mainStoppedForClarification) {
           if (window.setStatusMessage) window.setStatusMessage('🛑 Debate paused: Main Thread requested user clarification.');
@@ -335,6 +336,7 @@
         const secondAssistantEntry = { timestamp: new Date().toISOString(), role: 'assistant', content: secondReply };
         secondBrainLog.push(secondAssistantEntry);
         appendBubbleColumn(chatCSecond, 'assistant', secondReply, 'Second Brain');
+        if (window.boostFire) window.boostFire(secondReply.length, secondReply);
 
         if (secondStoppedForClarification) {
           if (window.setStatusMessage) window.setStatusMessage('🛑 Debate paused: Second Brain requested user clarification.');

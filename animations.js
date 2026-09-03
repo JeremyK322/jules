@@ -9,9 +9,12 @@
 
   // Bio-Algae (AI feeding & spreading by letters)
   const bioAlgaeParticles = [];
-  const MAX_ALGAE = 180;
+  const MAX_ALGAE = 250;
   let algaeActivity = 0.15;
   const activityDecay = 0.00015;
+
+  // Staggered spawning queue across frames
+  const spawnQueue = [];
 
   let lastFrameTime = 0;
   const FRAME_INTERVAL = 1000 / 30; // 30 FPS target
@@ -125,7 +128,7 @@
     });
   }
 
-  // ── AI Bio-Algae Class (Letter-Mapped Particle Bloom) ──
+  // ── AI Bio-Algae Class (Sustained Life & Letter-Mapped Bloom) ──
   class BioAlgaeParticle {
     constructor(x, y, char = 'a') {
       this.x = x;
@@ -135,7 +138,8 @@
       this.vx = (Math.random() - 0.5) * 1.2;
       this.vy = -Math.random() * 0.8 - 0.2;
       this.life = 1.0;
-      this.decay = 0.003 + Math.random() * 0.005;
+      // 3 to 10 seconds of lifespan (slow decay)
+      this.decay = 0.0001 + Math.random() * 0.0002;
 
       // Color spectrum: Cyan (175) to Electric Blue (220)
       const code = char.charCodeAt(0) || 97;
@@ -148,7 +152,7 @@
       const now = performance.now();
       this.x += this.vx + Math.sin(now * 0.0015 + this.phase) * 0.6;
       this.y += this.vy + Math.cos(now * 0.0018 + this.phase) * 0.4;
-      this.life -= this.decay;
+      this.life -= this.decay * dt;
     }
 
     draw(ctx) {
@@ -196,7 +200,7 @@
       const code = lower.charCodeAt(0) || 97;
       const norm = (code - 97) / 26; // 0 to 1
       const angle = norm * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const dist = (width * 0.2) + Math.random() * (width * 0.3);
+      const dist = (width * 0.2) + Math.random() * (width * 0.35);
       return {
         x: Math.max(30, Math.min(width - 30, width / 2 + Math.cos(angle) * dist)),
         y: Math.max(30, Math.min(height - 30, height / 2 + Math.sin(angle) * dist))
@@ -207,13 +211,25 @@
   function feedBioAlgaeFromText(text) {
     if (!text || !bgCanvas) return;
     const chars = text.split('').filter(c => /[a-zA-Z]/.test(c));
-    const spawnCount = Math.min(30, Math.max(5, Math.floor(chars.length / 10)));
+    // Denser spawn count calculation capped at 60
+    const spawnCount = Math.min(60, Math.max(10, Math.floor(chars.length / 5)));
 
+    // Queue particles to spawn across multiple frames for a sustained living bloom
     for (let i = 0; i < spawnCount; i++) {
+      const char = chars[Math.floor(Math.random() * chars.length)] || 'a';
+      spawnQueue.push(char);
+    }
+  }
+
+  function processSpawnQueue() {
+    if (spawnQueue.length === 0) return;
+    // Spawn 2 to 4 particles per frame to create a sustained multi-frame swirl
+    const toSpawn = Math.min(spawnQueue.length, 3);
+    for (let i = 0; i < toSpawn; i++) {
+      const char = spawnQueue.shift();
       if (bioAlgaeParticles.length >= MAX_ALGAE) {
         bioAlgaeParticles.shift(); // Replace oldest
       }
-      const char = chars[Math.floor(Math.random() * chars.length)] || 'a';
       const coords = getLetterCoordinates(char);
       bioAlgaeParticles.push(new BioAlgaeParticle(coords.x, coords.y, char));
     }
@@ -221,6 +237,7 @@
 
   function updateSystem(dt) {
     updateGlowbugs(dt);
+    processSpawnQueue();
 
     // Decay algae activity
     algaeActivity = Math.max(0.1, algaeActivity - activityDecay * dt);
@@ -270,9 +287,9 @@
     requestAnimationFrame(animationLoop);
   }
 
-  function boostFire(chars, sampleText) {
-    algaeActivity = Math.min(1.0, algaeActivity + Math.min(0.4, (chars / 2000) * 0.3));
-    feedBioAlgaeFromText(sampleText || "The Adze storytelling AI policy assistant");
+  function boostFire(chars, fullText) {
+    algaeActivity = Math.min(1.0, algaeActivity + Math.min(0.5, (chars / 2000) * 0.4));
+    feedBioAlgaeFromText(fullText || "The Adze storytelling AI policy assistant");
   }
 
   function initAnimations() {
