@@ -1356,7 +1356,6 @@
             const tex = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/moon_1024.jpg');
             const mat = new THREE.MeshBasicMaterial({ map: tex });
             const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), mat);
-            mesh.rotation.x = 0.1;
             return mesh;
         }
         const fallbackMoon = createFallbackMoon();
@@ -1431,7 +1430,9 @@
             if (targetMoon) {
                 const intersects = crosshairRaycaster.intersectObject(targetMoon, true);
                 if (intersects.length > 0) {
-                    const localPt = targetMoon.worldToLocal(intersects[0].point.clone());
+                    const worldPt = intersects[0].point.clone();
+                    const invMatrix = targetMoon.matrixWorld.clone().invert();
+                    const localPt = worldPt.applyMatrix4(invMatrix);
                     return positionToLatLon(localPt);
                 }
             }
@@ -1814,6 +1815,7 @@
 
             // 3D Dispersion Dome (Half-sphere into space)
             const domeMesh = createDispersionDomeMesh(radiusKm, color);
+            domeMesh.position.copy(pos);
             domeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
             domeMesh.visible = !!site.show_dispersion;
 
