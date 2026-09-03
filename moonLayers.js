@@ -3079,7 +3079,7 @@ export const LAYER_DEFS = {
   },
   "radio_quiet": {
     "label": "Radio Quiet Zone",
-    "color": "#8844ff",
+    "color": "#1E2A38",
     "tags": ["radio_quiet"],
     "desc": "Far-side electromagnetic radio quiet zone"
   },
