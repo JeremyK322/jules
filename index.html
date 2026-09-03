@@ -904,6 +904,18 @@
             <span class="popup-field-label">What that means</span>
             <span class="popup-field-val" id="popup-meaning"></span>
         </div>
+        <div class="popup-field">
+            <span class="popup-field-label">Legal Basis & Effect</span>
+            <span class="popup-field-val" id="popup-legal-basis"></span>
+        </div>
+        <div class="popup-field">
+            <span class="popup-field-label">Supervision & Agency</span>
+            <span class="popup-field-val" id="popup-supervision"></span>
+        </div>
+        <div class="popup-field">
+            <span class="popup-field-label">Coordination</span>
+            <span class="popup-field-val" id="popup-coordination"></span>
+        </div>
         <button id="popup-report-btn" class="popup-report-btn">Report</button>
     </div>
 
@@ -1353,9 +1365,41 @@
         // Moon
         let currentMoon = null;
         let moonMeshes = [];
+        function createFallbackCanvasTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#888899';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < 400; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const r = 2 + Math.random() * 12;
+                ctx.fillStyle = Math.random() > 0.5 ? '#666677' : '#aaaabb';
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
         function createFallbackMoon() {
-            const tex = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/moon_1024.jpg');
-            const mat = new THREE.MeshBasicMaterial({ map: tex });
+            const fallbackTex = createFallbackCanvasTexture();
+            const mat = new THREE.MeshBasicMaterial({ map: fallbackTex, color: 0xcccccc });
+            new THREE.TextureLoader().load(
+                'https://threejs.org/examples/textures/planets/moon_1024.jpg',
+                (loadedTex) => {
+                    mat.map = loadedTex;
+                    mat.needsUpdate = true;
+                },
+                undefined,
+                (err) => {
+                    console.warn('External Moon texture failed to load, using procedural lunar fallback texture.', err);
+                }
+            );
             const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), mat);
             return mesh;
         }
@@ -3229,6 +3273,26 @@
             }
             popupMeaningEl.textContent = meaningText;
 
+            const legalBasisEl = document.getElementById('popup-legal-basis');
+            const supervisionEl = document.getElementById('popup-supervision');
+            const coordinationEl = document.getElementById('popup-coordination');
+
+            if (legalBasisEl) {
+                const basis = feature.legal_basis || 'None';
+                const effect = feature.legal_status_effect || 'none';
+                legalBasisEl.textContent = `${basis} (${effect})`;
+            }
+            if (supervisionEl) {
+                const agency = feature.authorizing_agency || 'N/A';
+                const status = feature.supervision_status || 'N/A';
+                supervisionEl.textContent = `Agency: ${agency} | Status: ${status}`;
+            }
+            if (coordinationEl) {
+                const req = feature.coordination_required ? 'Required' : 'Not required';
+                const mech = feature.coordination_mechanism ? ` (${feature.coordination_mechanism})` : '';
+                coordinationEl.textContent = `${req}${mech}`;
+            }
+
             popupEl.classList.add('visible');
         }
 
@@ -3361,11 +3425,27 @@
                 dateText = targetFeature.date || 'Pending';
                 authText = targetFeature.designation_authority || 'IAU / Regulatory Framework';
 
-                legalInstrumentText = targetFeature.id === 'far_side_radio'
+                legalBasisText = targetFeature.legal_basis || 'None specified';
+                legalStatusEffectText = targetFeature.legal_status_effect || 'none';
+                responsibleStatesText = (targetFeature.responsible_states && targetFeature.responsible_states.length > 0)
+                    ? targetFeature.responsible_states.join(', ')
+                    : 'None specified';
+                authorizingAgencyText = targetFeature.authorizing_agency || 'None specified';
+                authorizationIdText = targetFeature.authorization_id || 'None';
+                authorizationDateText = targetFeature.authorization_date || 'None';
+                supervisionStatusText = targetFeature.supervision_status || 'None';
+                coordinationRequiredText = targetFeature.coordination_required ? 'Yes' : 'No';
+                coordinationMechanismText = targetFeature.coordination_mechanism || 'None';
+                disputePartiesText = (targetFeature.dispute_parties && targetFeature.dispute_parties.length > 0)
+                    ? targetFeature.dispute_parties.join(', ')
+                    : 'None';
+                statusDateText = targetFeature.status_date || 'None';
+
+                legalInstrumentText = targetFeature.legal_basis || (targetFeature.id === 'far_side_radio'
                     ? 'ITU Radio Regulations Article 22.22 and Outer Space Treaty Article IX'
                     : (targetFeature.articles && targetFeature.articles.length > 0
                         ? `Outer Space Treaty Articles ${targetFeature.articles.join(' and ')}`
-                        : 'Outer Space Treaty Article IX general due regard principles');
+                        : 'Outer Space Treaty Article IX general due regard principles'));
 
                 disputeText = targetFeature.disputed && targetFeature.dispute_details
                     ? `Active challenge by ${targetFeature.dispute_details.challenger || 'Challenger'}. Justification: ${targetFeature.dispute_details.justification || 'Pending'}. Deadline: ${targetFeature.dispute_details.response_deadline || 'None'}.`
@@ -3493,6 +3573,38 @@ h1 { font-size: 1.5rem; margin-top: 0; color: #93c5fd; border-bottom: 1px solid 
         <div class="audit-item">
             <div class="field-label">Relevant legal instrument</div>
             <div class="field-value">${legalInstrumentText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Legal Basis</div>
+            <div class="field-value">${legalBasisText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Legal Status Effect</div>
+            <div class="field-value">${legalStatusEffectText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Responsible States</div>
+            <div class="field-value">${responsibleStatesText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Authorizing Agency</div>
+            <div class="field-value">${authorizingAgencyText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Authorization ID & Date</div>
+            <div class="field-value">${authorizationIdText} (${authorizationDateText})</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Supervision Status</div>
+            <div class="field-value">${supervisionStatusText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Coordination Required</div>
+            <div class="field-value">${coordinationRequiredText} — ${coordinationMechanismText}</div>
+        </div>
+        <div class="audit-item">
+            <div class="field-label">Dispute Parties & Status Date</div>
+            <div class="field-value">${disputePartiesText} (${statusDateText})</div>
         </div>
     </div>
 

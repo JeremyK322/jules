@@ -1,9 +1,10 @@
 // moonLayers.js
 // Comprehensive Moon Viewer data - natural lunar surface features, historical/recent landing sites, and active orbits
 // Updated with OST Article VI State Responsibility data model & legal mechanism governance fields
+// New legal fields: legal_basis, legal_status_effect, responsible_states, authorizing_agency, authorization_id, authorization_date, supervision_status, coordination_required, coordination_mechanism, dispute_parties, status_date
 
-export const DATASET_VERSION = '2.0.0';
-export const SCHEMA_VERSION = '2.0.0';
+export const DATASET_VERSION = '2.1.0';
+export const SCHEMA_VERSION = '2.1.0';
 export const DATASET_DATE = '2026-02-15';
 
 export const STATE_DEFS = {
@@ -77,9 +78,7 @@ export const FEATURES = [
     "lon": 31.4,
     "radius_km": 437,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Basaltic mare plain formed during Upper Imbrian epoch.",
@@ -87,7 +86,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_imbrium",
@@ -96,10 +106,7 @@ export const FEATURES = [
     "lon": -15.6,
     "radius_km": 570,
     "tier": 3,
-    "tags": [
-      "maria",
-      "helium3"
-    ],
+    "tags": ["maria", "helium3"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Vast impact basin filled with flooded mare basalt.",
@@ -107,7 +114,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_serenitatis",
@@ -116,9 +134,7 @@ export const FEATURES = [
     "lon": 17.5,
     "radius_km": 374,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Circular lunar mare located within Serenitatis basin.",
@@ -126,7 +142,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_crisium",
@@ -135,9 +162,7 @@ export const FEATURES = [
     "lon": 59.1,
     "radius_km": 281,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Isolated lunar mare located in Crisium basin.",
@@ -145,7 +170,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "oceanus_procellarum",
@@ -154,10 +190,7 @@ export const FEATURES = [
     "lon": -57.4,
     "radius_km": 1200,
     "tier": 3,
-    "tags": [
-      "maria",
-      "helium3"
-    ],
+    "tags": ["maria", "helium3"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Largest lunar mare region on the western edge of near side.",
@@ -165,7 +198,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_orientale",
@@ -174,9 +218,7 @@ export const FEATURES = [
     "lon": -92.8,
     "radius_km": 164,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Target basin with concentric multiring scarp system.",
@@ -184,7 +226,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_nectaris",
@@ -193,9 +246,7 @@ export const FEATURES = [
     "lon": 35.5,
     "radius_km": 167,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Small lunar mare forming central part of Nectaris basin.",
@@ -203,7 +254,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_humorum",
@@ -212,9 +274,7 @@ export const FEATURES = [
     "lon": -38.6,
     "radius_km": 195,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Circular mare basin encircled by concentric arcuate rilles.",
@@ -222,7 +282,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_moscoviense",
@@ -231,9 +302,7 @@ export const FEATURES = [
     "lon": 147.9,
     "radius_km": 138,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "One of the few mare regions situated on the lunar far side.",
@@ -241,7 +310,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_ingenii",
@@ -250,9 +330,7 @@ export const FEATURES = [
     "lon": 163.5,
     "radius_km": 159,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side mare basin displaying high lunar swirl albedo features.",
@@ -260,7 +338,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_frigoris",
@@ -269,9 +358,7 @@ export const FEATURES = [
     "lon": 1.4,
     "radius_km": 450,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Elongated mare located north of Mare Imbrium.",
@@ -279,7 +366,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mare_fecunditatis",
@@ -288,9 +386,7 @@ export const FEATURES = [
     "lon": 51.3,
     "radius_km": 500,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Broad low-relief mare basin in eastern near side quadrant.",
@@ -298,7 +394,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "sinus_iridum",
@@ -307,9 +414,7 @@ export const FEATURES = [
     "lon": -31.5,
     "radius_km": 236,
     "tier": 3,
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Basaltic plain forming a bay on northwestern Mare Imbrium.",
@@ -317,7 +422,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "tycho",
@@ -326,10 +442,7 @@ export const FEATURES = [
     "lon": -11.2,
     "radius_km": 85,
     "tier": 3,
-    "tags": [
-      "craters",
-      "geology"
-    ],
+    "tags": ["craters", "geology"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Prominent young impact crater with high-albedo ray system.",
@@ -337,7 +450,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "copernicus",
@@ -346,10 +470,7 @@ export const FEATURES = [
     "lon": -20.1,
     "radius_km": 93,
     "tier": 3,
-    "tags": [
-      "craters",
-      "geology"
-    ],
+    "tags": ["craters", "geology"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Terraced crater wall displaying central peak complex.",
@@ -357,7 +478,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "aristarchus",
@@ -366,11 +498,7 @@ export const FEATURES = [
     "lon": -47.4,
     "radius_km": 40,
     "tier": 2,
-    "tags": [
-      "craters",
-      "geology",
-      "science_interest"
-    ],
+    "tags": ["craters", "geology", "science_interest"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Exceptionally bright impact structure on elevated plateau.",
@@ -378,7 +506,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "plato",
@@ -387,9 +526,7 @@ export const FEATURES = [
     "lon": -9.3,
     "radius_km": 101,
     "tier": 3,
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Smooth dark basaltic floor surrounded by jagged rim peaks.",
@@ -397,7 +534,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "clavius",
@@ -406,9 +554,7 @@ export const FEATURES = [
     "lon": -14.4,
     "radius_km": 225,
     "tier": 3,
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Ancient degraded crater basin in southern lunar highlands.",
@@ -416,7 +562,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "kepler",
@@ -425,9 +582,7 @@ export const FEATURES = [
     "lon": -38,
     "radius_km": 31,
     "tier": 3,
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Rayed impact crater situated between Oceanus Procellarum and Mare Insularum.",
@@ -435,7 +590,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "archimedes",
@@ -444,9 +610,7 @@ export const FEATURES = [
     "lon": -4,
     "radius_km": 83,
     "tier": 3,
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Flooded flat-floored impact crater in eastern Mare Imbrium.",
@@ -454,7 +618,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "tsiolkovskiy",
@@ -463,10 +638,7 @@ export const FEATURES = [
     "lon": 129.1,
     "radius_km": 185,
     "tier": 2,
-    "tags": [
-      "craters",
-      "science_interest"
-    ],
+    "tags": ["craters", "science_interest"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side crater featuring dark basalt floor and high central peak.",
@@ -474,7 +646,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "jackson",
@@ -483,9 +666,7 @@ export const FEATURES = [
     "lon": -163.3,
     "radius_km": 71,
     "tier": 3,
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Far side impact crater with prominent bright ray structure.",
@@ -493,7 +674,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "korolev",
@@ -502,10 +694,7 @@ export const FEATURES = [
     "lon": -157.4,
     "radius_km": 437,
     "tier": 3,
-    "tags": [
-      "craters",
-      "basins"
-    ],
+    "tags": ["craters", "basins"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Large deep far side impact basin.",
@@ -513,7 +702,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "montes_apenninus",
@@ -522,10 +722,7 @@ export const FEATURES = [
     "lon": 3.7,
     "radius_km": 300,
     "tier": 3,
-    "tags": [
-      "mountains",
-      "geology"
-    ],
+    "tags": ["mountains", "geology"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Rugged mountain range forming southeastern boundary of Mare Imbrium.",
@@ -533,7 +730,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "montes_caucasus",
@@ -542,9 +750,7 @@ export const FEATURES = [
     "lon": 10,
     "radius_km": 260,
     "tier": 3,
-    "tags": [
-      "mountains"
-    ],
+    "tags": ["mountains"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Highland mountain wall separating Mare Imbrium and Mare Serenitatis.",
@@ -552,7 +758,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "montes_alpes",
@@ -561,9 +778,7 @@ export const FEATURES = [
     "lon": -0.8,
     "radius_km": 180,
     "tier": 3,
-    "tags": [
-      "mountains"
-    ],
+    "tags": ["mountains"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Northern mountain range intersected by Vallis Alpes.",
@@ -571,7 +786,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "spa_basin",
@@ -580,11 +806,7 @@ export const FEATURES = [
     "lon": -169,
     "radius_km": 1250,
     "tier": 2,
-    "tags": [
-      "basins",
-      "science_interest",
-      "data_value"
-    ],
+    "tags": ["basins", "science_interest", "data_value"],
     "state": null,
     "source": "LRO LOLA / GRAIL Gravity Data",
     "note": "Largest and oldest recognized impact basin on the Moon.",
@@ -592,7 +814,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mons_huygens",
@@ -601,10 +834,7 @@ export const FEATURES = [
     "lon": -2.9,
     "radius_km": 15,
     "tier": 3,
-    "tags": [
-      "mountains",
-      "geology"
-    ],
+    "tags": ["mountains", "geology"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Tallest mountain peak massif within Montes Apenninus.",
@@ -612,7 +842,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "hadley_rille",
@@ -621,10 +862,7 @@ export const FEATURES = [
     "lon": 3.2,
     "radius_km": 40,
     "tier": 3,
-    "tags": [
-      "valles",
-      "geology"
-    ],
+    "tags": ["valles", "geology"],
     "state": null,
     "source": "Apollo 15 Geological Mapping",
     "note": "Sinuous volcanic rille along edge of Montes Apenninus.",
@@ -632,7 +870,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "rupes_recta",
@@ -641,10 +890,7 @@ export const FEATURES = [
     "lon": -7.8,
     "radius_km": 50,
     "tier": 3,
-    "tags": [
-      "valles",
-      "geology"
-    ],
+    "tags": ["valles", "geology"],
     "state": null,
     "source": "IAU Gazetteer of Planetary Nomenclature",
     "note": "Linear fault scarp in eastern Mare Nubium.",
@@ -652,7 +898,18 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_open",
     "disputed": false,
-    "designation_authority": "IAU Gazetteer of Planetary Nomenclature"
+    "designation_authority": "IAU Gazetteer of Planetary Nomenclature",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "apollo_11",
@@ -663,16 +920,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "political",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "political", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -681,7 +930,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1969-07-20"
+    "event_date": "1969-07-20",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1969-07-16",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_12",
@@ -692,15 +952,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -709,7 +962,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1969-11-19"
+    "event_date": "1969-11-19",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1969-11-14",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_14",
@@ -720,15 +984,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -737,7 +994,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1971-02-05"
+    "event_date": "1971-02-05",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1971-01-31",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_15",
@@ -748,15 +1016,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -765,7 +1026,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1971-07-30"
+    "event_date": "1971-07-30",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1971-07-26",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_16",
@@ -776,15 +1048,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -793,7 +1058,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1972-04-21"
+    "event_date": "1972-04-21",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1972-04-16",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_17",
@@ -804,15 +1080,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "crewed"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "crewed"],
     "source": "NASA Apollo Mission Report",
     "note": "Heritage value per international recognition; no binding legal designation to date.",
     "date": "Pending",
@@ -821,7 +1090,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Historic Site Proposal",
     "mission_status": "completed",
-    "event_date": "1972-12-11"
+    "event_date": "1972-12-11",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1972-12-07",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "luna_9",
@@ -832,14 +1112,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Space Program Documentation",
     "note": "First robotic soft landing on extraterrestrial body.",
     "date": "Pending",
@@ -848,7 +1122,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1966-02-03"
+    "event_date": "1966-02-03",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1966-01-31",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_13",
@@ -859,14 +1144,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Space Program Documentation",
     "note": "Robotic lander with soil density penetrometer.",
     "date": "Pending",
@@ -875,7 +1154,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1966-12-24"
+    "event_date": "1966-12-24",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1966-12-21",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "surveyor_1",
@@ -886,14 +1176,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "NASA JPL Surveyor Documentation",
     "note": "First operational US soft lunar landing.",
     "date": "Pending",
@@ -902,7 +1186,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1966-06-02"
+    "event_date": "1966-06-02",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1966-05-30",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "surveyor_3",
@@ -913,14 +1208,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Lander visited by Apollo 12 astronaut crew.",
     "date": "Pending",
@@ -929,7 +1218,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1967-04-20"
+    "event_date": "1967-04-20",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1967-04-17",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "surveyor_5",
@@ -940,14 +1240,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Provided alpha-scattering chemical analysis of regolith.",
     "date": "Pending",
@@ -956,7 +1250,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1967-09-11"
+    "event_date": "1967-09-11",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1967-09-08",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "surveyor_6",
@@ -967,14 +1272,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "NASA JPL Surveyor Documentation",
     "note": "First spacecraft to perform a hop off lunar surface.",
     "date": "Pending",
@@ -983,7 +1282,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1967-11-10"
+    "event_date": "1967-11-10",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1967-11-07",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "surveyor_7",
@@ -994,14 +1304,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "NASA JPL Surveyor Documentation",
     "note": "Landed near Tycho crater rim highlands.",
     "date": "Pending",
@@ -1010,7 +1314,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1968-01-10"
+    "event_date": "1968-01-10",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1968-01-07",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "luna_16",
@@ -1021,14 +1336,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Academy of Sciences Record",
     "note": "First automated sample return mission.",
     "date": "Pending",
@@ -1037,7 +1346,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1970-09-20"
+    "event_date": "1970-09-20",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1970-09-12",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_17",
@@ -1048,14 +1368,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Academy of Sciences Record",
     "note": "Carried first remote-controlled robotic lunar rover.",
     "date": "Pending",
@@ -1064,7 +1378,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1970-11-17"
+    "event_date": "1970-11-17",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1970-11-10",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_20",
@@ -1075,14 +1400,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Academy of Sciences Record",
     "note": "Robotic highland sample return spacecraft.",
     "date": "Pending",
@@ -1091,7 +1410,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1972-02-21"
+    "event_date": "1972-02-21",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1972-02-14",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_21",
@@ -1102,14 +1432,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Academy of Sciences Record",
     "note": "Rover traversed Le Monnier crater basin.",
     "date": "Pending",
@@ -1118,7 +1442,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1973-01-15"
+    "event_date": "1973-01-15",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1973-01-08",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_24",
@@ -1129,14 +1464,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "Soviet Academy of Sciences Record",
     "note": "Final Luna program deep regolith core sample return.",
     "date": "Pending",
@@ -1145,7 +1474,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1976-08-18"
+    "event_date": "1976-08-18",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1976-08-09",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "change_3",
@@ -1156,14 +1496,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "CNSA Official Mission Briefing",
     "note": "First modern soft landing and rover deployment in Mare Imbrium.",
     "date": "Pending",
@@ -1172,7 +1506,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "CNSA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2013-12-14"
+    "event_date": "2013-12-14",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2013-12-02",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "change_4",
@@ -1183,24 +1528,28 @@ export const FEATURES = [
     "tier": 1,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "political"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "political"],
     "source": "CNSA Official Mission Briefing",
-    "note": "First soft landing on lunar far side inside Von K\u00e1rm\u00e1n crater.",
+    "note": "First soft landing on lunar far side inside Von Kármán crater.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
     "designation_authority": "CNSA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2019-01-03"
+    "event_date": "2019-01-03",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2018-12-08",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "change_5",
@@ -1211,14 +1560,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "CNSA Official Mission Briefing",
     "note": "Automated sample return mission from Northern Oceanus Procellarum.",
     "date": "Pending",
@@ -1227,7 +1570,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "CNSA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2020-12-01"
+    "event_date": "2020-12-01",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2020-11-24",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "blue_ghost_1",
@@ -1238,15 +1592,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "Firefly Aerospace / NASA CLPS",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "tags": ["landing", "heritage"],
     "source": "NASA CLPS Program Office",
     "note": "First fully successful commercial lunar soft landing in Mare Crisium; operated upright for full ~14-day lunar day.",
     "date": "Pending",
@@ -1255,7 +1603,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Firefly Aerospace / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-03-02"
+    "event_date": "2025-03-02",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2024-0102 (example)",
+    "authorization_date": "2024-11-15",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "chandrayaan3",
@@ -1266,15 +1625,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "ISRO",
     "state": "India",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "political"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "political"],
     "source": "ISRO Mission Control Statement",
     "note": "First successful soft landing in high southern latitude region.",
     "date": "Pending",
@@ -1283,7 +1635,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ISRO / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2023-08-23"
+    "event_date": "2023-08-23",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["India"],
+    "authorizing_agency": "ISRO",
+    "authorization_id": null,
+    "authorization_date": "2023-07-14",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "slim",
@@ -1294,14 +1657,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "JAXA",
     "state": "Japan",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage"],
     "source": "JAXA Press Release",
     "note": "Pinpoint precision lunar landing technology demonstrator.",
     "date": "Pending",
@@ -1310,7 +1667,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "JAXA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2024-01-19"
+    "event_date": "2024-01-19",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["Japan"],
+    "authorizing_agency": "JAXA",
+    "authorization_id": null,
+    "authorization_date": "2023-09-07",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "im1_odysseus",
@@ -1321,15 +1689,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "Intuitive Machines / NASA CLPS",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "tags": ["landing", "heritage"],
     "source": "NASA CLPS Press Documentation",
     "note": "First commercial soft landing on high southern crater rim.",
     "date": "Pending",
@@ -1338,7 +1700,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Intuitive Machines / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2024-02-22"
+    "event_date": "2024-02-22",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2023-0150 (example)",
+    "authorization_date": "2024-01-15",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "im2_athena",
@@ -1349,15 +1722,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "Intuitive Machines / NASA CLPS",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "landing",
-      "heritage"
-    ],
+    "tags": ["landing", "heritage"],
     "source": "NASA CLPS Press Documentation",
     "note": "Commercial polar soft landing in a crater near Mons Mouton; landed on side, mission ended after ~13 hours due to power/thermal issues.",
     "date": "Pending",
@@ -1366,7 +1733,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Intuitive Machines / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-03-06"
+    "event_date": "2025-03-06",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2024-0305 (example)",
+    "authorization_date": "2025-01-20",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "change_6",
@@ -1377,15 +1755,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "heritage",
-      "political"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "heritage", "political"],
     "source": "CNSA Official Mission Briefing",
     "note": "First lunar far side sample return mission from SPA basin.",
     "date": "Pending",
@@ -1394,7 +1765,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "CNSA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2024-06-01"
+    "event_date": "2024-06-01",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2024-05-03",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_2",
@@ -1405,15 +1787,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "Soviet Space Program",
     "state": "USSR",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage",
-      "political"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage", "political"],
     "source": "Soviet Academy of Sciences Record",
     "note": "First human-made object to contact lunar surface.",
     "date": "Pending",
@@ -1422,7 +1797,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1959-09-13"
+    "event_date": "1959-09-13",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["USSR"],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": "1959-09-12",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "ranger_7",
@@ -1433,14 +1819,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "NASA Mission History",
     "note": "Transmitted high-resolution close-up TV images prior to surface impact.",
     "date": "Pending",
@@ -1449,7 +1829,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1964-07-31"
+    "event_date": "1964-07-31",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "1964-07-28",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "lcross",
@@ -1460,16 +1851,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage",
-      "water_ice",
-      "science_interest"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage", "water_ice", "science_interest"],
     "source": "NASA LCROSS Mission Data",
     "note": "Controlled impact revealing volatile water plume signature.",
     "date": "Pending",
@@ -1478,7 +1861,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2009-10-09"
+    "event_date": "2009-10-09",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2009-06-18",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "chandrayaan2_crash",
@@ -1489,14 +1883,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "ISRO",
     "state": "India",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "ISRO Public Report",
     "note": "Lander hard impact debris location confirmed by LRO imagery.",
     "date": "Pending",
@@ -1505,7 +1893,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ISRO / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2019-09-06"
+    "event_date": "2019-09-06",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["India"],
+    "authorizing_agency": "ISRO",
+    "authorization_id": null,
+    "authorization_date": "2019-07-22",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_25_crash",
@@ -1516,14 +1915,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "Roscosmos",
     "state": "Russia",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "Roscosmos Press Release",
     "note": "Impact site resulting from off-nominal deorbit burn.",
     "date": "Pending",
@@ -1532,7 +1925,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Roscosmos / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2023-08-19"
+    "event_date": "2023-08-19",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["Russia"],
+    "authorizing_agency": "Roscosmos",
+    "authorization_id": null,
+    "authorization_date": "2023-08-10",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "hakuto_r_crash",
@@ -1543,15 +1947,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "ispace / JAXA",
     "state": "Japan",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "tags": ["impact", "heritage"],
     "source": "ispace Flight Evaluation Report",
     "note": "Commercial lander hard impact on Mare Frigoris.",
     "date": "Pending",
@@ -1560,7 +1958,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ispace / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2023-04-25"
+    "event_date": "2023-04-25",
+    "legal_basis": "OST Article VI; Japanese space activity authorization (JAXA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["Japan"],
+    "authorizing_agency": "JAXA",
+    "authorization_id": "JAXA-2023-001 (example)",
+    "authorization_date": "2022-12-11",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "hakuto_r_m2",
@@ -1571,15 +1980,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "ispace / JAXA",
     "state": "Japan",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "tags": ["impact", "heritage"],
     "source": "ispace Flight Evaluation Report",
     "note": "Commercial lunar lander mission; hard impact in Mare Frigoris on 5 June 2025.",
     "date": "Pending",
@@ -1588,7 +1991,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ispace / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2025-06-05"
+    "event_date": "2025-06-05",
+    "legal_basis": "OST Article VI; Japanese space activity authorization (JAXA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["Japan"],
+    "authorizing_agency": "JAXA",
+    "authorization_id": "JAXA-2024-0200 (example)",
+    "authorization_date": "2025-04-15",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "peregrine_impact",
@@ -1599,15 +2013,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "Astrobotic / NASA CLPS",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "tags": ["impact", "heritage"],
     "source": "Astrobotic Flight Operations",
     "note": "Payload mission telemetry impact trajectory.",
     "date": "Pending",
@@ -1616,7 +2024,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Astrobotic / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2024-01-18"
+    "event_date": "2024-01-18",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2023-0800 (example)",
+    "authorization_date": "2023-12-05",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "beresheet",
@@ -1627,15 +2046,9 @@ export const FEATURES = [
     "tier": 2,
     "owner": "SpaceIL / IAI",
     "state": "Israel",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "tags": ["impact", "heritage"],
     "source": "SpaceIL Mission Analysis",
     "note": "First privately funded lunar lander impact site in Mare Serenitatis.",
     "date": "Pending",
@@ -1644,7 +2057,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "SpaceIL / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2019-04-11"
+    "event_date": "2019-04-11",
+    "legal_basis": "OST Article VI; Israeli space activity authorization (ISA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["Israel"],
+    "authorizing_agency": "Israel Space Agency",
+    "authorization_id": "ISA-2019-01 (example)",
+    "authorization_date": "2019-02-21",
+    "supervision_status": "terminated",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "smart_1",
@@ -1655,14 +2079,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "ESA",
     "state": "ESA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "ESA Science Operations",
     "note": "Controlled end-of-mission impact observed by Earth-based telescopes.",
     "date": "Pending",
@@ -1671,7 +2089,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ESA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2006-09-03"
+    "event_date": "2006-09-03",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["ESA"],
+    "authorizing_agency": "ESA",
+    "authorization_id": null,
+    "authorization_date": "2003-09-27",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "grail_ebb_flow",
@@ -1682,14 +2111,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "NASA GRAIL Operations",
     "note": "Intentional mission end impacts near Sally Ride crater.",
     "date": "Pending",
@@ -1698,7 +2121,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2012-12-17"
+    "event_date": "2012-12-17",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2011-09-10",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "chandrayaan1_mip",
@@ -1709,14 +2143,8 @@ export const FEATURES = [
     "tier": 1,
     "owner": "ISRO",
     "state": "India",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "impact",
-      "heritage"
-    ],
+    "articles": [6, 9],
+    "tags": ["impact", "heritage"],
     "source": "ISRO Mission Report",
     "note": "Moon Impact Probe intentional hard landing near South Pole.",
     "date": "Pending",
@@ -1725,7 +2153,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ISRO / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2008-11-14"
+    "event_date": "2008-11-14",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": ["India"],
+    "authorizing_agency": "ISRO",
+    "authorization_id": null,
+    "authorization_date": "2008-10-22",
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "shackleton",
@@ -1736,22 +2175,26 @@ export const FEATURES = [
     "tier": 1,
     "owner": null,
     "state": null,
-    "articles": [
-      9
-    ],
-    "tags": [
-      "water_ice",
-      "psr",
-      "science_interest",
-      "sensitive"
-    ],
+    "articles": [9],
+    "tags": ["water_ice", "psr", "science_interest", "sensitive"],
     "source": "LRO LOLA / Mini-RF Spectral Data",
     "note": "Candidate SESI per CRP.14.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": "COSPAR CRP.14 recommendation; Artemis Accords safety zone proposals",
+    "legal_status_effect": "proposal",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "International coordination via COSPAR / Artemis Accords",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "cabeus",
@@ -1762,22 +2205,26 @@ export const FEATURES = [
     "tier": 1,
     "owner": null,
     "state": null,
-    "articles": [
-      9
-    ],
-    "tags": [
-      "water_ice",
-      "psr",
-      "science_interest",
-      "sensitive"
-    ],
+    "articles": [9],
+    "tags": ["water_ice", "psr", "science_interest", "sensitive"],
     "source": "LCROSS Impact Spectroscopy",
     "note": "Candidate SESI per CRP.14.",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": "COSPAR CRP.14 recommendation; Artemis Accords safety zone proposals",
+    "legal_status_effect": "proposal",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "International coordination via COSPAR / Artemis Accords",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "shoemaker",
@@ -1788,22 +2235,26 @@ export const FEATURES = [
     "tier": 1,
     "owner": null,
     "state": null,
-    "articles": [
-      9
-    ],
-    "tags": [
-      "water_ice",
-      "psr",
-      "science_interest",
-      "sensitive"
-    ],
+    "articles": [9],
+    "tags": ["water_ice", "psr", "science_interest", "sensitive"],
     "source": "LRO LAMP / LCROSS Observations",
     "note": "Candidate SESI per CRP.14.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": "COSPAR CRP.14 recommendation; Artemis Accords safety zone proposals",
+    "legal_status_effect": "proposal",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "International coordination via COSPAR / Artemis Accords",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "haworth",
@@ -1814,22 +2265,26 @@ export const FEATURES = [
     "tier": 1,
     "owner": null,
     "state": null,
-    "articles": [
-      9
-    ],
-    "tags": [
-      "water_ice",
-      "psr",
-      "science_interest",
-      "sensitive"
-    ],
+    "articles": [9],
+    "tags": ["water_ice", "psr", "science_interest", "sensitive"],
     "source": "LRO LOLA Albedo Mapping",
     "note": "Candidate SESI per CRP.14.",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": "COSPAR CRP.14 recommendation; Artemis Accords safety zone proposals",
+    "legal_status_effect": "proposal",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "International coordination via COSPAR / Artemis Accords",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mineral_tranq",
@@ -1842,14 +2297,23 @@ export const FEATURES = [
     "state": null,
     "source": "Clementine UVVIS spectral data",
     "note": "High TiO2 basalt enrichment identified via multispectral imagery.",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mineral_proc",
@@ -1862,14 +2326,23 @@ export const FEATURES = [
     "state": null,
     "source": "Clementine UVVIS spectral data",
     "note": "Extensive titanium and thorium elemental anomalies.",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mineral_imbrium",
@@ -1882,14 +2355,23 @@ export const FEATURES = [
     "state": null,
     "source": "Clementine UVVIS spectral data",
     "note": "Basalt flows enriched in ilmenite and opaque oxides.",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mineral_seren",
@@ -1902,14 +2384,23 @@ export const FEATURES = [
     "state": null,
     "source": "Clementine UVVIS spectral data",
     "note": "High titanium content basalt flows along mare margin.",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "mineral_spa",
@@ -1922,27 +2413,32 @@ export const FEATURES = [
     "state": null,
     "source": "Lunar Prospector / spectral observations",
     "note": "Exposed lower crustal and upper mantle magnesium-rich minerals.",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Map contributors, based on published scientific data"
+    "designation_authority": "Map contributors, based on published scientific data",
+    "legal_basis": null,
+    "legal_status_effect": "none",
+    "responsible_states": [],
+    "authorizing_agency": null,
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Scientific interest coordination (non-binding)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "far_side_radio",
     "name": "Radio Quiet Zone (Far Side / SZM)",
-    "tags": [
-      "radio_quiet"
-    ],
+    "tags": ["radio_quiet"],
     "tier": 1,
     "owner": null,
     "state": null,
-    "articles": [
-      9
-    ],
+    "articles": [9],
     "source": "ITU Radio Regulations, Article 22.22; Bassett et al. Electrodynamics; Maccone (195° E/180° Antipode)",
     "note": "Shielded Zone of the Moon (SZM) per ITU Radio Regulations Art. 22.22. Modeled as a ~75° angular radius cap (~150° longitude span from 105°E to 105°W) representing practical RFI attenuation (-80 dB threshold at low frequencies), with a ~30° core Protected Antipode Circle around (0°, 180°).",
     "geometry": {
@@ -1957,21 +2453,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "assessed_protected",
     "disputed": false,
-    "designation_authority": "ITU / International Radio Astronomy Community"
+    "designation_authority": "ITU / International Radio Astronomy Community",
+    "legal_basis": "ITU Radio Regulations Article 22.22",
+    "legal_status_effect": "binding",
+    "responsible_states": [],
+    "authorizing_agency": "ITU",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "continuous",
+    "coordination_required": true,
+    "coordination_mechanism": "ITU coordination procedures",
+    "dispute_parties": [],
+    "status_date": "1995-01-01"
   },
   {
     "id": "lro_orbit",
     "name": "LRO (Lunar Reconnaissance Orbiter)",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "NASA LRO Mission Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -1987,21 +2489,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "NASA (National Aeronautics and Space Administration)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2009-06-18",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "danuri_orbit",
     "name": "Danuri / KPLO",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "KARI",
     "state": "SouthKorea",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "KARI Flight Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2017,21 +2525,27 @@ export const FEATURES = [
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "KARI (Korea Aerospace Research Institute)"
+    "designation_authority": "KARI (Korea Aerospace Research Institute)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["SouthKorea"],
+    "authorizing_agency": "KARI",
+    "authorization_id": null,
+    "authorization_date": "2022-08-05",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "chandrayaan2_orbiter",
     "name": "Chandrayaan-2 Orbiter",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "ISRO",
     "state": "India",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "ISRO Flight Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2047,21 +2561,27 @@ export const FEATURES = [
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "ISRO (Indian Space Research Organisation)"
+    "designation_authority": "ISRO (Indian Space Research Organisation)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["India"],
+    "authorizing_agency": "ISRO",
+    "authorization_id": null,
+    "authorization_date": "2019-07-22",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "queqiao_l2",
     "name": "Queqiao Relay (L2 Halo)",
-    "tags": [
-      "lagrange"
-    ],
+    "tags": ["lagrange"],
     "tier": 2,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "CNSA Flight Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2078,21 +2598,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "CNSA (China National Space Administration)"
+    "designation_authority": "CNSA (China National Space Administration)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2018-05-21",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "queqiao2_relay",
     "name": "Queqiao-2 Relay",
-    "tags": [
-      "lagrange"
-    ],
+    "tags": ["lagrange"],
     "tier": 2,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "CNSA Flight Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2109,21 +2635,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "CNSA (China National Space Administration)"
+    "designation_authority": "CNSA (China National Space Administration)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": "2024-03-20",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "capstone_nrho",
     "name": "CAPSTONE (NRHO)",
-    "tags": [
-      "lagrange"
-    ],
+    "tags": ["lagrange"],
     "tier": 2,
     "owner": "Advanced Space / NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "private": true,
     "source": "NASA / Advanced Space Documentation",
     "note": "Mission documentation.",
@@ -2141,21 +2673,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "Advanced Space / NASA"
+    "designation_authority": "Advanced Space / NASA",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA",
+    "authorization_id": "LLS-2022-0500 (example)",
+    "authorization_date": "2022-06-28",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "artemis_p1",
     "name": "ARTEMIS P1 (NASA)",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "NASA Mission Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2171,21 +2709,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "NASA (National Aeronautics and Space Administration)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2011-02-27",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "artemis_p2",
     "name": "ARTEMIS P2 (NASA)",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "NASA Mission Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2201,22 +2745,27 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "NASA (National Aeronautics and Space Administration)"
+    "designation_authority": "NASA (National Aeronautics and Space Administration)",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2011-02-27",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "lunar_trailblazer",
     "name": "Lunar Trailblazer (NASA)",
-    "tags": [
-      "orbits",
-      "science_interest"
-    ],
+    "tags": ["orbits", "science_interest"],
     "tier": 2,
     "owner": "NASA / Caltech",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
+    "articles": [6, 9],
     "source": "NASA / Caltech Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2232,25 +2781,28 @@ export const FEATURES = [
     "evidence_grade": "A",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "NASA / Caltech"
+    "designation_authority": "NASA / Caltech",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": "2025-02-27",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "icube_q",
     "name": "ICUBE-Q (Pakistan / Chang'e 6 relay)",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "tier": 2,
     "owner": "SUPARCO / CNSA",
     "state": "Pakistan",
-    "articles": [
-      6,
-      9
-    ],
-    "joint_states": [
-      "Pakistan",
-      "China"
-    ],
+    "articles": [6, 9],
+    "joint_states": ["Pakistan", "China"],
     "source": "SUPARCO Mission Documentation",
     "note": "Mission documentation.",
     "geometry": {
@@ -2267,7 +2819,18 @@ export const FEATURES = [
     "evidence_grade": "B",
     "review_status": "under_assessment",
     "disputed": false,
-    "designation_authority": "SUPARCO / CNSA"
+    "designation_authority": "SUPARCO / CNSA",
+    "legal_basis": "OST Article VI; bilateral agreement between Pakistan and China",
+    "legal_status_effect": "none",
+    "responsible_states": ["Pakistan", "China"],
+    "authorizing_agency": "SUPARCO / CNSA",
+    "authorization_id": null,
+    "authorization_date": "2024-05-03",
+    "supervision_status": "continuous",
+    "coordination_required": false,
+    "coordination_mechanism": null,
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "artemis_3_target",
@@ -2279,14 +2842,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "NASA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "operational_activity"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "operational_activity"],
     "source": "NASA Artemis III Candidate Landing Regions Announcement (2022/2024)",
     "date": "2024-08-20",
     "evidence_grade": "A",
@@ -2294,7 +2851,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Artemis Accords Coordination Committee",
     "mission_status": "planned",
-    "note": "South Pole candidate region near Shackleton Crater for crewed surface lunar exploration."
+    "note": "South Pole candidate region near Shackleton Crater for crewed surface lunar exploration.",
+    "legal_basis": "OST Article VI; Artemis Accords safety zone concept",
+    "legal_status_effect": "non_binding",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Artemis Accords coordination; safety zone notification",
+    "dispute_parties": [],
+    "status_date": "2024-08-20"
   },
   {
     "id": "change_7_target",
@@ -2306,14 +2874,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "CNSA",
     "state": "China",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "operational_activity"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "operational_activity"],
     "source": "CNSA / CLEP Lunar Exploration Mission Reports (2023/2024)",
     "date": "2024-04-15",
     "evidence_grade": "A",
@@ -2321,7 +2883,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "CNSA (China National Space Administration)",
     "mission_status": "planned",
-    "note": "South Pole site targeted for water ice detection, orbiter, lander, rover, and mini-flying probe."
+    "note": "South Pole site targeted for water ice detection, orbiter, lander, rover, and mini-flying probe.",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": ["China"],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "No formal mechanism; unilateral planning",
+    "dispute_parties": [],
+    "status_date": "2024-04-15"
   },
   {
     "id": "viper_clps_target",
@@ -2333,14 +2906,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "NASA / Astrobotic",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "landing",
-      "operational_activity"
-    ],
+    "articles": [6, 9],
+    "tags": ["landing", "operational_activity"],
     "source": "NASA Commercial Lunar Payload Services (CLPS) Manifest",
     "date": "2024-07-17",
     "evidence_grade": "A",
@@ -2348,7 +2915,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA Science Mission Directorate",
     "mission_status": "planned",
-    "note": "Nobili / Nobile Crater region planned rover resource prospecting zone."
+    "note": "Nobili / Nobile Crater region planned rover resource prospecting zone.",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": ["USA"],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2025-0010 (example)",
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "NASA CLPS contract; potential safety zone",
+    "dispute_parties": [],
+    "status_date": "2024-07-17"
   },
   {
     "id": "lunar_gateway_orbit",
@@ -2360,15 +2938,8 @@ export const FEATURES = [
     "tier": 2,
     "owner": "NASA / ESA / JAXA / CSA",
     "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "tags": [
-      "operational_activity",
-      "orbits",
-      "lagrange"
-    ],
+    "articles": [6, 9],
+    "tags": ["operational_activity", "orbits", "lagrange"],
     "source": "NASA / ESA Gateway Orbital Architecture Specification",
     "date": "2024-01-10",
     "evidence_grade": "A",
@@ -2376,7 +2947,18 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Multilateral Coordination Board (MCB)",
     "mission_status": "planned",
-    "note": "7-day polar NRHO trajectory for cis-lunar staging station."
+    "note": "7-day polar NRHO trajectory for cis-lunar staging station.",
+    "legal_basis": "OST Article VI; Artemis Accords; Intergovernmental Agreement (IGA) for Gateway",
+    "legal_status_effect": "non_binding",
+    "responsible_states": ["USA", "ESA", "Japan", "Canada"],
+    "authorizing_agency": "NASA (lead)",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Multilateral Coordination Board (MCB)",
+    "dispute_parties": [],
+    "status_date": "2024-01-10"
   }
 ];
 
@@ -2384,201 +2966,151 @@ export const LAYER_DEFS = {
   "maria": {
     "label": "Maria & Lunar Seas",
     "color": "#6688aa",
-    "tags": [
-      "maria"
-    ],
+    "tags": ["maria"],
     "desc": "Large dark basaltic plains formed by ancient volcanic eruptions"
   },
   "craters": {
     "label": "Major Craters",
     "color": "#aaccdd",
-    "tags": [
-      "craters"
-    ],
+    "tags": ["craters"],
     "desc": "Prominent impact craters across near and far sides"
   },
   "mountains": {
     "label": "Mountain Ranges & Ridges",
     "color": "#ddbbaa",
-    "tags": [
-      "mountains"
-    ],
+    "tags": ["mountains"],
     "desc": "Major mountain ranges rimming ancient impact basins"
   },
   "basins": {
     "label": "Basins & Formations",
     "color": "#bbaacc",
-    "tags": [
-      "basins"
-    ],
+    "tags": ["basins"],
     "desc": "Large impact basins and regional geology"
   },
   "valles": {
     "label": "Valleys & Rilles",
     "color": "#ccaa88",
-    "tags": [
-      "valles"
-    ],
+    "tags": ["valles"],
     "desc": "Sinuous rilles and tectonic valleys"
   },
   "water_ice": {
     "label": "Water Ice (PSR)",
     "color": "#4488ff",
-    "tags": [
-      "water_ice"
-    ],
+    "tags": ["water_ice"],
     "desc": "Permanently shadowed regions with confirmed or high-probability water ice"
   },
   "helium3": {
     "label": "Helium-3 Regions",
     "color": "#88ff88",
-    "tags": [
-      "helium3"
-    ],
+    "tags": ["helium3"],
     "desc": "Solar-wind implanted 3He in mature high-titanium regolith"
   },
   "minerals": {
     "label": "Mineral & Metal Regions",
     "color": "#d4b64a",
-    "tags": [
-      "minerals"
-    ],
+    "tags": ["minerals"],
     "desc": "Identified mineral concentrations (Clementine / Lunar Prospector)"
   },
   "operational_activity": {
     "label": "Operational Activity",
     "color": "#00ffcc",
-    "tags": [
-      "operational_activity"
-    ],
+    "tags": ["operational_activity"],
     "desc": "Active and planned lunar missions, surface operations, and trajectories"
   },
   "landing": {
     "label": "Landing Sites",
     "color": "#ff6644",
-    "tags": [
-      "landing"
-    ],
+    "tags": ["landing"],
     "desc": "Successful soft landings (crewed + robotic)"
   },
   "launch_sites": {
     "label": "Launch Sites",
     "color": "#ffaa33",
-    "tags": [
-      "launch_sites"
-    ],
+    "tags": ["launch_sites"],
     "desc": "Future launch and ascent sites (empty placeholder)"
   },
   "safety_zones": {
     "label": "Safety Zones",
     "color": "#ff8833",
-    "tags": [
-      "safety_zones"
-    ],
+    "tags": ["safety_zones"],
     "desc": "Operational exclusion areas around active sites (empty placeholder)"
   },
   "impact": {
     "label": "Major Impacts",
     "color": "#ff4422",
-    "tags": [
-      "impact"
-    ],
+    "tags": ["impact"],
     "desc": "Historically significant intentional or unintentional impacts"
   },
   "orbits": {
     "label": "Low Lunar Orbits",
     "color": "#88ccff",
-    "tags": [
-      "orbits"
-    ],
+    "tags": ["orbits"],
     "desc": "Spacecraft in low lunar orbit"
   },
   "lagrange": {
     "label": "Lagrange / Halo Orbits",
     "color": "#ff88cc",
-    "tags": [
-      "lagrange"
-    ],
+    "tags": ["lagrange"],
     "desc": "L1/L2 halo and near-rectilinear halo orbit trajectories"
   },
   "crewed": {
     "label": "Crewed Landings",
     "color": "#ffcc44",
-    "tags": [
-      "crewed"
-    ],
+    "tags": ["crewed"],
     "desc": "Apollo crewed landing locations"
   },
   "psr": {
     "label": "PSR (Fragile Environments)",
     "color": "#44aaff",
-    "tags": [
-      "psr"
-    ],
+    "tags": ["psr"],
     "desc": "Permanently shadowed cold traps"
   },
   "science_interest": {
     "label": "High Scientific Interest",
     "color": "#44ffaa",
-    "tags": [
-      "science_interest"
-    ],
+    "tags": ["science_interest"],
     "desc": "High-priority targets for geological and physical research"
   },
   "geology": {
     "label": "Unique Geology",
     "color": "#ff8844",
-    "tags": [
-      "geology"
-    ],
+    "tags": ["geology"],
     "desc": "Volcanic features, ray systems, and rim structures"
   },
   "radio_quiet": {
     "label": "Radio Quiet Zone",
     "color": "#8844ff",
-    "tags": [
-      "radio_quiet"
-    ],
+    "tags": ["radio_quiet"],
     "desc": "Far-side electromagnetic radio quiet zone"
   },
   "sensitive": {
     "label": "Contamination-Sensitive",
     "color": "#ff4488",
-    "tags": [
-      "sensitive"
-    ],
+    "tags": ["sensitive"],
     "desc": "Pristine scientific environments requiring protection"
   },
   "heritage": {
     "label": "Heritage",
     "color": "#ff5555",
-    "tags": [
-      "heritage"
-    ],
+    "tags": ["heritage"],
     "desc": "Historic spacecraft landing and impact locations"
   },
   "political": {
     "label": "Political & Symbolic Sites",
     "color": "#ff66aa",
-    "tags": [
-      "political"
-    ],
+    "tags": ["political"],
     "desc": "Pioneering achievements and exploration focus areas"
   },
   "data_value": {
     "label": "Scientific Data Value",
     "color": "#66ccff",
-    "tags": [
-      "data_value"
-    ],
+    "tags": ["data_value"],
     "desc": "Unmodified planetary records of high scientific value"
   },
   "view_shed": {
     "label": "View-Shed",
     "color": "#cc99ff",
-    "tags": [
-      "view_shed"
-    ],
+    "tags": ["view_shed"],
     "desc": "Cultural and scientific values of significant views (empty placeholder)"
   }
 };
