@@ -1,12 +1,18 @@
-// ── Bioluminescent Ocean Waves & Electric Blue Algae Animation ────────────
+// ── Background Animation (User Fireflies & AI Letter-Mapped Bio-Algae) ────────────────────
 (function(window) {
   let bgCanvas, ctx;
-  let activityIntensity = 0.15; // Ambient activity level
-  const maxActivity = 1.0;
-  const activityDecay = 0.00015; // Decay rate per ms
 
-  const algaeParticles = [];
-  const MAX_ALGAE = 120;
+  // Fireflies (User typing)
+  const glowbugs = [];
+  const keyMap = {};
+  const bugDecay = 0.00025;
+
+  // Bio-Algae (AI feeding & spreading by letters)
+  const bioAlgaeParticles = [];
+  const MAX_ALGAE = 180;
+  let algaeActivity = 0.15;
+  const activityDecay = 0.00015;
+
   let lastFrameTime = 0;
   const FRAME_INTERVAL = 1000 / 30; // 30 FPS target
 
@@ -16,41 +22,143 @@
     bgCanvas.height = window.innerHeight;
   }
 
-  class BioAlgae {
-    constructor(x, y, isBloom = false) {
-      this.x = x !== undefined ? x : Math.random() * (bgCanvas ? bgCanvas.width : window.innerWidth);
-      this.y = y !== undefined ? y : (bgCanvas ? bgCanvas.height : window.innerHeight) - Math.random() * (bgCanvas ? bgCanvas.height * 0.6 : 400);
-      this.vx = (Math.random() - 0.5) * 0.8;
-      this.vy = -Math.random() * 0.6 - 0.2;
-      this.size = 1.5 + Math.random() * 3.5;
+  // ── Firefly / Glowbug Class (User Keypresses) ──
+  function createGlowbugs() {
+    glowbugs.length = 0;
+    const keys = ['e','a','t','s','n','r','o','i','l','d','h','m','u','w','y','*'];
+    const width = bgCanvas ? bgCanvas.width : window.innerWidth;
+    const height = bgCanvas ? bgCanvas.height : window.innerHeight;
+
+    keys.forEach(k => {
+      let hue;
+      if (k === '*') hue = 90;
+      else if (['e','a','t','s'].includes(k)) hue = 55 + Math.random() * 25;
+      else if (['n','r','o','i'].includes(k)) hue = 75 + Math.random() * 35;
+      else if (['l','d','h'].includes(k)) hue = 100 + Math.random() * 45;
+      else hue = 60 + Math.random() * 70;
+
+      const bug = {
+        key: k,
+        hue,
+        sat: 30 + Math.random() * 30,
+        light: 75 + Math.random() * 15,
+        brightness: 0,
+        x: Math.random() * width,
+        y: Math.random() * height,
+        targetX: Math.random() * width,
+        targetY: Math.random() * height,
+        vx: 0,
+        vy: 0,
+        size: 2.5 + Math.random() * 4.5,
+        phase: Math.random() * Math.PI * 2
+      };
+      glowbugs.push(bug);
+      keyMap[k] = glowbugs.length - 1;
+    });
+  }
+
+  function boostBug(keyChar) {
+    if (!bgCanvas) return;
+    const idx = keyMap[keyChar] !== undefined ? keyMap[keyChar] : keyMap['*'];
+    if (idx === undefined || !glowbugs[idx]) return;
+    const bug = glowbugs[idx];
+    bug.brightness = Math.min(bug.brightness + 0.55, 1);
+    bug.targetX = Math.random() * bgCanvas.width;
+    bug.targetY = Math.random() * bgCanvas.height;
+    if (idx !== keyMap['*']) {
+      const fallback = glowbugs[keyMap['*']];
+      if (fallback) fallback.brightness = Math.min(fallback.brightness + 0.12, 0.75);
+    }
+  }
+
+  function updateGlowbugs(dt) {
+    if (!bgCanvas) return;
+    const now = performance.now();
+    glowbugs.forEach(bug => {
+      bug.brightness = Math.max(bug.brightness - bugDecay * dt, 0);
+      if (bug.brightness < 0.03 && Math.random() < 0.01) {
+        bug.targetX = Math.random() * bgCanvas.width;
+        bug.targetY = Math.random() * bgCanvas.height;
+      }
+      const hoverX = Math.sin(now * 0.0018 + bug.phase) * 30;
+      const hoverY = Math.cos(now * 0.0022 + bug.phase) * 22;
+      const destX = bug.targetX + hoverX;
+      const destY = bug.targetY + hoverY;
+      const speed = 0.02 + bug.brightness * 0.12;
+      bug.vx += (destX - bug.x) * speed * 0.012;
+      bug.vy += (destY - bug.y) * speed * 0.012;
+      bug.vx *= 0.96;
+      bug.vy *= 0.96;
+      bug.x += bug.vx;
+      bug.y += bug.vy;
+
+      if (bug.x < -50) bug.x = bgCanvas.width + 50;
+      if (bug.x > bgCanvas.width + 50) bug.x = -50;
+      if (bug.y < -50) bug.y = bgCanvas.height + 50;
+      if (bug.y > bgCanvas.height + 50) bug.y = -50;
+    });
+  }
+
+  function drawGlowbugs() {
+    glowbugs.forEach(bug => {
+      const alpha = bug.brightness * 0.85;
+      if (alpha < 0.02) return;
+      const halo = bug.size * 9 + bug.brightness * 22;
+      const haloGrad = ctx.createRadialGradient(bug.x, bug.y, 0, bug.x, bug.y, halo);
+      haloGrad.addColorStop(0, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,${alpha * 0.45})`);
+      haloGrad.addColorStop(0.5, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,0)`);
+      haloGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(bug.x, bug.y, halo, 0, Math.PI * 2);
+      ctx.fill();
+
+      const core = bug.size * 1.6 + bug.brightness * 3.5;
+      const coreGrad = ctx.createRadialGradient(bug.x, bug.y, 0, bug.x, bug.y, core);
+      coreGrad.addColorStop(0, `hsla(${bug.hue},25%,92%,${alpha * 0.9})`);
+      coreGrad.addColorStop(0.3, `hsla(${bug.hue},${bug.sat}%,${bug.light}%,${alpha * 0.9})`);
+      coreGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(bug.x, bug.y, core, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // ── AI Bio-Algae Class (Letter-Mapped Particle Bloom) ──
+  class BioAlgaeParticle {
+    constructor(x, y, char = 'a') {
+      this.x = x;
+      this.y = y;
+      this.char = char;
+      this.size = 2.0 + Math.random() * 4.0;
+      this.vx = (Math.random() - 0.5) * 1.2;
+      this.vy = -Math.random() * 0.8 - 0.2;
       this.life = 1.0;
-      this.decay = 0.002 + Math.random() * 0.004;
-      this.hue = 180 + Math.random() * 35; // Cyan (180) to Electric Blue (215)
-      this.brightness = isBloom ? 0.9 + Math.random() * 0.1 : 0.4 + Math.random() * 0.5;
+      this.decay = 0.003 + Math.random() * 0.005;
+
+      // Color spectrum: Cyan (175) to Electric Blue (220)
+      const code = char.charCodeAt(0) || 97;
+      this.hue = 175 + (code % 45);
+      this.brightness = 0.7 + Math.random() * 0.3;
       this.phase = Math.random() * Math.PI * 2;
-      this.pulseSpeed = 0.002 + Math.random() * 0.003;
     }
 
     update(dt) {
       const now = performance.now();
-      this.x += this.vx + Math.sin(now * 0.001 + this.phase) * 0.5;
-      this.y += this.vy + Math.cos(now * 0.0012 + this.phase) * 0.3;
+      this.x += this.vx + Math.sin(now * 0.0015 + this.phase) * 0.6;
+      this.y += this.vy + Math.cos(now * 0.0018 + this.phase) * 0.4;
       this.life -= this.decay;
-      this.brightness = Math.min(1.0, this.brightness + Math.sin(now * this.pulseSpeed) * 0.05);
-
-      if (this.x < -20) this.x = (bgCanvas ? bgCanvas.width : window.innerWidth) + 20;
-      if (this.x > (bgCanvas ? bgCanvas.width : window.innerWidth) + 20) this.x = -20;
     }
 
     draw(ctx) {
       if (this.life <= 0) return;
-      const alpha = Math.max(0, this.life * this.brightness * (0.4 + activityIntensity * 0.6));
-      const glowRadius = this.size * (6 + activityIntensity * 8);
+      const alpha = Math.max(0, this.life * this.brightness);
+      const glowRadius = this.size * (7 + algaeActivity * 6);
 
-      // Outer glowing halo
       const glowGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
-      glowGrad.addColorStop(0, `hsla(${this.hue}, 100%, 65%, ${alpha * 0.7})`);
-      glowGrad.addColorStop(0.4, `hsla(${this.hue}, 90%, 50%, ${alpha * 0.25})`);
+      glowGrad.addColorStop(0, `hsla(${this.hue}, 100%, 65%, ${alpha * 0.65})`);
+      glowGrad.addColorStop(0.5, `hsla(${this.hue}, 90%, 50%, ${alpha * 0.2})`);
       glowGrad.addColorStop(1, 'transparent');
 
       ctx.save();
@@ -59,8 +167,8 @@
       ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Intense bioluminescent core
-      ctx.fillStyle = `hsla(${this.hue}, 100%, 88%, ${alpha})`;
+      // Core electric algae dot
+      ctx.fillStyle = `hsla(${this.hue}, 100%, 90%, ${alpha * 0.9})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -68,110 +176,85 @@
     }
   }
 
-  function createInitialAlgae() {
-    algaeParticles.length = 0;
-    const initialCount = Math.floor(MAX_ALGAE * 0.4);
-    for (let i = 0; i < initialCount; i++) {
-      algaeParticles.push(new BioAlgae());
-    }
-  }
-
-  function boostAlgaeBloom() {
-    // Add pulsing bioluminescent algae particles on keypress or AI response
-    const bloomCount = 3 + Math.floor(activityIntensity * 8);
-    for (let i = 0; i < bloomCount; i++) {
-      if (algaeParticles.length < MAX_ALGAE) {
-        const x = Math.random() * bgCanvas.width;
-        const y = bgCanvas.height - Math.random() * (bgCanvas.height * 0.5);
-        algaeParticles.push(new BioAlgae(x, y, true));
-      }
-    }
-  }
-
-  function drawBioluminescentWaves(time) {
-    if (!ctx || !bgCanvas) return;
+  function getLetterCoordinates(char) {
+    if (!bgCanvas) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const width = bgCanvas.width;
     const height = bgCanvas.height;
+    const lower = char.toLowerCase();
+    const isVowel = ['a','e','i','o','u'].includes(lower);
 
-    // Number of active wave layers scales with AI activity (3 to 6 waves)
-    const waveCount = 3 + Math.floor(activityIntensity * 3);
-    const baseWaveHeight = height * 0.25;
+    if (isVowel) {
+      // Vowels bloom near the center of the screen
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * (width * 0.2);
+      return {
+        x: width / 2 + Math.cos(angle) * dist,
+        y: height / 2 + Math.sin(angle) * dist
+      };
+    } else {
+      // Consonants spread outward towards edges/top/bottom based on ASCII value
+      const code = lower.charCodeAt(0) || 97;
+      const norm = (code - 97) / 26; // 0 to 1
+      const angle = norm * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const dist = (width * 0.2) + Math.random() * (width * 0.3);
+      return {
+        x: Math.max(30, Math.min(width - 30, width / 2 + Math.cos(angle) * dist)),
+        y: Math.max(30, Math.min(height - 30, height / 2 + Math.sin(angle) * dist))
+      };
+    }
+  }
 
-    for (let i = 0; i < waveCount; i++) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(0, height);
+  function feedBioAlgaeFromText(text) {
+    if (!text || !bgCanvas) return;
+    const chars = text.split('').filter(c => /[a-zA-Z]/.test(c));
+    const spawnCount = Math.min(30, Math.max(5, Math.floor(chars.length / 10)));
 
-      const waveSpeed = (0.0008 + i * 0.0004) * (1 + activityIntensity * 1.5);
-      const amplitude = (15 + i * 12) * (1 + activityIntensity * 1.8);
-      const frequency = 0.004 - i * 0.0006;
-
-      for (let x = 0; x <= width; x += 15) {
-        const y = height - baseWaveHeight + (i * 25) +
-                  Math.sin(x * frequency + time * waveSpeed + i) * amplitude +
-                  Math.cos(x * frequency * 0.5 + time * waveSpeed * 0.7) * (amplitude * 0.5);
-        ctx.lineTo(x, y);
+    for (let i = 0; i < spawnCount; i++) {
+      if (bioAlgaeParticles.length >= MAX_ALGAE) {
+        bioAlgaeParticles.shift(); // Replace oldest
       }
-
-      ctx.lineTo(width, height);
-      ctx.closePath();
-
-      // Wave color gradients (deep abyssal ocean to electric cyan crests)
-      const hue = 185 + i * 10; // Cyan to Deep Sapphire Blue
-      const alpha = (0.06 + (i * 0.03)) * (0.8 + activityIntensity * 1.2);
-
-      const grad = ctx.createLinearGradient(0, height - baseWaveHeight, 0, height);
-      grad.addColorStop(0, `hsla(${hue}, 100%, 60%, ${alpha * 1.5})`); // Crest bioluminescence
-      grad.addColorStop(0.3, `hsla(${hue - 15}, 85%, 40%, ${alpha * 0.8})`);
-      grad.addColorStop(1, `hsla(220, 90%, 10%, ${alpha * 0.4})`); // Deep ocean abyss
-
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.restore();
+      const char = chars[Math.floor(Math.random() * chars.length)] || 'a';
+      const coords = getLetterCoordinates(char);
+      bioAlgaeParticles.push(new BioAlgaeParticle(coords.x, coords.y, char));
     }
   }
 
   function updateSystem(dt) {
-    // Slowly decay activity back to ambient floor
-    activityIntensity = Math.max(0.12, activityIntensity - activityDecay * dt);
+    updateGlowbugs(dt);
 
-    // Maintain target algae particle count proportional to AI activity
-    const targetAlgaeCount = Math.floor(25 + (MAX_ALGAE - 25) * (activityIntensity / maxActivity));
-    while (algaeParticles.length < targetAlgaeCount) {
-      algaeParticles.push(new BioAlgae());
-    }
+    // Decay algae activity
+    algaeActivity = Math.max(0.1, algaeActivity - activityDecay * dt);
 
-    // Update particles
-    for (let i = algaeParticles.length - 1; i >= 0; i--) {
-      algaeParticles[i].update(dt);
-      if (algaeParticles[i].life <= 0) {
-        algaeParticles.splice(i, 1);
+    // Update bio-algae particles
+    for (let i = bioAlgaeParticles.length - 1; i >= 0; i--) {
+      bioAlgaeParticles[i].update(dt);
+      if (bioAlgaeParticles[i].life <= 0) {
+        bioAlgaeParticles.splice(i, 1);
       }
     }
   }
 
   function drawBackground() {
     if (!ctx || !bgCanvas) return;
-    const now = performance.now();
     ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
 
-    // Deep ocean atmospheric radial background
+    // Atmospheric deep abyssal background radial gradient
     const bgGrad = ctx.createRadialGradient(
-      bgCanvas.width / 2, bgCanvas.height * 0.8, 0,
-      bgCanvas.width / 2, bgCanvas.height * 0.8, bgCanvas.width * 0.8
+      bgCanvas.width / 2, bgCanvas.height / 2, 0,
+      bgCanvas.width / 2, bgCanvas.height / 2, bgCanvas.width * 0.75
     );
-    bgGrad.addColorStop(0, `rgba(4, 25, 45, ${0.2 + activityIntensity * 0.35})`);
-    bgGrad.addColorStop(0.6, `rgba(2, 12, 25, ${0.1 + activityIntensity * 0.2})`);
+    bgGrad.addColorStop(0, `rgba(4, 20, 38, ${0.15 + algaeActivity * 0.25})`);
+    bgGrad.addColorStop(0.6, `rgba(2, 10, 20, ${0.08 + algaeActivity * 0.15})`);
     bgGrad.addColorStop(1, 'transparent');
 
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
-    // Render waves
-    drawBioluminescentWaves(now);
+    // 1. Draw User Fireflies (golden/yellow/green glowbugs)
+    drawGlowbugs();
 
-    // Render bio-algae plankton particles
-    algaeParticles.forEach(p => p.draw(ctx));
+    // 2. Draw AI Bio-Algae (electric blue/cyan particles)
+    bioAlgaeParticles.forEach(p => p.draw(ctx));
   }
 
   function animationLoop(ts) {
@@ -187,11 +270,9 @@
     requestAnimationFrame(animationLoop);
   }
 
-  function boostFire(chars) {
-    // Increase activity intensity as AI generates responses
-    const boost = Math.min(0.35, (chars / 2500) * 0.25);
-    activityIntensity = Math.min(maxActivity, activityIntensity + boost);
-    boostAlgaeBloom();
+  function boostFire(chars, sampleText) {
+    algaeActivity = Math.min(1.0, algaeActivity + Math.min(0.4, (chars / 2000) * 0.3));
+    feedBioAlgaeFromText(sampleText || "The Adze storytelling AI policy assistant");
   }
 
   function initAnimations() {
@@ -199,13 +280,14 @@
     if (!bgCanvas) return;
     ctx = bgCanvas.getContext('2d');
     resizeCanvas();
-    createInitialAlgae();
+    createGlowbugs();
     window.addEventListener('resize', resizeCanvas);
 
+    // User Keypresses feed fireflies
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
-        activityIntensity = Math.min(maxActivity, activityIntensity + 0.03);
-        if (Math.random() < 0.3) boostAlgaeBloom();
+        const key = e.key;
+        if (key.length === 1) boostBug(key.toLowerCase());
       }
     });
 
