@@ -3214,8 +3214,7 @@ export const FEATURES = [
     "id": "lunar_trailblazer",
     "name": "Lunar Trailblazer (NASA)",
     "tags": [
-      "orbits",
-      "science_interest"
+      "orbits"
     ],
     "tier": 2,
     "owner": "NASA / Caltech",

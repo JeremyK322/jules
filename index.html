@@ -2648,6 +2648,11 @@
                             const isChecked = e.target.checked;
                             featureEnabledState.set(feature.id, isChecked);
 
+                            // Sync all checkboxes for this feature across other layer lists
+                            document.querySelectorAll(`.feature-item input[data-feature-id="${feature.id}"]`).forEach(input => {
+                                input.checked = isChecked;
+                            });
+
                             const allLayerFeatChecks = featureList.querySelectorAll('input[type="checkbox"]');
                             const anyChecked = Array.from(allLayerFeatChecks).some(fcb => fcb.checked);
 
@@ -2706,8 +2711,6 @@
                         const featChecks = featureList.querySelectorAll('input[type="checkbox"]');
                         featChecks.forEach(fcb => {
                             fcb.checked = isChecked;
-                            const fid = fcb.dataset.featureId;
-                            if (fid) featureEnabledState.set(fid, isChecked);
                         });
 
                         updateVisibility(activeLayers);
@@ -2735,8 +2738,6 @@
                     const featCheckboxes = body.querySelectorAll('.feature-item > input[type="checkbox"]');
                     featCheckboxes.forEach(fcb => {
                         fcb.checked = checked;
-                        const fid = fcb.dataset.featureId;
-                        if (fid) featureEnabledState.set(fid, checked);
                     });
                     updateVisibility(activeLayers);
                     updateGlobalToggle();
@@ -2773,9 +2774,10 @@
                 allCatChecks.forEach(cb => { cb.checked = checked; });
                 allFeatChecks.forEach(fcb => {
                     fcb.checked = checked;
-                    const fid = fcb.dataset.featureId;
-                    if (fid) featureEnabledState.set(fid, checked);
                 });
+                if (!checked) {
+                    featureEnabledState.clear();
+                }
                 updateVisibility(activeLayers);
                 highlightActiveLayerItems();
             });
