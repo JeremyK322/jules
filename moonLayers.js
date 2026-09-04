@@ -3301,6 +3301,604 @@ export const FEATURES = [
     "coordination_mechanism": null,
     "dispute_parties": [],
     "status_date": null
+  },
+  {
+    "id": "ranger_4",
+    "name": "Ranger 4 (first US impact, far side)",
+    "lat": -15.5,
+    "lon": -130.7,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage",
+      "political"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "First US spacecraft to reach the lunar surface (far side). Navigation failure; no data returned.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1962-04-26"
+  },
+  {
+    "id": "ranger_6",
+    "name": "Ranger 6",
+    "lat": 9.36,
+    "lon": 21.48,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "Intentional impact in Mare Tranquillitatis. Cameras failed.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1964-02-02"
+  },
+  {
+    "id": "ranger_8",
+    "name": "Ranger 8",
+    "lat": 2.64,
+    "lon": 24.79,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "Successful imaging impact in Mare Tranquillitatis, near future Apollo 11 site.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1965-02-20"
+  },
+  {
+    "id": "ranger_9",
+    "name": "Ranger 9",
+    "lat": -12.83,
+    "lon": -2.39,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "Successful imaging impact inside Alphonsus crater.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1965-03-24"
+  },
+  {
+    "id": "luna_5",
+    "name": "Luna 5",
+    "lat": -1.6,
+    "lon": -25,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "Soviet Space Program",
+    "state": "USSR",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "Soviet / NSSDC records",
+    "note": "Failed soft-landing attempt; hard impact in Mare Nubium region.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1965-05-12"
+  },
+  {
+    "id": "luna_7",
+    "name": "Luna 7",
+    "lat": 9.8,
+    "lon": -47.8,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "Soviet Space Program",
+    "state": "USSR",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "Soviet / NSSDC records",
+    "note": "Failed soft-landing attempt in Oceanus Procellarum.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1965-10-07"
+  },
+  {
+    "id": "luna_8",
+    "name": "Luna 8",
+    "lat": 9.1,
+    "lon": -63.3,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "Soviet Space Program",
+    "state": "USSR",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "Soviet / NSSDC records",
+    "note": "Failed soft-landing attempt in Oceanus Procellarum.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1965-12-06"
+  },
+  {
+    "id": "luna_15",
+    "name": "Luna 15",
+    "lat": 17,
+    "lon": 60,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "Soviet Space Program",
+    "state": "USSR",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage",
+      "political"
+    ],
+    "source": "Soviet records",
+    "note": "Sample-return attempt that crashed during Apollo 11 mission window.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1969-07-21"
+  },
+  {
+    "id": "luna_18",
+    "name": "Luna 18",
+    "lat": 3.57,
+    "lon": 56.5,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "Soviet Space Program",
+    "state": "USSR",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "Soviet records",
+    "note": "Failed sample-return attempt.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1971-09-11"
+  },
+  {
+    "id": "surveyor_2",
+    "name": "Surveyor 2",
+    "lat": 5.5,
+    "lon": -12,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA JPL Surveyor Documentation",
+    "note": "Failed soft-landing attempt southeast of Copernicus.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1966-09-23"
+  },
+  {
+    "id": "surveyor_4",
+    "name": "Surveyor 4",
+    "lat": 0.4,
+    "lon": -1.33,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA JPL Surveyor Documentation",
+    "note": "Contact lost shortly before touchdown in Sinus Medii; presumed hard impact.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1967-07-17"
+  },
+  {
+    "id": "lunar_orbiter_1",
+    "name": "Lunar Orbiter 1 (post-mission impact)",
+    "lat": 6.35,
+    "lon": 160.72,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "First US lunar orbiter; intentionally de-orbited onto far side.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1966-10-29"
+  },
+  {
+    "id": "lunar_orbiter_2",
+    "name": "Lunar Orbiter 2 (post-mission impact)",
+    "lat": 3,
+    "lon": 119.1,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "Intentionally de-orbited onto far side.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1967-10-11"
+  },
+  {
+    "id": "lunar_orbiter_5",
+    "name": "Lunar Orbiter 5 (post-mission impact)",
+    "lat": -2.79,
+    "lon": -83,
+    "radius_km": 10,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA / NSSDC",
+    "note": "Final Lunar Orbiter; intentionally de-orbited.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1968-01-31"
+  },
+  {
+    "id": "apollo_13_sivb",
+    "name": "Apollo 13 S-IVB",
+    "lat": -2.75,
+    "lon": -27.86,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA Apollo Mission Reports / LRO imaging",
+    "note": "Saturn V third stage intentionally impacted for seismic experiments.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1970-04-14"
+  },
+  {
+    "id": "apollo_14_sivb",
+    "name": "Apollo 14 S-IVB",
+    "lat": -8.09,
+    "lon": -26.02,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA Apollo Mission Reports",
+    "note": "Saturn V third stage intentional impact for seismic data.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1971-02-04"
+  },
+  {
+    "id": "apollo_17_sivb",
+    "name": "Apollo 17 S-IVB",
+    "lat": -4.21,
+    "lon": -12.31,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA Apollo Mission Reports / LRO",
+    "note": "Final Apollo S-IVB intentional impact for seismic experiments.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1972-12-10"
+  },
+  {
+    "id": "hiten",
+    "name": "Hiten (Japan)",
+    "lat": -34.3,
+    "lon": 55.6,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "ISAS / JAXA",
+    "state": "Japan",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "ISAS / JAXA",
+    "note": "First Japanese lunar probe; intentional end-of-mission impact.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "JAXA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1993-04-10"
+  },
+  {
+    "id": "lunar_prospector",
+    "name": "Lunar Prospector",
+    "lat": -87.7,
+    "lon": 42,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage",
+      "water_ice",
+      "science_interest"
+    ],
+    "source": "NASA Lunar Prospector Mission Data",
+    "note": "Intentional polar impact into a permanently shadowed crater to search for water vapor.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "1999-07-31"
+  },
+  {
+    "id": "change_1",
+    "name": "Chang'e 1 (impact)",
+    "lat": -1.5,
+    "lon": 52.36,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "CNSA",
+    "state": "China",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "CNSA",
+    "note": "China’s first lunar orbiter; controlled impact at end of mission.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "CNSA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2009-03-01"
+  },
+  {
+    "id": "kaguya",
+    "name": "Kaguya / SELENE (impact)",
+    "lat": -65.5,
+    "lon": 80.4,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "JAXA",
+    "state": "Japan",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "JAXA",
+    "note": "Main Kaguya orbiter intentional impact.",
+    "date": "Pending",
+    "evidence_grade": "B",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "JAXA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2009-06-10"
+  },
+  {
+    "id": "ladee",
+    "name": "LADEE",
+    "lat": 11.85,
+    "lon": -93.25,
+    "radius_km": 10,
+    "tier": 1,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "impact",
+      "heritage"
+    ],
+    "source": "NASA LADEE Mission Data / LRO imaging",
+    "note": "Lunar Atmosphere and Dust Environment Explorer; controlled far-side impact.",
+    "date": "Pending",
+    "evidence_grade": "A",
+    "review_status": "proposed_protected",
+    "disputed": false,
+    "designation_authority": "NASA / Proposed by map contributors",
+    "mission_status": "completed",
+    "event_date": "2014-04-18"
   }
 ];
 
