@@ -1500,7 +1500,7 @@
         const MOON_RADIUS_KM = 1737.4;
         const MOON_3D_RADIUS = 1;
         const DEFAULT_RADIUS_KM = 10;
-        const MIN_VISUAL_RADIUS_KM = 50;
+        const MIN_VISUAL_RADIUS_KM = 100;
         const MIN_DETECTION_KM = 150;
 
         // --- Planning System ---
@@ -2365,11 +2365,10 @@
 
                 if (type === 'point') {
                     const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
-                    const visualRadiusKm = Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM);
                     const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
                     const targetNormal = pos.clone().normalize();
 
-                    const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
+                    const discGeo = createCurvedDiscGeometry(featureRadiusKm, 1.002);
                     const visualProps = getFeatureVisualProps(feature);
                     const discMatProps = {
                         color: new THREE.Color(visualProps.color),
@@ -4040,7 +4039,7 @@ function copyText() {
                     const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
                     const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
                     const currentR = actualR + zoomProgress * (maxR - actualR);
-                    const scaleS = currentR / maxR;
+                    const scaleS = currentR / actualR;
 
                     if (entry.discObject) {
                         entry.discObject.scale.set(scaleS, scaleS, scaleS);

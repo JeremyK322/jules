@@ -3328,7 +3328,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1962-04-26"
+    "event_date": "1962-04-26",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "ranger_6",
@@ -3355,7 +3368,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1964-02-02"
+    "event_date": "1964-02-02",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "ranger_8",
@@ -3382,7 +3408,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1965-02-20"
+    "event_date": "1965-02-20",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "ranger_9",
@@ -3409,7 +3448,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1965-03-24"
+    "event_date": "1965-03-24",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "luna_5",
@@ -3436,7 +3488,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1965-05-12"
+    "event_date": "1965-05-12",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "USSR"
+    ],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_7",
@@ -3463,7 +3528,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1965-10-07"
+    "event_date": "1965-10-07",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "USSR"
+    ],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_8",
@@ -3490,7 +3568,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1965-12-06"
+    "event_date": "1965-12-06",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "USSR"
+    ],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_15",
@@ -3518,7 +3609,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1969-07-21"
+    "event_date": "1969-07-21",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "USSR"
+    ],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "luna_18",
@@ -3545,7 +3649,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1971-09-11"
+    "event_date": "1971-09-11",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "USSR"
+    ],
+    "authorizing_agency": "Soviet Space Program",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "surveyor_2",
@@ -3572,7 +3689,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1966-09-23"
+    "event_date": "1966-09-23",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "surveyor_4",
@@ -3599,7 +3729,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1967-07-17"
+    "event_date": "1967-07-17",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "lunar_orbiter_1",
@@ -3626,7 +3769,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1966-10-29"
+    "event_date": "1966-10-29",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "lunar_orbiter_2",
@@ -3653,7 +3809,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1967-10-11"
+    "event_date": "1967-10-11",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "lunar_orbiter_5",
@@ -3680,7 +3849,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1968-01-31"
+    "event_date": "1968-01-31",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_13_sivb",
@@ -3707,7 +3889,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1970-04-14"
+    "event_date": "1970-04-14",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_14_sivb",
@@ -3734,7 +3929,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1971-02-04"
+    "event_date": "1971-02-04",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "apollo_17_sivb",
@@ -3761,7 +3969,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1972-12-10"
+    "event_date": "1972-12-10",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "hiten",
@@ -3788,7 +4009,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "JAXA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1993-04-10"
+    "event_date": "1993-04-10",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "Japan"
+    ],
+    "authorizing_agency": "ISAS / JAXA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "lunar_prospector",
@@ -3817,7 +4051,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "1999-07-31"
+    "event_date": "1999-07-31",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   },
   {
     "id": "change_1",
@@ -3844,7 +4091,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "CNSA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2009-03-01"
+    "event_date": "2009-03-01",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "China"
+    ],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "kaguya",
@@ -3871,7 +4131,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "JAXA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2009-06-10"
+    "event_date": "2009-06-10",
+    "legal_basis": "No binding international protection; proposed heritage under non-binding initiatives",
+    "legal_status_effect": "proposal",
+    "responsible_states": [
+      "Japan"
+    ],
+    "authorizing_agency": "JAXA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "International heritage coordination (proposed)",
+    "dispute_parties": [],
+    "status_date": null
   },
   {
     "id": "ladee",
@@ -3898,7 +4171,20 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
-    "event_date": "2014-04-18"
+    "event_date": "2014-04-18",
+    "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
+    "legal_status_effect": "binding (national, US)",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": "terminated",
+    "coordination_required": true,
+    "coordination_mechanism": "U.S. law; NASA heritage guidelines",
+    "dispute_parties": [],
+    "status_date": "2019-12-31"
   }
 ];
 
