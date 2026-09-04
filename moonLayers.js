@@ -3899,6 +3899,170 @@ export const FEATURES = [
     "designation_authority": "NASA / Proposed by map contributors",
     "mission_status": "completed",
     "event_date": "2014-04-18"
+  },
+  {
+    "id": "artemis_3_target",
+    "name": "Artemis III Candidate Landing Zone (Shackleton Rim)",
+    "lat": -89.9,
+    "lon": 0,
+    "radius_km": 15,
+    "operational_radius_km": 25,
+    "tier": 2,
+    "owner": "NASA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "landing",
+      "operational_activity"
+    ],
+    "source": "NASA Artemis III Candidate Landing Regions Announcement (2022/2024)",
+    "date": "2024-08-20",
+    "evidence_grade": "A",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "NASA / Artemis Accords Coordination Committee",
+    "mission_status": "planned",
+    "note": "South Pole candidate region near Shackleton Crater for crewed surface lunar exploration.",
+    "legal_basis": "OST Article VI; Artemis Accords safety zone concept",
+    "legal_status_effect": "non_binding",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "NASA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Artemis Accords coordination; safety zone notification",
+    "dispute_parties": [],
+    "status_date": "2024-08-20"
+  },
+  {
+    "id": "change_7_target",
+    "name": "Chang'e 7 Target Landing Region (Shackleton / Malapert)",
+    "lat": -88.8,
+    "lon": 0,
+    "radius_km": 18,
+    "operational_radius_km": 30,
+    "tier": 2,
+    "owner": "CNSA",
+    "state": "China",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "landing",
+      "operational_activity"
+    ],
+    "source": "CNSA / CLEP Lunar Exploration Mission Reports (2023/2024)",
+    "date": "2024-04-15",
+    "evidence_grade": "A",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "CNSA (China National Space Administration)",
+    "mission_status": "planned",
+    "note": "South Pole site targeted for water ice detection, orbiter, lander, rover, and mini-flying probe.",
+    "legal_basis": "OST Article VI",
+    "legal_status_effect": "none",
+    "responsible_states": [
+      "China"
+    ],
+    "authorizing_agency": "CNSA",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "No formal mechanism; unilateral planning",
+    "dispute_parties": [],
+    "status_date": "2024-04-15"
+  },
+  {
+    "id": "viper_clps_target",
+    "name": "VIPER / Commercial CLPS Planned South Pole Zone",
+    "lat": -85.5,
+    "lon": 31.5,
+    "radius_km": 12,
+    "operational_radius_km": 20,
+    "tier": 2,
+    "owner": "NASA / Astrobotic",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "landing",
+      "operational_activity"
+    ],
+    "source": "NASA Commercial Lunar Payload Services (CLPS) Manifest",
+    "date": "2024-07-17",
+    "evidence_grade": "A",
+    "review_status": "under_assessment",
+    "disputed": false,
+    "designation_authority": "NASA Science Mission Directorate",
+    "mission_status": "planned",
+    "note": "Nobili / Nobile Crater region planned rover resource prospecting zone.",
+    "legal_basis": "OST Article VI; U.S. commercial space launch license (FAA)",
+    "legal_status_effect": "none",
+    "responsible_states": [
+      "USA"
+    ],
+    "authorizing_agency": "FAA (via NASA CLPS)",
+    "authorization_id": "LLS-2025-0010 (example)",
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "NASA CLPS contract; potential safety zone",
+    "dispute_parties": [],
+    "status_date": "2024-07-17"
+  },
+  {
+    "id": "lunar_gateway_orbit",
+    "name": "Gateway NRHO (Near-Rectilinear Halo Orbit)",
+    "lat": -89,
+    "lon": 180,
+    "radius_km": 300,
+    "operational_radius_km": 500,
+    "tier": 2,
+    "owner": "NASA / ESA / JAXA / CSA",
+    "state": "USA",
+    "articles": [
+      6,
+      9
+    ],
+    "tags": [
+      "operational_activity",
+      "orbits",
+      "lagrange"
+    ],
+    "source": "NASA / ESA Gateway Orbital Architecture Specification",
+    "date": "2024-01-10",
+    "evidence_grade": "A",
+    "review_status": "assessed_open",
+    "disputed": false,
+    "designation_authority": "Multilateral Coordination Board (MCB)",
+    "mission_status": "planned",
+    "note": "7-day polar NRHO trajectory for cis-lunar staging station.",
+    "legal_basis": "OST Article VI; Artemis Accords; Intergovernmental Agreement (IGA) for Gateway",
+    "legal_status_effect": "non_binding",
+    "responsible_states": [
+      "USA",
+      "ESA",
+      "Japan",
+      "Canada"
+    ],
+    "authorizing_agency": "NASA (lead)",
+    "authorization_id": null,
+    "authorization_date": null,
+    "supervision_status": null,
+    "coordination_required": true,
+    "coordination_mechanism": "Multilateral Coordination Board (MCB)",
+    "dispute_parties": [],
+    "status_date": "2024-01-10"
   }
 ];
 

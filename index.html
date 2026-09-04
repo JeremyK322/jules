@@ -2334,6 +2334,10 @@
                 }
             }
             for (const key in featureObjects) delete featureObjects[key];
+            harmMeshes.forEach(mesh => {
+                if (currentMoon) currentMoon.remove(mesh);
+            });
+            harmMeshes.length = 0;
             allGlowMeshes.length = 0;
             allLabels.length = 0;
             satelliteList.length = 0;
@@ -2357,7 +2361,7 @@
                 let satelliteObj = null;
                 const geom = feature.geometry;
                 const type = geom ? geom.type : 'point';
-                const color = '#ff5555';
+                const geomColor = (geom && geom.color) ? geom.color : (feature.tags && feature.tags.includes('radio_quiet') ? LAYER_DEFS['radio_quiet'].color : '#ff5555');
 
                 if (type === 'point') {
                     const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
@@ -2437,7 +2441,7 @@
                     const angularRadiusRad = ((geom.angular_radius_deg || (type === 'hemisphere' ? 90 : 75)) * Math.PI) / 180;
                     const opacity = geom.opacity || 0.14;
                     const geo = new THREE.SphereGeometry(radius3D, segs, segs/2, 0, Math.PI*2, 0, angularRadiusRad);
-                    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: opacity, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
+                    const mat = new THREE.MeshBasicMaterial({ color: geomColor, transparent: true, opacity: opacity, side: THREE.DoubleSide, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending });
                     const mesh = new THREE.Mesh(geo, mat);
                     const hLat = geom.lat ?? 0;
                     const hLon = geom.lon ?? 180;
@@ -2467,9 +2471,9 @@
                     const isDashed = geom.dash || false;
                     let mat;
                     if (isDashed) {
-                        mat = new THREE.LineDashedMaterial({ color, dashSize: 0.02, gapSize: 0.015, transparent: true, opacity: 0.7, depthWrite: false });
+                        mat = new THREE.LineDashedMaterial({ color: geomColor, dashSize: 0.02, gapSize: 0.015, transparent: true, opacity: 0.7, depthWrite: false });
                     } else {
-                        mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false });
+                        mat = new THREE.LineBasicMaterial({ color: geomColor, transparent: true, opacity: 0.5, depthWrite: false });
                     }
                     const line = new THREE.Line(orbitGeo, mat);
                     line.userData = { featureId: feature.id };
@@ -2820,7 +2824,7 @@
             highlightActiveLayerItems();
         }
 
-        function getFeatureColor(feature, primaryLayerKey) {
+        function getFeatureColor(feature, primaryKey) {
             if (isAssessmentStatusMode) {
                 const visualProps = getFeatureVisualProps(feature);
                 return visualProps.color;
@@ -2828,8 +2832,8 @@
             if (isStateModeActive && feature.state && STATE_DEFS[feature.state]) {
                 return STATE_DEFS[feature.state].color;
             }
-            if (primaryLayerKey && LAYER_DEFS[primaryLayerKey]) {
-                return LAYER_DEFS[primaryLayerKey].color;
+            if (primaryKey && LAYER_DEFS[primaryKey]) {
+                return LAYER_DEFS[primaryKey].color;
             }
             return '#ff5555';
         }
@@ -2845,19 +2849,24 @@
 
                 const feature = FEATURES.find(f => f.id === fid);
                 if (!feature) continue;
-                let belongsToCategory = null;
+
+                let categoryDiscsOn = true;
                 for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
-                    for (const key of layerKeys) {
+                    const matchesCat = layerKeys.some(key => {
                         const def = LAYER_DEFS[key];
-                        if (def && feature.tags && feature.tags.some(t => def.tags.includes(t))) {
-                            belongsToCategory = catName;
+                        return def && feature.tags && feature.tags.some(t => def.tags.includes(t));
+                    });
+                    if (matchesCat) {
+                        const isCatDiscOn = !categoryDiscState.has(catName) || categoryDiscState.get(catName);
+                        if (isCatDiscOn) {
+                            categoryDiscsOn = true;
                             break;
+                        } else {
+                            categoryDiscsOn = false;
                         }
                     }
-                    if (belongsToCategory) break;
                 }
 
-                const categoryDiscsOn = !categoryDiscState.has(belongsToCategory) || categoryDiscState.get(belongsToCategory);
                 entry.discObject.visible = isActive && categoryDiscsOn;
             }
         }
@@ -2948,17 +2957,29 @@
                         entry.satellite.label.visible = true;
                     }
 
-                    const visualProps = getFeatureVisualProps(feature);
+                    const color = getFeatureColor(feature, primaryKey);
                     if (entry.discObject && entry.discObject.material) {
-                        entry.discObject.material.color.set(visualProps.color);
-                        entry.discObject.userData.baseOpacity = visualProps.opacity;
-                        if (visualProps.useTexture === 'provisional') {
-                            entry.discObject.material.map = createPulsatingRingTexture(visualProps.color);
-                        } else if (visualProps.useTexture === 'dashed') {
-                            entry.discObject.material.map = createDashedRingTexture(visualProps.color);
-                        } else {
-                            entry.discObject.material.map = null;
+                        entry.discObject.material.color.set(color);
+
+                        let baseOp = 0.5;
+                        let tex = null;
+
+                        if (isAssessmentStatusMode) {
+                            if (feature.review_status === 'under_assessment') {
+                                baseOp = 0.6;
+                                tex = createPulsatingRingTexture(color);
+                            } else if (feature.review_status === 'unassessed') {
+                                baseOp = 0.35;
+                                tex = createDashedRingTexture(color);
+                            } else if (feature.review_status === 'assessed_open') {
+                                baseOp = 0.3;
+                            } else {
+                                baseOp = 0.5;
+                            }
                         }
+
+                        entry.discObject.userData.baseOpacity = baseOp;
+                        entry.discObject.material.map = tex;
                         entry.discObject.material.needsUpdate = true;
                     }
                 } else {
@@ -3564,35 +3585,6 @@
                 } else {
                     ostObligationsTriggeredText = 'Article IX (Due Regard & Harmful Interference)';
                 }
-
-                summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
-            } else {
-                const isOrbitReport = targetFeature && targetFeature.geometry && targetFeature.geometry.type === 'orbit';
-                if (isOrbitReport) {
-                    reportName = `${targetFeature.name} (Orbital Domain)`;
-                } else {
-                    const latStr = currentTelemetryLat >= 0 ? `${currentTelemetryLat.toFixed(2)}° N` : `${(-currentTelemetryLat).toFixed(2)}° S`;
-                    const lonStr = lonToDisplay(currentTelemetryLon);
-                    reportName = `Open Lunar Surface (${latStr}, ${lonStr})`;
-                }
-                categoryName = targetFeature ? getCategoryLabel(targetFeature) : 'Unassessed Area';
-                tierNum = targetFeature ? (targetFeature.tier || 3) : 3;
-                tierText = tierNum === 1
-                    ? 'Tier 1: high protection, activity requires coordination and can be challenged.'
-                    : tierNum === 2
-                    ? 'Tier 2: coordination required before proceeding.'
-                    : 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
-                sourceText = targetFeature ? (targetFeature.source || 'IAU / Mission Catalog') : 'Lunar Telemetry Location Survey';
-                evidenceText = targetFeature ? (targetFeature.evidence_grade === 'A' ? 'Grade A' : 'Grade B') : 'Not graded (Unassessed surface point)';
-                statusText = targetFeature ? (targetFeature.review_status ? targetFeature.review_status.toUpperCase() : 'Assessed') : 'Unassessed';
-                dateText = targetFeature ? (targetFeature.date || 'Pending') : 'N/A';
-                authText = targetFeature ? (targetFeature.designation_authority || 'N/A') : 'N/A';
-                stateResp = targetFeature ? (targetFeature.state || 'None specified') : 'None (OST Article II: Non-appropriation by claim, use or occupation)';
-                disputeText = 'No active disputes recorded';
-                legalInstrumentText = 'Outer Space Treaty Articles II (Non-appropriation) and IX (Due Regard)';
-                summaryText = isOrbit
-                    ? `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics. OST Article VI state authorization and supervision apply.`
-                    : `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
             } else {
                 const latStr = currentTelemetryLat >= 0 ? `${currentTelemetryLat.toFixed(2)}° N` : `${(-currentTelemetryLat).toFixed(2)}° S`;
                 const lonStr = lonToDisplay(currentTelemetryLon);
@@ -3608,6 +3600,7 @@
                 stateResp = 'None (OST Article II: Non-appropriation by claim, use or occupation)';
                 disputeText = 'No active disputes recorded';
                 legalInstrumentText = 'Outer Space Treaty Articles II (Non-appropriation) and IX (Due Regard)';
+                ostObligationsTriggeredText = 'Article II (Non-appropriation) & Article IX (Due Regard & Non-Interference)';
                 summaryText = `This location represents unassessed open lunar surface. Under OST Article II, no part of the lunar surface is subject to national appropriation. Operators must adhere to OST Article IX due regard obligations and consult prior to undertaking activities that could cause harmful interference.`;
             }
 
@@ -3949,7 +3942,7 @@ function copyText() {
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
                 if (entry.discObject && entry.discObject.material) {
-                    const baseOp = entry.discObject.userData.baseOpacity ?? 0.4;
+                    const baseOp = entry.discObject.userData.baseOpacity ?? 0.5;
                     entry.discObject.material.opacity = baseOp * (globalLayerOpacity / 0.5);
                 }
             }
@@ -4012,7 +4005,8 @@ function copyText() {
                 for (const id of highlightedFeatureIds) {
                     const entry = featureObjects[id];
                     if (entry && entry.discObject && entry.discObject.material) {
-                        entry.discObject.material.opacity = Math.min(1.0, globalLayerOpacity * 1.8);
+                        const baseOp = entry.discObject.userData.baseOpacity ?? 0.5;
+                        entry.discObject.material.opacity = Math.min(1.0, baseOp * (globalLayerOpacity / 0.5) * 1.8);
                     }
                 }
             }
@@ -4050,7 +4044,7 @@ function copyText() {
                     const scaleS = currentR / actualR;
 
                     if (entry.discObject) {
-                        entry.discObject.scale.set(scaleS, 1.0, scaleS);
+                        entry.discObject.scale.set(scaleS, scaleS, scaleS);
                     }
 
                     if (entry.label) {
