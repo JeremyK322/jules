@@ -2130,7 +2130,7 @@
             }
             const categoryLabel = primaryLayerKey && LAYER_DEFS[primaryLayerKey] ? LAYER_DEFS[primaryLayerKey].label : (isUserSite ? 'Planning' : 'General');
 
-            const statusText = feature.review_status ? feature.review_status.replace('_', ' ').toUpperCase() : `Tier ${feature.tier || 3}`;
+            const statusText = feature.review_status ? feature.review_status.replaceAll('_', ' ').toUpperCase() : `Tier ${feature.tier || 3}`;
             const stateText = feature.state && feature.state.trim() ? feature.state : 'None';
 
             let ostText = 'Art. IX (Due regard)';
@@ -2242,6 +2242,29 @@
         }
 
 
+        function createDashedRingTexture(colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = colorHex + '11'; // Low opacity fill
+            ctx.beginPath();
+            ctx.arc(64, 64, 58, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = colorHex;
+            ctx.lineWidth = 4;
+            ctx.setLineDash([8, 6]);
+            ctx.beginPath();
+            ctx.arc(64, 64, 58, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
         function getFeatureVisualProps(feature) {
             let color = '#888899';
             let opacity = 0.4;
@@ -2254,6 +2277,7 @@
                         color = '#888899';
                         opacity = 0.2;
                         isDashed = true;
+                        useTexture = 'dashed';
                         break;
                     case 'under_assessment':
                         color = '#ffaa00'; // Amber provisional protection
@@ -2262,7 +2286,7 @@
                         break;
                     case 'assessed_open':
                         color = '#94a3b8'; // Muted slate outline
-                        opacity = 0.05; // Thin outline, virtually no fill
+                        opacity = 0.08; // Thin outline
                         break;
                     case 'proposed_protected':
                     case 'assessed_protected':
@@ -2352,10 +2376,12 @@
                     };
                     if (visualProps.useTexture === 'provisional') {
                         discMatProps.map = createPulsatingRingTexture(visualProps.color);
+                    } else if (visualProps.useTexture === 'dashed') {
+                        discMatProps.map = createDashedRingTexture(visualProps.color);
                     }
                     const discMat = new THREE.MeshBasicMaterial(discMatProps);
                     discObject = new THREE.Mesh(discGeo, discMat);
-                    discObject.userData = { featureId: feature.id };
+                    discObject.userData = { featureId: feature.id, baseOpacity: visualProps.opacity };
                     discObject.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), targetNormal);
                     allGlowMeshes.push(discObject);
                     // Create dynamic harms meshes if operational activity
@@ -2795,6 +2821,10 @@
         }
 
         function getFeatureColor(feature, primaryLayerKey) {
+            if (isAssessmentStatusMode) {
+                const visualProps = getFeatureVisualProps(feature);
+                return visualProps.color;
+            }
             if (isStateModeActive && feature.state && STATE_DEFS[feature.state]) {
                 return STATE_DEFS[feature.state].color;
             }
@@ -2918,8 +2948,19 @@
                         entry.satellite.label.visible = true;
                     }
 
-                    const color = getFeatureColor(feature, primaryKey);
-                    if (entry.discObject && entry.discObject.material) entry.discObject.material.color.set(color);
+                    const visualProps = getFeatureVisualProps(feature);
+                    if (entry.discObject && entry.discObject.material) {
+                        entry.discObject.material.color.set(visualProps.color);
+                        entry.discObject.userData.baseOpacity = visualProps.opacity;
+                        if (visualProps.useTexture === 'provisional') {
+                            entry.discObject.material.map = createPulsatingRingTexture(visualProps.color);
+                        } else if (visualProps.useTexture === 'dashed') {
+                            entry.discObject.material.map = createDashedRingTexture(visualProps.color);
+                        } else {
+                            entry.discObject.material.map = null;
+                        }
+                        entry.discObject.material.needsUpdate = true;
+                    }
                 } else {
                     featureActiveState.set(fid, false);
                     if (entry.discObject) entry.discObject.visible = false;
@@ -2931,16 +2972,16 @@
                 }
             }
             harmMeshes.forEach(mesh => {
-                const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
-                if (!isDynamicHarmsEnabled || !parentActive) {
-                    mesh.visible = false;
-                    return;
-                }
-                if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
-                else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
-                else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
-            });
-            applyDiscVisibility();
+                    const parentActive = featureActiveState.get(mesh.userData.featureId) || false;
+                    if (!isDynamicHarmsEnabled || !parentActive) {
+                        mesh.visible = false;
+                        return;
+                    }
+                    if (mesh.userData.harmType === 'psi') mesh.visible = harmPsiEnabled;
+                    else if (mesh.userData.harmType === 'contam') mesh.visible = harmContamEnabled;
+                    else if (mesh.userData.harmType === 'emi') mesh.visible = harmEmiEnabled;
+                });
+                applyDiscVisibility();
             updateGlobalToggle();
         }
 
@@ -3499,7 +3540,15 @@
                     ? `Active challenge by ${targetFeature.dispute_details.challenger || 'Challenger'}. Justification: ${targetFeature.dispute_details.justification || 'Pending'}. Deadline: ${targetFeature.dispute_details.response_deadline || 'None'}.`
                     : 'No active disputes recorded';
 
-                if (targetFeature.articles && targetFeature.articles.length > 0) {
+                const isOrbit = targetFeature.geometry && targetFeature.geometry.type === 'orbit';
+                if (isOrbit) {
+                    reportName = `${targetFeature.name} (Orbital Domain)`;
+                    summaryText = `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics. OST Article VI state authorization and supervision apply.`;
+                } else {
+                    summaryText = `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
+                }
+
+                if (Array.isArray(targetFeature.articles) && targetFeature.articles.length > 0) {
                     const mappedArts = targetFeature.articles.map(a => {
                         if (a === 2) return 'Article II (Non-appropriation)';
                         if (a === 3) return 'Article III (International Law & UN Charter)';
@@ -3541,9 +3590,25 @@
                 stateResp = targetFeature ? (targetFeature.state || 'None specified') : 'None (OST Article II: Non-appropriation by claim, use or occupation)';
                 disputeText = 'No active disputes recorded';
                 legalInstrumentText = 'Outer Space Treaty Articles II (Non-appropriation) and IX (Due Regard)';
-                summaryText = targetFeature
+                summaryText = isOrbit
                     ? `This orbital feature represents ${targetFeature.name} operating in lunar orbit. Coordinates are omitted for non-surface orbital dynamics. OST Article VI state authorization and supervision apply.`
-                    : `This location represents unassessed open lunar surface. Under OST Article II, no part of the lunar surface is subject to national appropriation. Operators must adhere to OST Article IX due regard obligations and consult prior to undertaking activities that could cause harmful interference.`;
+                    : `This designation identifies ${targetFeature.name} as a ${categoryName} area under a Tier ${tierNum} framework. Pursuant to OST Article VI, authorizing states bear international responsibility for national activities. Operators planning activities in this vicinity must observe OST Article IX due regard obligations to avoid harmful interference.`;
+            } else {
+                const latStr = currentTelemetryLat >= 0 ? `${currentTelemetryLat.toFixed(2)}° N` : `${(-currentTelemetryLat).toFixed(2)}° S`;
+                const lonStr = lonToDisplay(currentTelemetryLon);
+                reportName = `Open Lunar Surface (${latStr}, ${lonStr})`;
+                categoryName = 'Unassessed Area';
+                tierNum = 3;
+                tierText = 'Tier 3: activity permitted, subject to the general due regard obligation under Article IX.';
+                sourceText = 'Lunar Telemetry Location Survey';
+                evidenceText = 'Not graded (Unassessed surface point)';
+                statusText = 'Unassessed';
+                dateText = 'N/A';
+                authText = 'N/A';
+                stateResp = 'None (OST Article II: Non-appropriation by claim, use or occupation)';
+                disputeText = 'No active disputes recorded';
+                legalInstrumentText = 'Outer Space Treaty Articles II (Non-appropriation) and IX (Due Regard)';
+                summaryText = `This location represents unassessed open lunar surface. Under OST Article II, no part of the lunar surface is subject to national appropriation. Operators must adhere to OST Article IX due regard obligations and consult prior to undertaking activities that could cause harmful interference.`;
             }
 
             const eventDateLine = eventDateText ? `\nEvent date: ${eventDateText}` : "";
@@ -3884,7 +3949,8 @@ function copyText() {
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
                 if (entry.discObject && entry.discObject.material) {
-                    entry.discObject.material.opacity = globalLayerOpacity;
+                    const baseOp = entry.discObject.userData.baseOpacity ?? 0.4;
+                    entry.discObject.material.opacity = baseOp * (globalLayerOpacity / 0.5);
                 }
             }
 
