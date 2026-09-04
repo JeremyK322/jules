@@ -2499,7 +2499,7 @@
                     feature
                 };
                 if (!featureActiveState.has(feature.id)) featureActiveState.set(feature.id, false);
-                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, false);
+                if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, true);
 
                 if (currentMoon) {
                     if (discObject) currentMoon.add(discObject);
@@ -2641,7 +2641,7 @@
                         featureItem.className = 'feature-item';
                         const featureCheck = document.createElement('input');
                         featureCheck.type = 'checkbox';
-                        featureCheck.checked = featureEnabledState.get(feature.id) ?? false;
+                        featureCheck.checked = featureEnabledState.get(feature.id) ?? true;
                         featureCheck.dataset.featureId = feature.id;
                         featureCheck.dataset.layerKey = layerKey;
                         featureCheck.addEventListener('change', (e) => {
@@ -2711,6 +2711,10 @@
                         const featChecks = featureList.querySelectorAll('input[type="checkbox"]');
                         featChecks.forEach(fcb => {
                             fcb.checked = isChecked;
+                            const fid = fcb.dataset.featureId;
+                            if (fid && isChecked) {
+                                featureEnabledState.set(fid, true);
+                            }
                         });
 
                         updateVisibility(activeLayers);
@@ -2738,6 +2742,10 @@
                     const featCheckboxes = body.querySelectorAll('.feature-item > input[type="checkbox"]');
                     featCheckboxes.forEach(fcb => {
                         fcb.checked = checked;
+                        const fid = fcb.dataset.featureId;
+                        if (fid && checked) {
+                            featureEnabledState.set(fid, true);
+                        }
                     });
                     updateVisibility(activeLayers);
                     updateGlobalToggle();
@@ -2774,10 +2782,11 @@
                 allCatChecks.forEach(cb => { cb.checked = checked; });
                 allFeatChecks.forEach(fcb => {
                     fcb.checked = checked;
+                    const fid = fcb.dataset.featureId;
+                    if (fid && checked) {
+                        featureEnabledState.set(fid, true);
+                    }
                 });
-                if (!checked) {
-                    featureEnabledState.clear();
-                }
                 updateVisibility(activeLayers);
                 highlightActiveLayerItems();
             });
