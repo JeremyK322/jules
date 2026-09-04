@@ -2365,10 +2365,11 @@
 
                 if (type === 'point') {
                     const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const visualRadiusKm = Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM);
                     const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
                     const targetNormal = pos.clone().normalize();
 
-                    const discGeo = createCurvedDiscGeometry(featureRadiusKm, 1.002);
+                    const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
                     const visualProps = getFeatureVisualProps(feature);
                     const discMatProps = {
                         color: new THREE.Color(visualProps.color),
@@ -2850,7 +2851,7 @@
                 const feature = FEATURES.find(f => f.id === fid);
                 if (!feature) continue;
 
-                let categoryDiscsOn = true;
+                let categoryDiscsOn = false;
                 for (const [catName, layerKeys] of Object.entries(CATEGORIES)) {
                     const matchesCat = layerKeys.some(key => {
                         const def = LAYER_DEFS[key];
@@ -2861,8 +2862,6 @@
                         if (isCatDiscOn) {
                             categoryDiscsOn = true;
                             break;
-                        } else {
-                            categoryDiscsOn = false;
                         }
                     }
                 }
@@ -4041,7 +4040,7 @@ function copyText() {
                     const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
                     const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
                     const currentR = actualR + zoomProgress * (maxR - actualR);
-                    const scaleS = currentR / actualR;
+                    const scaleS = currentR / maxR;
 
                     if (entry.discObject) {
                         entry.discObject.scale.set(scaleS, scaleS, scaleS);
