@@ -71,7 +71,7 @@ The LCM features four master governance overlays that transform map interpretati
   - **Unassessed:** Gray outline with dashed border.
   - **Under Assessment:** Amber fill with pulsating provisional ring texture.
   - **Assessed Open:** Muted slate outline.
-  - **Assessed Protected:** Solid slate fill.
+  - **Proposed Protected:** Solid slate fill.
 - Sites under active assessment carry a provisional protection notice requiring public justification prior to proceeding during the review window.
 
 ### 2. Operational Activity Layer
