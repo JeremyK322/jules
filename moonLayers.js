@@ -3,8 +3,8 @@
 // Updated with OST Article VI State Responsibility data model & legal mechanism governance fields
 // New legal fields: legal_basis, legal_status_effect, responsible_states, authorizing_agency, authorization_id, authorization_date, supervision_status, coordination_required, coordination_mechanism, dispute_parties, status_date
 
-export const DATASET_VERSION = '2.2.0';
-export const SCHEMA_VERSION = '2.2.0';
+export const DATASET_VERSION = '2.2.1';
+export const SCHEMA_VERSION = '2.2.1';
 export const DATASET_DATE = '2026-09-06';
 
 export const STATE_DEFS = {
@@ -1014,7 +1014,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1969-07-20",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1055,7 +1055,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1969-11-19",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1096,7 +1096,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1971-02-05",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1137,7 +1137,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1971-07-30",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1178,7 +1178,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1972-04-21",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1219,7 +1219,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1972-12-11",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1339,7 +1339,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1966-06-02",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1379,7 +1379,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-04-20",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1419,7 +1419,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-09-11",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1459,7 +1459,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-11-10",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1499,7 +1499,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1968-01-10",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "proposal",
     "responsible_states": [
       "USA"
     ],
@@ -1852,7 +1852,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA CLPS Program Office",
-    "note": "First fully successful commercial lunar soft landing in Mare Crisium; operated upright for full ~14-day lunar day.",
+    "note": "First fully successful commercial lunar soft landing in Mare Crisium; operated upright for full ~14-day lunar day.; FAA launch licence under OST Article VI",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
@@ -1870,7 +1870,7 @@ export const FEATURES = [
     "authorization_date": null,
     "supervision_status": "terminated",
     "coordination_required": false,
-    "coordination_mechanism": null,
+    "coordination_mechanism": "FAA launch licence under OST Article VI",
     "dispute_parties": [],
     "status_date": null
   },
@@ -1974,7 +1974,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
-    "note": "First commercial soft landing on high southern crater rim.",
+    "note": "First commercial soft landing on high southern crater rim.; FAA launch licence under OST Article VI",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
@@ -1992,7 +1992,7 @@ export const FEATURES = [
     "authorization_date": null,
     "supervision_status": "terminated",
     "coordination_required": false,
-    "coordination_mechanism": null,
+    "coordination_mechanism": "FAA launch licence under OST Article VI",
     "dispute_parties": [],
     "status_date": null
   },
@@ -2015,7 +2015,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA CLPS Press Documentation",
-    "note": "Commercial polar soft landing in a crater near Mons Mouton; landed on side, mission ended after ~13 hours due to power/thermal issues.",
+    "note": "Commercial polar soft landing in a crater near Mons Mouton; landed on side, mission ended after ~13 hours due to power/thermal issues.; FAA launch licence under OST Article VI",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
@@ -2033,7 +2033,7 @@ export const FEATURES = [
     "authorization_date": null,
     "supervision_status": "terminated",
     "coordination_required": false,
-    "coordination_mechanism": null,
+    "coordination_mechanism": "FAA launch licence under OST Article VI",
     "dispute_parties": [],
     "status_date": null
   },
@@ -2137,7 +2137,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA Mission History",
-    "note": "Transmitted high-resolution close-up TV images prior to surface impact.",
+    "note": "Transmitted high-resolution close-up TV images prior to surface impact.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -2146,7 +2146,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1964-07-31",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -2179,7 +2179,7 @@ export const FEATURES = [
       "science_interest"
     ],
     "source": "NASA LCROSS Mission Data",
-    "note": "Controlled impact revealing volatile water plume signature.",
+    "note": "Controlled impact revealing volatile water plume signature.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "under_assessment",
@@ -2188,7 +2188,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "2009-10-09",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -2364,47 +2364,6 @@ export const FEATURES = [
     "status_date": null
   },
   {
-    "id": "peregrine_impact",
-    "name": "Peregrine Mission 1",
-    "lat": 35.2,
-    "lon": -30.5,
-    "radius_km": 10,
-    "tier": 2,
-    "owner": "Astrobotic / NASA CLPS",
-    "state": "USA",
-    "articles": [
-      6,
-      9
-    ],
-    "private": true,
-    "tags": [
-      "impact",
-      "heritage"
-    ],
-    "source": "Astrobotic Flight Operations",
-    "note": "Payload mission telemetry impact trajectory.",
-    "date": "Pending",
-    "evidence_grade": "B",
-    "review_status": "under_assessment",
-    "disputed": false,
-    "designation_authority": "Astrobotic / Proposed by map contributors",
-    "mission_status": "completed",
-    "event_date": "2024-01-18",
-    "legal_basis": "OST Article VI",
-    "legal_status_effect": "none",
-    "responsible_states": [
-      "USA"
-    ],
-    "authorizing_agency": "NASA via CLPS",
-    "authorization_id": "CLPS contract",
-    "authorization_date": null,
-    "supervision_status": "terminated",
-    "coordination_required": false,
-    "coordination_mechanism": null,
-    "dispute_parties": [],
-    "status_date": null
-  },
-  {
     "id": "beresheet",
     "name": "Beresheet (Israel, 2019 crash)",
     "lat": 32.6,
@@ -2503,7 +2462,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA GRAIL Operations",
-    "note": "Intentional mission end impacts near Sally Ride crater.",
+    "note": "Intentional mission end impacts near Sally Ride crater.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -2512,7 +2471,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "2012-12-17",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -2896,7 +2855,7 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ITU / International Radio Astronomy Community",
     "legal_basis": "ITU Radio Regulations Article 22.22",
-    "legal_status_effect": "binding (international)",
+    "legal_status_effect": "proposal",
     "responsible_states": [],
     "authorizing_agency": "ITU",
     "authorization_id": null,
@@ -3321,7 +3280,7 @@ export const FEATURES = [
       "political"
     ],
     "source": "NASA / NSSDC",
-    "note": "First US spacecraft to reach the lunar surface (far side). Navigation failure; no data returned.",
+    "note": "First US spacecraft to reach the lunar surface (far side). Navigation failure; no data returned.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "proposed_protected",
@@ -3330,7 +3289,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1962-04-26",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3361,7 +3320,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "Intentional impact in Mare Tranquillitatis. Cameras failed.",
+    "note": "Intentional impact in Mare Tranquillitatis. Cameras failed.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3370,7 +3329,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1964-02-02",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3401,7 +3360,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "Successful imaging impact in Mare Tranquillitatis, near future Apollo 11 site.",
+    "note": "Successful imaging impact in Mare Tranquillitatis, near future Apollo 11 site.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3410,7 +3369,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1965-02-20",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3441,7 +3400,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "Successful imaging impact inside Alphonsus crater.",
+    "note": "Successful imaging impact inside Alphonsus crater.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3450,7 +3409,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1965-03-24",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3682,7 +3641,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
-    "note": "Failed soft-landing attempt southeast of Copernicus.",
+    "note": "Failed soft-landing attempt southeast of Copernicus.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
@@ -3691,7 +3650,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1966-09-23",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3722,7 +3681,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA JPL Surveyor Documentation",
-    "note": "Contact lost shortly before touchdown in Sinus Medii; presumed hard impact.",
+    "note": "Contact lost shortly before touchdown in Sinus Medii; presumed hard impact.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
@@ -3731,7 +3690,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-07-17",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3762,7 +3721,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "First US lunar orbiter; intentionally de-orbited onto far side.",
+    "note": "First US lunar orbiter; intentionally de-orbited onto far side.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
@@ -3771,7 +3730,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1966-10-29",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3802,7 +3761,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "Intentionally de-orbited onto far side.",
+    "note": "Intentionally de-orbited onto far side.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
@@ -3811,7 +3770,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-10-11",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3842,7 +3801,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA / NSSDC",
-    "note": "Final Lunar Orbiter; intentionally de-orbited.",
+    "note": "Final Lunar Orbiter; intentionally de-orbited.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "B",
     "review_status": "under_assessment",
@@ -3851,7 +3810,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1968-01-31",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3882,7 +3841,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA Apollo Mission Reports / LRO imaging",
-    "note": "Saturn V third stage intentionally impacted for seismic experiments.",
+    "note": "Saturn V third stage intentionally impacted for seismic experiments.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3891,7 +3850,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1970-04-14",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3922,7 +3881,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA Apollo Mission Reports",
-    "note": "Saturn V third stage intentional impact for seismic data.",
+    "note": "Saturn V third stage intentional impact for seismic data.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3931,7 +3890,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1971-02-04",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -3962,7 +3921,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA Apollo Mission Reports / LRO",
-    "note": "Final Apollo S-IVB intentional impact for seismic experiments.",
+    "note": "Final Apollo S-IVB intentional impact for seismic experiments.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -3971,7 +3930,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1972-12-10",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -4044,7 +4003,7 @@ export const FEATURES = [
       "science_interest"
     ],
     "source": "NASA Lunar Prospector Mission Data",
-    "note": "Intentional polar impact into a permanently shadowed crater to search for water vapor.",
+    "note": "Intentional polar impact into a permanently shadowed crater to search for water vapor.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -4053,7 +4012,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1999-07-31",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
@@ -4164,7 +4123,7 @@ export const FEATURES = [
       "heritage"
     ],
     "source": "NASA LADEE Mission Data / LRO imaging",
-    "note": "Lunar Atmosphere and Dust Environment Explorer; controlled far-side impact.",
+    "note": "Lunar Atmosphere and Dust Environment Explorer; controlled far-side impact.; Application of U.S. One Small Step Act to crash/impact artifacts is legally untested",
     "date": "Pending",
     "evidence_grade": "A",
     "review_status": "proposed_protected",
@@ -4173,7 +4132,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "2014-04-18",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "binding (national, US)",
+    "legal_status_effect": "none",
     "responsible_states": [
       "USA"
     ],
