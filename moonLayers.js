@@ -3,8 +3,8 @@
 // Updated with OST Article VI State Responsibility data model & legal mechanism governance fields
 // New legal fields: legal_basis, legal_status_effect, responsible_states, authorizing_agency, authorization_id, authorization_date, supervision_status, coordination_required, coordination_mechanism, dispute_parties, status_date
 
-export const DATASET_VERSION = '2.2.1';
-export const SCHEMA_VERSION = '2.2.1';
+export const DATASET_VERSION = '2.2.2';
+export const SCHEMA_VERSION = '2.2.2';
 export const DATASET_DATE = '2026-09-06';
 
 export const STATE_DEFS = {
@@ -1014,7 +1014,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1969-07-20",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1055,7 +1055,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1969-11-19",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1096,7 +1096,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1971-02-05",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1137,7 +1137,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1971-07-30",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1178,7 +1178,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1972-04-21",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1219,7 +1219,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1972-12-11",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1339,7 +1339,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1966-06-02",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1379,7 +1379,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-04-20",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1419,7 +1419,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-09-11",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1459,7 +1459,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1967-11-10",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -1499,7 +1499,7 @@ export const FEATURES = [
     "mission_status": "completed",
     "event_date": "1968-01-10",
     "legal_basis": "U.S. One Small Step to Protect Human Heritage in Space Act (51 U.S.C. § 50901)",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (national, US)",
     "responsible_states": [
       "USA"
     ],
@@ -2855,7 +2855,7 @@ export const FEATURES = [
     "disputed": false,
     "designation_authority": "ITU / International Radio Astronomy Community",
     "legal_basis": "ITU Radio Regulations Article 22.22",
-    "legal_status_effect": "proposal",
+    "legal_status_effect": "binding (international)",
     "responsible_states": [],
     "authorizing_agency": "ITU",
     "authorization_id": null,
