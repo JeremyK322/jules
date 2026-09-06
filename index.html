@@ -2284,6 +2284,7 @@
                         opacity = 0.5;
                         useTexture = 'provisional';
                         break;
+                    case 'open':
                     case 'assessed_open':
                         color = '#94a3b8'; // Muted slate outline
                         opacity = 0.08; // Thin outline
@@ -2969,7 +2970,7 @@
                             } else if (feature.review_status === 'unassessed') {
                                 baseOp = 0.35;
                                 tex = createDashedRingTexture(color);
-                            } else if (feature.review_status === 'assessed_open') {
+                            } else if (feature.review_status === 'open' || feature.review_status === 'assessed_open') {
                                 baseOp = 0.3;
                             } else {
                                 baseOp = 0.5;
@@ -3523,6 +3524,8 @@
                     ? 'Proposed Protected'
                     : targetFeature.review_status === 'assessed_protected'
                     ? 'Assessed Protected'
+                    : targetFeature.review_status === 'open'
+                    ? 'Open'
                     : targetFeature.review_status === 'assessed_open'
                     ? 'Assessed Open'
                     : targetFeature.review_status === 'under_assessment'
