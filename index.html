@@ -1878,7 +1878,7 @@
             domeMesh.visible = !!site.show_dispersion;
 
             // Label
-            const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24, '(PLANNED)');
+            const labelTex = createLabelTexture(site.name + (site.tier ? ` [T${site.tier}]` : ''), 24, null);
             const labelMat = new THREE.SpriteMaterial({
                 map: labelTex,
                 transparent: true,
