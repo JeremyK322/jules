@@ -2366,10 +2366,11 @@
 
                 if (type === 'point') {
                     const featureRadiusKm = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const visualRadiusKm = Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM);
                     const pos = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS);
                     const targetNormal = pos.clone().normalize();
 
-                    const discGeo = createCurvedDiscGeometry(featureRadiusKm, 1.002);
+                    const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
                     const visualProps = getFeatureVisualProps(feature);
                     const discMatProps = {
                         color: new THREE.Color(visualProps.color),
@@ -2429,7 +2430,7 @@
                     const labelTex = createLabelTexture(feature.name, 30);
                     const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false, depthWrite: false, opacity: 0, sizeAttenuation: true });
                     labelSprite = new THREE.Sprite(labelMat);
-                    const labelHeight = 1.005 + (Math.max(featureRadiusKm, MIN_VISUAL_RADIUS_KM) / MOON_RADIUS_KM) * 0.2;
+                    const labelHeight = 1.005 + (visualRadiusKm / MOON_RADIUS_KM) * 0.15;
                     const labelPos = targetNormal.clone().multiplyScalar(labelHeight);
                     labelSprite.position.copy(labelPos);
                     labelSprite.scale.set(0.4, 0.1, 1);
@@ -2494,7 +2495,7 @@
 
                 let opFootprintMesh = null;
                 if (feature.tags && feature.tags.includes('operational_activity') && (feature.mission_status === 'planned' || feature.mission_status === 'active')) {
-                    const opRadKm = feature.operational_radius_km || (feature.radius_km * 1.5);
+                    const opRadKm = Math.max(feature.operational_radius_km || (feature.radius_km * 1.5), MIN_VISUAL_RADIUS_KM);
                     const opGeo = createCurvedDiscGeometry(opRadKm, 1.003);
                     const opMat = new THREE.MeshBasicMaterial({
                         color: new THREE.Color('#00ffcc'),
@@ -4037,23 +4038,6 @@ function copyText() {
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
                 const feature = FEATURES.find(f => f.id === key);
-
-                if (feature && entry.type === 'point') {
-                    const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
-                    const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
-                    const currentR = actualR + zoomProgress * (maxR - actualR);
-                    const scaleS = currentR / actualR;
-
-                    if (entry.discObject) {
-                        entry.discObject.scale.set(scaleS, scaleS, scaleS);
-                    }
-
-                    if (entry.label) {
-                        const targetNormal = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS).normalize();
-                        const labelHeight = 1.005 + (currentR / MOON_RADIUS_KM) * 0.2;
-                        entry.label.position.copy(targetNormal.multiplyScalar(labelHeight));
-                    }
-                }
 
                 if (entry.label) {
                     const isLabelVisible = featureActiveState.get(key) && showLabels;
