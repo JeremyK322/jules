@@ -968,7 +968,10 @@
               throw new Error('Invalid response from Claude API');
             }
 
-            const reply = data.content[0]?.text || '(no response from Claude)';
+            const reply = data.content[0]?.text?.trim();
+            if (!reply || reply === '(no response from Claude)') {
+              throw new Error('Claude returned an empty response.');
+            }
             return reply.replace(/^\s*\[\d{12}\]\s*/, '');
           } catch (error) {
             console.error('[Claude API Error]', error);
@@ -994,7 +997,10 @@
             throw new Error(errData.error?.message || `xAI API error ${res.status}`);
           }
           const data = await res.json();
-          let reply = data.choices?.[0]?.message?.content || '(no response from Grok)';
+          let reply = data.choices?.[0]?.message?.content?.trim();
+          if (!reply || reply === '(no response from Grok)') {
+            throw new Error('Grok returned an empty response.');
+          }
 
           const citations = data.choices?.[0]?.message?.citations || data.citations;
           if (citations && citations.length > 0) {
@@ -1051,7 +1057,11 @@
           throw new Error('Invalid response structure from DeepSeek API');
         }
 
-        let reply = data.choices[0].message.content || '(no response from DeepSeek)';
+        let reply = data.choices[0].message.content?.trim();
+        if (!reply || reply === '(no response from DeepSeek)') {
+          throw new Error('DeepSeek returned an empty response.');
+        }
+
         if (thinkingEnabled && data.choices[0].message.thinking) {
           reply = data.choices[0].message.thinking + '\n\n' + reply;
         }
@@ -1060,7 +1070,7 @@
       }
       window.callApi = callApi;
 
-      async function callApiWithRetry(messages, maxRetries = 1, modelOverride) {
+      async function callApiWithRetry(messages, maxRetries = 2, modelOverride) {
         let attempts = 0;
         let lastError = null;
         let activeMessages = [...messages];
@@ -1069,24 +1079,31 @@
           attempts++;
           try {
             const reply = await callApi(activeMessages, modelOverride);
-            if (reply && reply !== '(no response)' && !isNonAsciiHeavy(reply)) {
+            const isValid = reply &&
+                            reply.trim().length > 0 &&
+                            !reply.startsWith('(no response') &&
+                            !isNonAsciiHeavy(reply);
+            if (isValid) {
               return reply;
             }
+            lastError = new Error(reply || 'Empty or invalid API response.');
             if (attempts <= maxRetries) {
-              showToast(`⚠️ Non-English/invalid response on attempt ${attempts}. Retrying in English...`);
+              if (window.showToast) window.showToast(`⚠️ Empty/invalid response on attempt ${attempts}. Retrying...`);
+              if (window.setStatusMessage) window.setStatusMessage(`🔄 Retry ${attempts}/${maxRetries} — waiting for API...`);
               activeMessages = [
-                { role: 'system', content: '[System Instruction]: Critical rule violation. Respond in English only using standard Latin script.' },
+                { role: 'system', content: '[System Instruction]: Critical rule violation. Provide a clear, non-empty response in English.' },
                 ...messages
               ];
             }
           } catch (err) {
             lastError = err;
             if (attempts <= maxRetries) {
-              showToast(`⚠️ API error on attempt ${attempts}. Retrying stage...`);
+              if (window.showToast) window.showToast(`⚠️ API error on attempt ${attempts} (${err.message}). Retrying...`);
+              if (window.setStatusMessage) window.setStatusMessage(`🔄 Retry ${attempts}/${maxRetries} — ${err.message}...`);
             }
           }
         }
-        throw new Error(lastError ? lastError.message : 'API failed after 2 attempts.');
+        throw new Error(lastError ? lastError.message : `API failed after ${maxRetries + 1} attempts.`);
       }
       window.callApiWithRetry = callApiWithRetry;
 
@@ -1097,7 +1114,7 @@
           window.runDebateFlow(msg);
           return;
         }
-        waiting=true;window.waiting=true;sendBtn.disabled=true;chatInp.disabled=true;setStatusMessage('🔥 AI is thinking…');const originalMsg=msg.trim();const ts=getTimestamp();const stampedMsg=`[${ts}] ${originalMsg}`;if(!isRetry){const entry={timestamp:new Date().toISOString(),role:'user',content:stampedMsg};chatLog.push(entry);save('wc_chatLog',chatLog);appendBubble('user',originalMsg);chatInp.value='';scrollChat();}autoSave();const typing=showTyping();try{const{prompt:sys,truncatedCount}=buildSystemPrompt();const messages=[{role:'system',content:sys},...chatLog.map(e=>({role:e.role,content:e.content}))];if(isRetry){messages.unshift({role:'system',content:'[System: Reply in English only. Do not use Chinese characters.]'});}let totalPromptChars=sys.length;chatLog.forEach(e=>totalPromptChars+=e.content.length);const usedPercent=Math.round((totalPromptChars/MAX_CHARS)*100);let statusMsg=`📊 Context: ${totalPromptChars.toLocaleString()} / ${MAX_CHARS.toLocaleString()} chars (${usedPercent}%)`;if(truncatedCount>0)statusMsg+=` — ${truncatedCount} document(s) truncated`;setStatusMessage(statusMsg);let reply = await callApi(messages);removeTyping(typing);reply=reply.replace(/^\s*\[\d{12}\]\s*/,'');const{cleanedReply,actionsApplied}=processActions(reply);if(actionsApplied){appendSystemBubble('🤖 AI taking notes…');scrollChat();showToast('📝 Memory saved (visible after reset)');}if(!isRetry&&isNonAsciiHeavy(cleanedReply)){appendSystemBubble('⚠️ Technical difficulties — retrying in English…');scrollChat();setStatusMessage('🔄 Retrying in English…');waiting=false;window.waiting=false;sendBtn.disabled=false;chatInp.disabled=false;send(msg,true);return;}chatLog.push({timestamp:new Date().toISOString(),role:'assistant',content:reply});save('wc_chatLog',chatLog);appendBubble('assistant',cleanedReply);if(window.boostFire)window.boostFire(cleanedReply.length, cleanedReply);autoSave();}catch(e){removeTyping(typing);const err='⚠️ '+(e.message||'Error');chatLog.push({timestamp:new Date().toISOString(),role:'assistant',content:err});appendBubble('assistant',err,true);autoSave();}finally{waiting=false;window.waiting=false;sendBtn.disabled=false;chatInp.disabled=false;chatInp.focus();setStatusMessage('');}
+        waiting=true;window.waiting=true;sendBtn.disabled=true;chatInp.disabled=true;setStatusMessage('🔥 AI is thinking…');const originalMsg=msg.trim();const ts=getTimestamp();const stampedMsg=`[${ts}] ${originalMsg}`;if(!isRetry){const entry={timestamp:new Date().toISOString(),role:'user',content:stampedMsg};chatLog.push(entry);save('wc_chatLog',chatLog);appendBubble('user',originalMsg);chatInp.value='';scrollChat();}autoSave();const typing=showTyping();try{const{prompt:sys,truncatedCount}=buildSystemPrompt();const messages=[{role:'system',content:sys},...chatLog.map(e=>({role:e.role,content:e.content}))];if(isRetry){messages.unshift({role:'system',content:'[System: Reply in English only. Do not use Chinese characters.]'});}let totalPromptChars=sys.length;chatLog.forEach(e=>totalPromptChars+=e.content.length);const usedPercent=Math.round((totalPromptChars/MAX_CHARS)*100);let statusMsg=`📊 Context: ${totalPromptChars.toLocaleString()} / ${MAX_CHARS.toLocaleString()} chars (${usedPercent}%)`;if(truncatedCount>0)statusMsg+=` — ${truncatedCount} document(s) truncated`;setStatusMessage(statusMsg);let reply = await callApiWithRetry(messages, 2);removeTyping(typing);reply=reply.replace(/^\s*\[\d{12}\]\s*/,'');const{cleanedReply,actionsApplied}=processActions(reply);if(actionsApplied){appendSystemBubble('🤖 AI taking notes…');scrollChat();showToast('📝 Memory saved (visible after reset)');}if(!isRetry&&isNonAsciiHeavy(cleanedReply)){appendSystemBubble('⚠️ Technical difficulties — retrying in English…');scrollChat();setStatusMessage('🔄 Retrying in English…');waiting=false;window.waiting=false;sendBtn.disabled=false;chatInp.disabled=false;send(msg,true);return;}chatLog.push({timestamp:new Date().toISOString(),role:'assistant',content:reply});save('wc_chatLog',chatLog);appendBubble('assistant',cleanedReply);if(window.boostFire)window.boostFire(cleanedReply.length, cleanedReply);autoSave();}catch(e){removeTyping(typing);const err='⚠️ '+(e.message||'Error');chatLog.push({timestamp:new Date().toISOString(),role:'assistant',content:err});appendBubble('assistant',err,true);autoSave();}finally{waiting=false;window.waiting=false;sendBtn.disabled=false;chatInp.disabled=false;chatInp.focus();setStatusMessage('');}
       }
 
       function copyToClipboard(text, msg) {

@@ -233,7 +233,7 @@
           })
         ];
 
-        let mainReply = await window.callApiWithRetry(mainMsgs);
+        let mainReply = await window.callApiWithRetry(mainMsgs, 2);
         removeTyping(typingMain);
 
         let mainEndDebateSignaled = false;
@@ -320,7 +320,7 @@
           ...secondBrainLog.map(e => ({ role: e.role, content: e.content }))
         ];
 
-        let secondReply = await window.callApiWithRetry(secondMsgs, 1, window.secondBrainModel);
+        let secondReply = await window.callApiWithRetry(secondMsgs, 2, window.secondBrainModel);
         removeTyping(typingSecond);
 
         let secondStoppedForClarification = false;
