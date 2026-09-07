@@ -2371,6 +2371,7 @@
                     const targetNormal = pos.clone().normalize();
 
                     const discGeo = createCurvedDiscGeometry(visualRadiusKm, 1.002);
+                    const basePositions = discGeo.attributes.position.clone();
                     const visualProps = getFeatureVisualProps(feature);
                     const discMatProps = {
                         color: new THREE.Color(visualProps.color),
@@ -2528,7 +2529,9 @@
                     satellite: satelliteObj || null,
                     type,
                     tags: feature.tags || [],
-                    feature
+                    feature,
+                    basePositions: discObject && discObject.geometry ? discObject.geometry.attributes.position.clone() : null,
+                    lastFactor: 1.0
                 };
                 if (!featureActiveState.has(feature.id)) featureActiveState.set(feature.id, false);
                 if (!featureEnabledState.has(feature.id)) featureEnabledState.set(feature.id, true);
@@ -4038,6 +4041,46 @@ function copyText() {
             for (const key in featureObjects) {
                 const entry = featureObjects[key];
                 const feature = FEATURES.find(f => f.id === key);
+
+                if (feature && entry.type === 'point' && entry.discObject && entry.basePositions) {
+                    const actualR = feature.radius_km || DEFAULT_RADIUS_KM;
+                    const maxR = Math.max(actualR, MIN_VISUAL_RADIUS_KM);
+                    const currentR = actualR + zoomProgress * (maxR - actualR);
+                    const factor = currentR / maxR;
+
+                    if (Math.abs((entry.lastFactor || 1.0) - factor) > 0.001) {
+                        entry.lastFactor = factor;
+                        const posAttr = entry.discObject.geometry.attributes.position;
+                        const baseAttr = entry.basePositions;
+                        const count = posAttr.count;
+
+                        for (let i = 0; i < count; i++) {
+                            const x0 = baseAttr.getX(i);
+                            const y0 = baseAttr.getY(i);
+                            const z0 = baseAttr.getZ(i);
+
+                            const r_xz0 = Math.sqrt(x0 * x0 + z0 * z0);
+                            if (r_xz0 < 0.000001) {
+                                posAttr.setXYZ(i, 0, 1.002, 0);
+                            } else {
+                                const theta0 = Math.atan2(r_xz0, y0);
+                                const thetaNew = theta0 * factor;
+                                const sinNew = Math.sin(thetaNew);
+                                const cosNew = Math.cos(thetaNew);
+                                const scaleXZ = (1.002 * sinNew) / r_xz0;
+
+                                posAttr.setXYZ(i, x0 * scaleXZ, 1.002 * cosNew, z0 * scaleXZ);
+                            }
+                        }
+                        posAttr.needsUpdate = true;
+                    }
+
+                    if (entry.label) {
+                        const targetNormal = latLonToPosition(feature.lat, feature.lon, MOON_3D_RADIUS).normalize();
+                        const labelHeight = 1.005 + (currentR / MOON_RADIUS_KM) * 0.15;
+                        entry.label.position.copy(targetNormal.multiplyScalar(labelHeight));
+                    }
+                }
 
                 if (entry.label) {
                     const isLabelVisible = featureActiveState.get(key) && showLabels;
