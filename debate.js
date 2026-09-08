@@ -54,42 +54,6 @@
       if (chatC) chatC.innerHTML = '';
       if (window.restoreChatHistory) window.restoreChatHistory();
 
-      // Automatically synthesize debate summary when exiting debate mode
-      if (hadDebateEntries && window.hasActiveApiKeyForModel && window.hasActiveApiKeyForModel()) {
-        generateDebateSummary();
-      }
-    }
-  }
-
-  async function generateDebateSummary() {
-    if (!window.chatLog) return;
-    if (window.setStatusMessage) window.setStatusMessage('📊 Main Thread synthesising debate summary…');
-    try {
-      const summaryPrompt = "[System Request]: The debate session has concluded. Read the conversation above and provide a concise summary (1-2 short paragraphs) covering: 1) What was challenged by Second Brain, 2) What arguments held up, and 3) Key takeaways or decisions moving forward.";
-      const { prompt: baseSysPrompt } = window.buildSystemPrompt();
-      const messages = [
-        { role: 'system', content: baseSysPrompt },
-        ...window.chatLog.map(e => ({ role: e.role, content: e.content })),
-        { role: 'user', content: summaryPrompt }
-      ];
-
-      let summaryReply = await window.callApiWithRetry(messages, 2);
-      if (summaryReply) {
-        const { cleanedReply } = window.processActions(summaryReply);
-        const summaryEntry = {
-          timestamp: new Date().toISOString(),
-          role: 'assistant',
-          content: `📊 **Debate Summary:**\n\n${cleanedReply}`
-        };
-        window.chatLog.push(summaryEntry);
-        if (window.save) window.save('wc_chatLog', window.chatLog);
-        if (window.restoreChatHistory) window.restoreChatHistory();
-        if (window.autoSave) window.autoSave();
-      }
-    } catch (err) {
-      console.warn('[Debate Summary Warning]:', err.message);
-    } finally {
-      if (window.setStatusMessage) window.setStatusMessage('');
     }
   }
 
