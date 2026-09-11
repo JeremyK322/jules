@@ -685,7 +685,11 @@
       const API_ANTHROPIC = 'https://api.anthropic.com/v1/messages';
       const HARDCODED_API_KEY = '';
       let documents=[], chatLog=[], savedScenes=[], aiDocs=[], aiDocsArchive=[];
-      window.documents = documents; window.chatLog = chatLog; window.savedScenes = savedScenes; window.aiDocs = aiDocs; window.aiDocsArchive = aiDocsArchive;
+      Object.defineProperty(window, 'documents', { get: () => documents, set: (v) => { documents = v; } });
+      Object.defineProperty(window, 'chatLog', { get: () => chatLog, set: (v) => { chatLog = v; } });
+      Object.defineProperty(window, 'savedScenes', { get: () => savedScenes, set: (v) => { savedScenes = v; } });
+      Object.defineProperty(window, 'aiDocs', { get: () => aiDocs, set: (v) => { aiDocs = v; } });
+      Object.defineProperty(window, 'aiDocsArchive', { get: () => aiDocsArchive, set: (v) => { aiDocsArchive = v; } });
       let apiKey=HARDCODED_API_KEY; let xaiApiKey=''; let anthropicApiKey=''; let waiting=false, sessionCount=0, lastCategory='';
       window.waiting = waiting;
       let currentModel='deepseek-v4-flash'; let secondBrainModel='claude-haiku-4-5'; let thinkingEnabled=false; let webSearchEnabled=true; let currentTemp=0.8;
@@ -1219,7 +1223,6 @@
           savedScenes=load('wc_savedScenes',[]).map(s=>({...s,tag:s.tag||'draft'}));
           aiDocs=load('wc_aiDocs',[]).map(doc=>({...doc,type:doc.type||'memory',inPrompt:doc.inPrompt!==undefined?doc.inPrompt:true}));
           aiDocsArchive=load('wc_aiDocsArchive',[]);
-          window.documents = documents; window.chatLog = chatLog; window.savedScenes = savedScenes; window.aiDocs = aiDocs; window.aiDocsArchive = aiDocsArchive;
           sessionCount=load('wc_sessionCount',0)+1;save('wc_sessionCount',sessionCount);
           if(!load('wc_hasVisited',false))save('wc_hasVisited',true);
           lastCategory=load('wc_lastCategory','');
