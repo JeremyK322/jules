@@ -16,6 +16,21 @@
     if (directOverlay) directOverlay.style.display = 'flex';
   }
 
+  function importExistingMemories() {
+    const directInput = document.getElementById('directMemoryInput');
+    if (directInput) {
+      const formatted = formatWorkspaceForEditor();
+      directInput.value = formatted;
+      if (window.showToast) {
+        if (formatted) {
+          window.showToast('📥 Loaded all existing workspace memories into editor.');
+        } else {
+          window.showToast('⚠️ AI workspace is currently empty.');
+        }
+      }
+    }
+  }
+
   function closeDirectMemoryModal() {
     const directOverlay = document.getElementById('directMemoryOverlay');
     if (directOverlay) directOverlay.style.display = 'none';
@@ -87,6 +102,7 @@
     const btnCloseDirect = document.getElementById('btnCloseDirectMemory');
     const btnCancelDirect = document.getElementById('btnCancelDirectMemory');
     const btnCommitDirect = document.getElementById('btnCommitDirectMemory');
+    const btnImport = document.getElementById('btnImportMemories');
     const btnUndo = document.getElementById('btnUndoConsolidation');
     const directOverlay = document.getElementById('directMemoryOverlay');
 
@@ -94,6 +110,7 @@
     if (btnCloseDirect) btnCloseDirect.addEventListener('click', closeDirectMemoryModal);
     if (btnCancelDirect) btnCancelDirect.addEventListener('click', closeDirectMemoryModal);
     if (btnCommitDirect) btnCommitDirect.addEventListener('click', commitDirectMemoryReplace);
+    if (btnImport) btnImport.addEventListener('click', importExistingMemories);
     if (btnUndo) btnUndo.addEventListener('click', undoLastConsolidation);
     if (directOverlay) {
       directOverlay.addEventListener('click', (e) => {
@@ -108,4 +125,5 @@
   window.undoLastConsolidation = undoLastConsolidation;
   window.openDirectMemoryModal = openDirectMemoryModal;
   window.closeDirectMemoryModal = closeDirectMemoryModal;
+  window.importExistingMemories = importExistingMemories;
 })(window);
