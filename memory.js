@@ -18,17 +18,22 @@
 
   function importExistingMemories() {
     const directInput = document.getElementById('directMemoryInput');
+    const formatted = formatWorkspaceForEditor();
     if (directInput) {
-      const formatted = formatWorkspaceForEditor();
       directInput.value = formatted;
-      if (window.showToast) {
-        if (formatted) {
-          window.showToast('📥 Loaded all existing workspace memories into editor.');
-        } else {
-          window.showToast('⚠️ AI workspace is currently empty.');
-        }
+    }
+    if (window.showToast) {
+      if (formatted) {
+        window.showToast('📥 Loaded all existing workspace memories into editor.');
+      } else {
+        window.showToast('⚠️ AI workspace is currently empty.');
       }
     }
+  }
+
+  function openModalAndLoadMemories() {
+    openDirectMemoryModal();
+    importExistingMemories();
   }
 
   function closeDirectMemoryModal() {
@@ -99,6 +104,7 @@
     showUndoButtonIfArchive();
 
     const btnOpenDirect = document.getElementById('btnOpenDirectMemory');
+    const btnLoadSidebar = document.getElementById('btnLoadSidebarMemories');
     const btnCloseDirect = document.getElementById('btnCloseDirectMemory');
     const btnCancelDirect = document.getElementById('btnCancelDirectMemory');
     const btnCommitDirect = document.getElementById('btnCommitDirectMemory');
@@ -107,6 +113,7 @@
     const directOverlay = document.getElementById('directMemoryOverlay');
 
     if (btnOpenDirect) btnOpenDirect.addEventListener('click', openDirectMemoryModal);
+    if (btnLoadSidebar) btnLoadSidebar.addEventListener('click', openModalAndLoadMemories);
     if (btnCloseDirect) btnCloseDirect.addEventListener('click', closeDirectMemoryModal);
     if (btnCancelDirect) btnCancelDirect.addEventListener('click', closeDirectMemoryModal);
     if (btnCommitDirect) btnCommitDirect.addEventListener('click', commitDirectMemoryReplace);
@@ -126,4 +133,5 @@
   window.openDirectMemoryModal = openDirectMemoryModal;
   window.closeDirectMemoryModal = closeDirectMemoryModal;
   window.importExistingMemories = importExistingMemories;
+  window.openModalAndLoadMemories = openModalAndLoadMemories;
 })(window);
