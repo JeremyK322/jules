@@ -55,15 +55,20 @@
     window.aiDocsArchive.push([...(window.aiDocs || [])]);
     window.save('wc_aiDocsArchive', window.aiDocsArchive);
 
+    // Set all existing memories' inPrompt property to false
+    const updatedExisting = (window.aiDocs || []).map(d => ({ ...d, inPrompt: false }));
+
     const title = (directTitleInput ? directTitleInput.value.trim() : '') || 'Consolidated Permanent Memory';
-    window.aiDocs = [{
+    const newConsolidatedDoc = {
       id: 'ai_' + Date.now() + Math.random().toString(36),
       title,
       type: 'memory',
       content: pastedText,
       timestamp: new Date().toISOString(),
       inPrompt: true
-    }];
+    };
+
+    window.aiDocs = [...updatedExisting, newConsolidatedDoc];
 
     window.save('wc_aiDocs', window.aiDocs);
     if (window.renderAiWorkspace) window.renderAiWorkspace();
@@ -71,7 +76,7 @@
     if (window.autoSave) window.autoSave();
     showUndoButtonIfArchive();
     closeDirectMemoryModal();
-    if (window.showToast) window.showToast('Existing memories removed & replaced with pasted content!');
+    if (window.showToast) window.showToast('Previous memories archived (inPrompt: false) & new consolidated memory set to permanent!');
   }
 
   function showUndoButtonIfArchive() {
